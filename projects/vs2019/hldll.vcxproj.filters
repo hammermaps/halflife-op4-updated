@@ -54,9 +54,15 @@
     </Filter>
     <Filter Include="Source Files\dlls\ctf">
       <UniqueIdentifier>{a2593f6b-0415-4442-8232-2135c1979f29}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="Source Files\common">
       <UniqueIdentifier>{42fd860c-8851-42ea-81e1-ffda08a6174d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dlls\bs">
+      <UniqueIdentifier>{e1fdbe3f-fa83-40c4-95b1-3d727be1f5b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dlls\effects">
+      <UniqueIdentifier>{c2cd79ac-5614-4d88-afa4-eccb5574fcc6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -562,7 +568,7 @@
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\coopplay_gamerules.cpp">
-		<Filter>Source Files\dlls</Filter>
+      <Filter>Source Files\dlls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\UserMessages.cpp">
       <Filter>Source Files\dlls</Filter>
@@ -572,6 +578,18 @@
     </ClCompile>
     <ClCompile Include="..\..\dlls\weapons_shared.cpp">
       <Filter>Source Files\dlls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\bs\CItemArmorVest .cpp">
+      <Filter>Source Files\dlls\bs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\bs\CItemHelmet.cpp">
+      <Filter>Source Files\dlls\bs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\bs\CRosenberg.cpp">
+      <Filter>Source Files\dlls\bs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\bs\CWarpBall.cpp">
+      <Filter>Source Files\dlls\bs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -828,7 +846,7 @@
       <Filter>Header Files\dlls\weapons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\coopplay_gamerules.h">
-		<Filter>Header Files\dlls</Filter>
+      <Filter>Header Files\dlls</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\UserMessages.h">
       <Filter>Header Files\dlls</Filter>
@@ -949,6 +967,21 @@
     </ClInclude>
     <ClInclude Include="..\..\common\winsani_out.h">
       <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\bs\CItemArmorVest.h">
+      <Filter>Source Files\dlls\bs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\bs\CItemHelmet.h">
+      <Filter>Source Files\dlls\bs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\bs\CRosenberg.h">
+      <Filter>Source Files\dlls\bs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\bs\CWarpBall.h">
+      <Filter>Source Files\dlls\bs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\effects\CLightning.h">
+      <Filter>Source Files\dlls\effects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

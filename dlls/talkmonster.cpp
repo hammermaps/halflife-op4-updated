@@ -53,10 +53,12 @@ IMPLEMENT_SAVERESTORE( CTalkMonster, CBaseMonster );
 const char *CTalkMonster::m_szFriends[TLK_CFRIENDS] = 
 {
 	"monster_barney",
+	"monster_otis",
 	"monster_scientist",
+	"monster_rosenberg",
 	"monster_sitting_scientist",
+	"monster_cleansuit_scientist",
 };
-
 
 //=========================================================
 // AI Schedules Specific to talking monsters

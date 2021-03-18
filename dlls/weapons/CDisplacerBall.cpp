@@ -48,6 +48,7 @@ const char* const displace[] =
 	"monster_alien_controller",
 	"monster_alien_slave",
 	"monster_barney",
+	"monster_rosenberg",
 	"monster_bullchicken",
 	"monster_cleansuit_scientist",
 	"monster_houndeye",

@@ -2445,32 +2445,79 @@ void CTriggerCamera::Move()
 class CTriggerPlayerFreeze : public CBaseDelay
 {
 public:
+	static	TYPEDESCRIPTION m_SaveData[];
+
+	int Save(CSave& save) override;
+	int Restore(CRestore& restore) override;
+
 	void Spawn() override;
 
-	void Use( CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value ) override;
+	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) override;
+
+	void EXPORT PlayerFreezeDelay();
 
 public:
-	bool m_bUnFrozen;
+	BOOL m_bUnFrozen;
 };
 
-LINK_ENTITY_TO_CLASS( trigger_playerfreeze, CTriggerPlayerFreeze );
+TYPEDESCRIPTION	CTriggerPlayerFreeze::m_SaveData[] =
+{
+	DEFINE_FIELD(CTriggerPlayerFreeze, m_bUnFrozen, FIELD_BOOLEAN),
+};
+
+LINK_ENTITY_TO_CLASS(trigger_playerfreeze, CTriggerPlayerFreeze);
+
+int CTriggerPlayerFreeze::Save(CSave& save)
+{
+	if (!CBaseDelay::Save(save))
+		return false;
+
+	return save.WriteFields("CTriggerPlayerFreeze", this, m_SaveData, ARRAYSIZE(m_SaveData));
+}
+
+int CTriggerPlayerFreeze::Restore(CRestore& restore)
+{
+	if (!CBaseDelay::Restore(restore))
+		return false;
+
+	if (!restore.ReadFields("CTriggerPlayerFreeze", this, m_SaveData, ARRAYSIZE(m_SaveData)))
+		return false;
+
+	if (m_bUnFrozen)
+	{
+		SetThink(&CTriggerPlayerFreeze::PlayerFreezeDelay);
+		pev->nextthink = gpGlobals->time + 0.5;
+	}
+
+	return true;
+}
 
 void CTriggerPlayerFreeze::Spawn()
 {
-	if( g_pGameRules->IsDeathmatch() )
-		REMOVE_ENTITY( edict() );
+	if (g_pGameRules->IsDeathmatch())
+		REMOVE_ENTITY(edict());
 	else
 		m_bUnFrozen = true;
 }
 
-void CTriggerPlayerFreeze::Use( CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value )
+void CTriggerPlayerFreeze::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
 	m_bUnFrozen = !m_bUnFrozen;
 
 	//TODO: not made for multiplayer
-	auto pPlayer = GetClassPtr( ( CBasePlayer* ) &g_engfuncs.pfnPEntityOfEntIndex( 1 )->v );
+	auto pPlayer = GetClassPtr((CBasePlayer*)&g_engfuncs.pfnPEntityOfEntIndex(1)->v);
 
-	pPlayer->EnableControl( m_bUnFrozen );
+	pPlayer->EnableControl(m_bUnFrozen);
+}
+
+void CTriggerPlayerFreeze::PlayerFreezeDelay()
+{
+	auto player = static_cast<CBasePlayer*>(UTIL_PlayerByIndex(1));
+
+	if (player)
+		player->EnableControl(m_bUnFrozen);
+
+	SetThink(nullptr);
 }
 
 /**

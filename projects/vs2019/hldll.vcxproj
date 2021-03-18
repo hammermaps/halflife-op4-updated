@@ -119,6 +119,10 @@
     <ClCompile Include="..\..\dlls\bloater.cpp" />
     <ClCompile Include="..\..\dlls\blowercannon.cpp" />
     <ClCompile Include="..\..\dlls\bmodels.cpp" />
+    <ClCompile Include="..\..\dlls\bs\CItemArmorVest .cpp" />
+    <ClCompile Include="..\..\dlls\bs\CItemHelmet.cpp" />
+    <ClCompile Include="..\..\dlls\bs\CRosenberg.cpp" />
+    <ClCompile Include="..\..\dlls\bs\CWarpBall.cpp" />
     <ClCompile Include="..\..\dlls\bullsquid.cpp" />
     <ClCompile Include="..\..\dlls\buttons.cpp" />
     <ClCompile Include="..\..\dlls\cbase.cpp" />
@@ -313,6 +317,10 @@
     <ClInclude Include="..\..\dlls\activitymap.h" />
     <ClInclude Include="..\..\dlls\animation.h" />
     <ClInclude Include="..\..\dlls\basemonster.h" />
+    <ClInclude Include="..\..\dlls\bs\CItemArmorVest.h" />
+    <ClInclude Include="..\..\dlls\bs\CItemHelmet.h" />
+    <ClInclude Include="..\..\dlls\bs\CRosenberg.h" />
+    <ClInclude Include="..\..\dlls\bs\CWarpBall.h" />
     <ClInclude Include="..\..\dlls\cbase.h" />
     <ClInclude Include="..\..\dlls\cdll_dll.h" />
     <ClInclude Include="..\..\dlls\client.h" />
@@ -338,6 +346,7 @@
     <ClInclude Include="..\..\dlls\defaultai.h" />
     <ClInclude Include="..\..\dlls\doors.h" />
     <ClInclude Include="..\..\dlls\effects.h" />
+    <ClInclude Include="..\..\dlls\effects\CLightning.h" />
     <ClInclude Include="..\..\dlls\enginecallback.h" />
     <ClInclude Include="..\..\dlls\explode.h" />
     <ClInclude Include="..\..\dlls\extdll.h" />
