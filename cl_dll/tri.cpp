@@ -20,6 +20,12 @@
 
 #include "particleman.h"
 #include "tri.h"
+#include "particle_header.h"
+#include <windows.h>
+#include <gl/gl.h>
+#include <gl/glaux.h>
+
+class CException;
 extern IParticleMan *g_pParticleMan;
 
 /*
@@ -36,10 +42,6 @@ void DLLEXPORT HUD_DrawNormalTriangles()
 	gHUD.m_Spectator.DrawOverview();
 }
 
-#if defined( _TFC )
-void RunEventList();
-#endif
-
 /*
 =================
 HUD_DrawTransparentTriangles
@@ -51,9 +53,15 @@ void DLLEXPORT HUD_DrawTransparentTriangles()
 {
 //	RecClDrawTransparentTriangles();
 
-#if defined( _TFC )
-	RunEventList();
-#endif
+	try {
+		pParticleManager->UpdateSystems();
+	}
+	catch (CException* e) {
+		e = nullptr;
+		gEngfuncs.Con_Printf("There was a serious error within the particle engine. Particles will return on map change\n");
+		delete pParticleManager;
+		pParticleManager = nullptr;
+	}
 
 	if ( g_pParticleMan )
 		 g_pParticleMan->Update();

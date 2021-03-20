@@ -212,6 +212,7 @@ const char *CBreakable::pSoundsGlass[] =
 	"debris/glass1.wav",
 	"debris/glass2.wav",
 	"debris/glass3.wav",
+	"debris/glass4.wav",
 };
 
 const char **CBreakable::MaterialSoundList( Materials precacheMaterial, int &soundCount )
@@ -384,7 +385,8 @@ void CBreakable::DamageSound()
 		rgpsz[0] = "debris/glass1.wav";
 		rgpsz[1] = "debris/glass2.wav";
 		rgpsz[2] = "debris/glass3.wav";
-		i = 3;
+		rgpsz[3] = "debris/glass3.wav";
+		i = 4;
 		break;
 
 	case matWood:

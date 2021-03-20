@@ -626,6 +626,8 @@ public:
 	int MsgFunc_SetMenuTeam( const char *pszName, int iSize, void *pbuf );
 	int MsgFunc_StatsInfo(const char* pszName, int iSize, void* pbuf);
 	int MsgFunc_StatsPlayer(const char* pszName, int iSize, void* pbuf);
+	int MsgFunc_Particles(const char* pszName, int iSize, void* pbuf);
+	int MsgFunc_Grass(const char* pszName, int iSize, void* pbuf);
 
 	// Input
 	bool SlotInput( int iSlot );

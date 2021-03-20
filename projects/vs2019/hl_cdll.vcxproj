@@ -60,14 +60,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>OPFOR;WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\dlls;..\..\cl_dll;..\..\public;..\..\common;..\..\pm_shared;..\..\engine;..\..\utils\vgui\include;..\..\game_shared;..\..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dlls;..\..\cl_dll;..\..\public;..\..\common;..\..\pm_shared;..\..\engine;..\..\utils\vgui\include;..\..\game_shared;..\..\external;..\..\cl_dll\particles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;OpenGL32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
     </Link>
@@ -142,6 +142,14 @@
     <ClCompile Include="..\..\cl_dll\in_camera.cpp" />
     <ClCompile Include="..\..\cl_dll\menu.cpp" />
     <ClCompile Include="..\..\cl_dll\message.cpp" />
+    <ClCompile Include="..\..\cl_dll\particles\grass_particle.cpp" />
+    <ClCompile Include="..\..\cl_dll\particles\grass_particles.cpp" />
+    <ClCompile Include="..\..\cl_dll\particles\mapped_particle.cpp" />
+    <ClCompile Include="..\..\cl_dll\particles\mapped_particles.cpp" />
+    <ClCompile Include="..\..\cl_dll\particles\particle.cpp" />
+    <ClCompile Include="..\..\cl_dll\particles\particle_systems.cpp" />
+    <ClCompile Include="..\..\cl_dll\particles\system_manager.cpp" />
+    <ClCompile Include="..\..\cl_dll\particles\tga_loader.cpp" />
     <ClCompile Include="..\..\cl_dll\saytext.cpp" />
     <ClCompile Include="..\..\cl_dll\scoreboard.cpp" />
     <ClCompile Include="..\..\cl_dll\statusbar.cpp" />
@@ -223,6 +231,11 @@
     <ClInclude Include="..\..\cl_dll\interpolation.h" />
     <ClInclude Include="..\..\cl_dll\in_defs.h" />
     <ClInclude Include="..\..\cl_dll\kbutton.h" />
+    <ClInclude Include="..\..\cl_dll\particles\particle.h" />
+    <ClInclude Include="..\..\cl_dll\particles\particle_header.h" />
+    <ClInclude Include="..\..\cl_dll\particles\particle_systems.h" />
+    <ClInclude Include="..\..\cl_dll\particles\particle_texture.h" />
+    <ClInclude Include="..\..\cl_dll\particles\system_manager.h" />
     <ClInclude Include="..\..\cl_dll\StudioModelRenderer.h" />
     <ClInclude Include="..\..\cl_dll\tri.h" />
     <ClInclude Include="..\..\cl_dll\vgui_int.h" />

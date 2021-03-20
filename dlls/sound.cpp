@@ -1728,10 +1728,18 @@ float TEXTURETYPE_PlaySound(TraceResult *ptr,  Vector vecSrc, Vector vecEnd, int
 		cnt = 4;
 		break;
 	case CHAR_TEX_WOOD: fvol = 0.9; fvolbar = 0.2;
-		rgsz[0] = "debris/wood1.wav";
-		rgsz[1] = "debris/wood2.wav";
-		rgsz[2] = "debris/wood3.wav";
-		cnt = 3;
+		rgsz[0] = "player/pl_wood1.wav";
+		rgsz[1] = "player/pl_wood2.wav";
+		rgsz[2] = "player/pl_wood3.wav";
+		rgsz[3] = "player/pl_wood4.wav";
+		cnt = 4;
+		break;
+	case CHAR_TEX_SNOW: fvol = 0.9; fvolbar = 0.2;
+		rgsz[0] = "player/pl_snow1.wav";
+		rgsz[1] = "player/pl_snow2.wav";
+		rgsz[2] = "player/pl_snow3.wav";
+		rgsz[3] = "player/pl_snow4.wav";
+		cnt = 4;
 		break;
 	case CHAR_TEX_GLASS:
 	case CHAR_TEX_COMPUTER:
@@ -1739,7 +1747,8 @@ float TEXTURETYPE_PlaySound(TraceResult *ptr,  Vector vecSrc, Vector vecEnd, int
 		rgsz[0] = "debris/glass1.wav";
 		rgsz[1] = "debris/glass2.wav";
 		rgsz[2] = "debris/glass3.wav";
-		cnt = 3;
+		rgsz[3] = "debris/glass3.wav";
+		cnt = 4;
 		break;
 	case CHAR_TEX_FLESH:
 		if (iBulletType == BULLET_PLAYER_CROWBAR)

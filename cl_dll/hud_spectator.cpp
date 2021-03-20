@@ -1420,8 +1420,8 @@ void CHudSpectator::LoadMapSprites()
 
 void CHudSpectator::DrawOverviewLayer()
 {
-	float screenaspect, xs, ys, xStep, yStep, x,y,z;
-	int ix,iy,i,xTiles,yTiles,frame;
+	float xs, ys, xStep, yStep, x,y,z;
+	int ix,iy,i,xTiles,yTiles;
 
 	qboolean	hasMapImage = m_MapSprite?TRUE:FALSE;
 	model_t *   dummySprite = (struct model_s *)gEngfuncs.GetSpritePointer( m_hsprUnkownMap);
@@ -1440,7 +1440,7 @@ void CHudSpectator::DrawOverviewLayer()
 	}
 
 
-	screenaspect = 4.0f/3.0f;	
+	float screenaspect = 4.0f / 3.0f;	
 
 
 	xs = m_OverviewData.origin[0];
@@ -1454,7 +1454,7 @@ void CHudSpectator::DrawOverviewLayer()
 	gEngfuncs.pTriAPI->CullFace( TRI_NONE );
 	gEngfuncs.pTriAPI->Color4f( 1.0, 1.0, 1.0, 1.0 );
 
-	frame = 0;
+	int frame = 0;
 	
 
 	// rotated view ?

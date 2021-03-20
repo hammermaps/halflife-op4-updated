@@ -29,6 +29,7 @@
 #include "demo.h"
 #include "demo_api.h"
 #include "vgui_ScorePanel.h"
+#include "particle_header.h"
 
 hud_player_info_t	 g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
@@ -324,9 +325,29 @@ int __MsgFunc_StatsPlayer(const char* pszName, int iSize, void* pbuf)
 	return 0;
 }
 
+//BP - ParticleEmitter
+int __MsgFunc_Particles(const char* pszName, int iSize, void* pbuf)
+{
+	if (gViewPort)
+		return gViewPort->MsgFunc_Particles(pszName, iSize, pbuf);
+	return 0;
+}
+
+//BP - Grass
+int __MsgFunc_Grass(const char* pszName, int iSize, void* pbuf)
+{
+	if (gViewPort)
+		return gViewPort->MsgFunc_Grass(pszName, iSize, pbuf);
+	return 0;
+}
+
 // This is called every time the DLL is loaded
 void CHud :: Init()
 {
+	//BP ParticleEmitter
+	HOOK_MESSAGE(Particles);
+	HOOK_MESSAGE(Grass);
+	
 	HOOK_MESSAGE( Logo );
 	HOOK_MESSAGE( ResetHUD );
 	HOOK_MESSAGE( GameMode );
@@ -388,6 +409,11 @@ void CHud :: Init()
 	cl_rollspeed = CVAR_CREATE("cl_rollspeed", "200", FCVAR_ARCHIVE);
 	cl_bobtilt = CVAR_CREATE("cl_bobtilt", "0", FCVAR_ARCHIVE);
 
+	g_ParticleCount = CVAR_CREATE("cl_particlecount", "100", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
+	g_ParticleDebug = CVAR_CREATE("cl_particledebug", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
+	g_ParticleSorts = CVAR_CREATE("cl_particlesorts", "3", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_grassamount", "100", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
+
 	m_pSpriteList = NULL;
 
 	// Clear any old HUD list
@@ -434,6 +460,8 @@ void CHud :: Init()
 // cleans up memory allocated for m_rg* arrays
 CHud :: ~CHud()
 {
+	delete pParticleManager;
+	pParticleManager = nullptr;
 	delete [] m_rghSprites;
 	delete [] m_rgrcRects;
 	delete [] m_rgszSpriteNames;
@@ -572,6 +600,12 @@ void CHud :: VidInit()
 	m_FlagIcons.VidInit();
 	m_PlayerBrowse.VidInit();
 	GetClientVoiceMgr()->VidInit();
+
+	if (pParticleManager)
+		delete pParticleManager;
+	
+	pParticleManager = new CParticleSystemManager;
+	pParticleManager->PrecacheTextures();
 }
 
 int CHud::MsgFunc_Logo(const char *pszName,  int iSize, void *pbuf)

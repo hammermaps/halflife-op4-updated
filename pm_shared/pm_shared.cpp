@@ -43,6 +43,7 @@ static int pm_shared_initialized = 0;
 typedef enum {mod_brush, mod_sprite, mod_alias, mod_studio} modtype_t;
 
 playermove_t *pmove = NULL;
+Vector flPlayerOrigin;
 
 typedef struct
 {
@@ -90,6 +91,8 @@ typedef struct hull_s
 #define CHAR_TEX_COMPUTER	'P'
 #define CHAR_TEX_GLASS		'Y'
 #define CHAR_TEX_FLESH		'F'
+#define CHAR_TEX_SNOW		'O'
+#define CHAR_TEX_ORGANIC	'N'
 
 #define STEP_CONCRETE	0		// default step sound
 #define STEP_METAL		1		// metal floor
@@ -100,6 +103,9 @@ typedef struct hull_s
 #define STEP_SLOSH		6		// shallow liquid puddle
 #define STEP_WADE		7		// wading in liquid
 #define STEP_LADDER		8		// climbing ladder
+#define STEP_SNOW		9		// snow
+#define STEP_WOOD		10		// wood
+#define STEP_ORGANIC	11		// organic
 
 #define PLAYER_FATAL_FALL_SPEED		1024// approx 60 feet
 #define PLAYER_MAX_SAFE_FALL_SPEED	580// approx 20 feet
@@ -113,6 +119,7 @@ typedef struct hull_s
 
 // double to float warning
 #pragma warning(disable : 4244)
+
 // up / down
 #define	PITCH	0
 // left / right
@@ -423,8 +430,41 @@ void PM_PlayStepSound( int step, float fvol )
 		case 3:	pmove->PM_PlaySound( CHAN_BODY, "player/pl_ladder4.wav", fvol, ATTN_NORM, 0, PITCH_NORM );	break;
 		}
 		break;
+	case STEP_SNOW:
+		switch (irand)
+		{
+			// right foot
+		case 0:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_snow1.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		case 1:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_snow3.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+			// left foot
+		case 2:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_snow2.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		case 3:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_snow4.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		}
+		break;
+	case STEP_WOOD:
+		switch (irand)
+		{
+			// right foot
+		case 0:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_wood1.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		case 1:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_wood3.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+			// left foot
+		case 2:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_wood2.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		case 3:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_wood4.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		}
+		break;
+	case STEP_ORGANIC:
+		switch (irand)
+		{
+			// right foot
+		case 0:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_organic1.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		case 1:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_organic3.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+			// left foot
+		case 2:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_organic2.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		case 3:	pmove->PM_PlaySound(CHAN_BODY, "player/pl_organic4.wav", fvol, ATTN_NORM, 0, PITCH_NORM);	break;
+		}
+		break;
 	}
-}	
+}
 
 int PM_MapTextureTypeStepType(char chTextureType)
 {
@@ -438,6 +478,9 @@ int PM_MapTextureTypeStepType(char chTextureType)
 		case CHAR_TEX_GRATE: return STEP_GRATE;	
 		case CHAR_TEX_TILE: return STEP_TILE;
 		case CHAR_TEX_SLOSH: return STEP_SLOSH;
+		case CHAR_TEX_SNOW: return STEP_SNOW;
+		case CHAR_TEX_WOOD: return STEP_WOOD;
+		case CHAR_TEX_ORGANIC: return STEP_ORGANIC;
 	}
 }
 
@@ -2957,6 +3000,7 @@ void PM_PlayerMove ( qboolean server )
 	{
 		PM_SpectatorMove();
 		PM_CatagorizePosition();
+		VectorCopy(pmove->origin, flPlayerOrigin);
 		return;
 	}
 
@@ -3184,6 +3228,8 @@ void PM_PlayerMove ( qboolean server )
 		PM_PlayWaterSounds();
 		break;
 	}
+
+	VectorCopy(pmove->origin, flPlayerOrigin);
 }
 
 void PM_CreateStuckTable()
