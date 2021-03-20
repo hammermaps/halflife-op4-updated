@@ -424,6 +424,8 @@ void W_Precache()
 	// used by explosions
 	PRECACHE_MODEL ("models/grenade.mdl");
 	PRECACHE_MODEL ("sprites/explode1.spr");
+	PRECACHE_MODEL("sprites/wallsmoke.spr");
+	PRECACHE_MODEL("sprites/metal_glow.spr");
 
 	PRECACHE_SOUND ("weapons/debris1.wav");// explosion aftermaths
 	PRECACHE_SOUND ("weapons/debris2.wav");// explosion aftermaths
@@ -437,7 +439,6 @@ void W_Precache()
 	PRECACHE_SOUND ("weapons/bullet_hit2.wav");	// hit by bullet
 	
 	PRECACHE_SOUND ("items/weapondrop1.wav");// weapon falls to the ground
-
 }
 
 

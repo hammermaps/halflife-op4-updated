@@ -78,11 +78,9 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 	VectorAngles(pTrace->plane.normal, angles);
 	AngleVectors(angles, forward, up, right);
 	forward.z = -forward.z;
-	int m_iMetalGlow;
 	int contents = gEngfuncs.PM_PointContents(pTrace->endpos, NULL);
 
-	m_iMetalGlow = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/metal_glow.spr");
-	int iWallsmoke = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/wallsmoke.spr");
+	int m_iMetalGlow = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/metal_glow.spr");
 
 	// get entity at endpoint
 	physent_t* pe = gEngfuncs.pEventAPI->EV_GetPhysent(pTrace->ent);
