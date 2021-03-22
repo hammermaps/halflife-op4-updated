@@ -591,6 +591,12 @@
     <ClCompile Include="..\..\dlls\bs\CWarpBall.cpp">
       <Filter>Source Files\dlls\bs</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\effects\CFuncGrass.cpp">
+      <Filter>Source Files\dlls\effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\effects\CParticleEmitter.cpp">
+      <Filter>Source Files\dlls\effects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\doors.h">
@@ -981,6 +987,12 @@
       <Filter>Source Files\dlls\bs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\effects\CLightning.h">
+      <Filter>Source Files\dlls\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\effects\CFuncGrass.h">
+      <Filter>Source Files\dlls\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\effects\CParticleEmitter.h">
       <Filter>Source Files\dlls\effects</Filter>
     </ClInclude>
   </ItemGroup>

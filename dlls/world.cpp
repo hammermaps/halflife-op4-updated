@@ -566,6 +566,19 @@ void CWorld :: Precache()
 	PRECACHE_SOUND ("weapons/ric3.wav");
 	PRECACHE_SOUND ("weapons/ric4.wav");
 	PRECACHE_SOUND ("weapons/ric5.wav");
+
+	PRECACHE_SOUND("explosions/explode1.wav");
+	PRECACHE_SOUND("explosions/explode2.wav");
+	PRECACHE_SOUND("explosions/explode3.wav");
+	PRECACHE_SOUND("explosions/explode4.wav");
+	PRECACHE_SOUND("explosions/explode5.wav");
+
+	PRECACHE_SOUND("explosions/explode_dist1.wav");
+	PRECACHE_SOUND("explosions/explode_dist2.wav");
+	PRECACHE_SOUND("explosions/explode_dist3.wav");
+
+	PRECACHE_SOUND("explosions/underwater_explode3.wav");
+	PRECACHE_SOUND("explosions/underwater_explode4.wav");
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
 //

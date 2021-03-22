@@ -25,6 +25,9 @@
 #include "decals.h"
 #include "explode.h"
 
+#include "effects.h"
+#include "weapons.h"
+
 // Spark Shower
 class CShower : public CBaseEntity
 {
@@ -210,6 +213,8 @@ void CEnvExplosion::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 			WRITE_BYTE( TE_EXPLFLAG_NONE );
 		MESSAGE_END();
 	}
+
+	UTIL_ScreenShake(pev->origin, 12.0, 100.0, 2.0, 700);
 
 	// do damage
 	if ( !( pev->spawnflags & SF_ENVEXPLOSION_NODAMAGE ) )

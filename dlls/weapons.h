@@ -440,6 +440,11 @@ extern DLL_GLOBAL	short	g_sModelIndexWExplosion;// holds the index for the under
 extern DLL_GLOBAL	short	g_sModelIndexBubbles;// holds the index for the bubbles model
 extern DLL_GLOBAL	short	g_sModelIndexBloodDrop;// holds the sprite index for blood drops
 extern DLL_GLOBAL	short	g_sModelIndexBloodSpray;// holds the sprite index for blood spray (bigger)
+extern DLL_GLOBAL 	unsigned short 	m_usEffects;//special effects event (rocket trail, explosion e.t.c.)
+
+extern DLL_GLOBAL	short	g_sModelIndexFireball2;// holds the index for the fireball
+extern DLL_GLOBAL	short	g_sModelIndexFireball3;// holds the index for the fireball
+extern DLL_GLOBAL	short	g_sModelIndexFireballEnd;// holds the index for the fireball
 
 extern void ClearMultiDamage();
 extern void ApplyMultiDamage(entvars_t* pevInflictor, entvars_t* pevAttacker );

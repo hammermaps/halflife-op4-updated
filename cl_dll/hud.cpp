@@ -325,7 +325,6 @@ int __MsgFunc_StatsPlayer(const char* pszName, int iSize, void* pbuf)
 	return 0;
 }
 
-//BP - ParticleEmitter
 int __MsgFunc_Particles(const char* pszName, int iSize, void* pbuf)
 {
 	if (gViewPort)
@@ -333,7 +332,6 @@ int __MsgFunc_Particles(const char* pszName, int iSize, void* pbuf)
 	return 0;
 }
 
-//BP - Grass
 int __MsgFunc_Grass(const char* pszName, int iSize, void* pbuf)
 {
 	if (gViewPort)

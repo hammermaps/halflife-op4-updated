@@ -154,6 +154,8 @@
     <ClCompile Include="..\..\dlls\defaultai.cpp" />
     <ClCompile Include="..\..\dlls\doors.cpp" />
     <ClCompile Include="..\..\dlls\effects.cpp" />
+    <ClCompile Include="..\..\dlls\effects\CFuncGrass.cpp" />
+    <ClCompile Include="..\..\dlls\effects\CParticleEmitter.cpp" />
     <ClCompile Include="..\..\dlls\egon.cpp" />
     <ClCompile Include="..\..\dlls\ehandle.cpp" />
     <ClCompile Include="..\..\dlls\explode.cpp" />
@@ -346,7 +348,9 @@
     <ClInclude Include="..\..\dlls\defaultai.h" />
     <ClInclude Include="..\..\dlls\doors.h" />
     <ClInclude Include="..\..\dlls\effects.h" />
+    <ClInclude Include="..\..\dlls\effects\CFuncGrass.h" />
     <ClInclude Include="..\..\dlls\effects\CLightning.h" />
+    <ClInclude Include="..\..\dlls\effects\CParticleEmitter.h" />
     <ClInclude Include="..\..\dlls\enginecallback.h" />
     <ClInclude Include="..\..\dlls\explode.h" />
     <ClInclude Include="..\..\dlls\extdll.h" />

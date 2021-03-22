@@ -1,31 +1,31 @@
 /*
-    Copyright 2001 to 2004. The Battle Grounds Team and Contributors
+	Copyright 2001 to 2004. The Battle Grounds Team and Contributors
 
-    This file is part of the Battle Grounds Modification for Half-Life.
+	This file is part of the Battle Grounds Modification for Half-Life.
 
-    The Battle Grounds Modification for Half-Life is free software;
-    you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.
+	The Battle Grounds Modification for Half-Life is free software;
+	you can redistribute it and/or modify it under the terms of the
+	GNU Lesser General Public License as published by the Free
+	Software Foundation; either version 2.1 of the License, or
+	(at your option) any later version.
 
-    The Battle Grounds Modification for Half-Life is distributed in
-    the hope that it will be useful, but WITHOUT ANY WARRANTY; without
-    even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-    PARTICULAR PURPOSE.  See the GNU Lesser General Public License
-    for more details.
+	The Battle Grounds Modification for Half-Life is distributed in
+	the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+	even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+	PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+	for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with The Battle Grounds Modification for Half-Life;
-    if not, write to the Free Software Foundation, Inc., 59 Temple Place,
-    Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with The Battle Grounds Modification for Half-Life;
+	if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+	Suite 330, Boston, MA  02111-1307  USA
 
-    You must obey the GNU Lesser General Public License in all respects for
-    all of the code used other than code distributed with the Half-Life
-    SDK developed by Valve.  If you modify this file, you may extend this
-    exception to your version of the file, but you are not obligated to do so.
-    If you do not wish to do so, delete this exception statement from your
-    version.
+	You must obey the GNU Lesser General Public License in all respects for
+	all of the code used other than code distributed with the Half-Life
+	SDK developed by Valve.  If you modify this file, you may extend this
+	exception to your version of the file, but you are not obligated to do so.
+	If you do not wish to do so, delete this exception statement from your
+	version.
 */
 
 // definition of the particle system manager
@@ -42,15 +42,15 @@
 #include "r_efx.h"
 #include "pm_shared.h"
 
-CParticleSystemManager *pParticleManager = NULL;
+CParticleSystemManager* pParticleManager = NULL;
 cvar_t* g_ParticleCount;
 cvar_t* g_ParticleDebug;
 cvar_t* g_ParticleSorts;
 
 // updates all systems
-void CParticleSystemManager::UpdateSystems( void )
+void CParticleSystemManager::UpdateSystems(void)
 {
-	CParticleSystem *pSystem = nullptr;
+	CParticleSystem* pSystem = nullptr;
 	signed int i = 0;
 	signed int iSystems = (signed)m_pParticleSystems.size();
 	// iterate through all the particle systems, drawing each
@@ -58,7 +58,7 @@ void CParticleSystemManager::UpdateSystems( void )
 	{
 		pSystem = m_pParticleSystems[i];
 		// remove the system if the system requests it
-		if( pSystem && pSystem->DrawSystem() == false)
+		if (pSystem && pSystem->DrawSystem() == false)
 		{
 			delete pSystem;
 			pSystem = nullptr;
@@ -70,7 +70,7 @@ void CParticleSystemManager::UpdateSystems( void )
 
 	// we couldn't return earlier as we need to have the sorting before the ps updating
 	// however no sorting when we can't see the particles
-	if(CheckDrawSystem() == false)
+	if (CheckDrawSystem() == false)
 		return;
 
 	// prepare opengl
@@ -82,25 +82,26 @@ void CParticleSystemManager::UpdateSystems( void )
 	int iDrawn = 0;
 
 	// draw all unsorted particles first, so they are at the back of the screen.
-	if(iParticles > 0) {
+	if (iParticles > 0) {
 		// loop through all particles drawing them
-		CParticle *pParticle = NULL;
-		for(i = 0; i < iParticles ; i++) {
-			if(m_pUnsortedParticles[i]) {
+		CParticle* pParticle = NULL;
+		for (i = 0; i < iParticles; i++) {
+			if (m_pUnsortedParticles[i]) {
 				pParticle = m_pUnsortedParticles[i];
-				if(pParticle && pParticle->Test()) {
+				if (pParticle && pParticle->Test()) {
 					pParticle->Update(flTimeSinceLastDraw);
 
 					// don't draw in certain spec modes
-					if(g_iUser1 != OBS_MAP_FREE && g_iUser1 != OBS_MAP_CHASE) {
+					if (g_iUser1 != OBS_MAP_FREE && g_iUser1 != OBS_MAP_CHASE) {
 						// unfortunately we have to prepare every particle now
 						// as we can't prepare for a batch of the same type anymore
-						pParticle->Prepare(); 
+						pParticle->Prepare();
 						pParticle->Draw();
 						iDrawn++;
 					}
-				// particle wants to die, so kill it
-				} else {
+					// particle wants to die, so kill it
+				}
+				else {
 					RemoveParticle(pParticle);
 					i--;
 					iParticles--;
@@ -112,35 +113,36 @@ void CParticleSystemManager::UpdateSystems( void )
 	iParticles = m_pParticles.size();
 
 	// sort and draw the sorted particles list
-	if(iParticles > 0) {
+	if (iParticles > 0) {
 		// calculate the fraction of a second between sorts
 		float flTimeSinceLastSort = (gEngfuncs.GetClientTime() - m_flLastSort);
 		// 1 / time between sorts will give us a number like 5
 		// if it is less than the particlesorts cvar then it is a small value 
 		// and therefore a long time since last sort
-		if((((int)(1 / flTimeSinceLastSort)) < g_ParticleSorts->value)) {
+		if ((((int)(1 / flTimeSinceLastSort)) < g_ParticleSorts->value)) {
 			m_flLastSort = gEngfuncs.GetClientTime();
 			std::sort(m_pParticles.begin(), m_pParticles.end(), less_than);
 		}
 
 		// loop through all particles drawing them
-		CParticle *pParticle = NULL;
-		for(i = 0; i < iParticles ; i++) {
-			if(m_pParticles[i]) {
+		CParticle* pParticle = nullptr;
+		for (i = 0; i < iParticles; i++) {
+			if (m_pParticles[i]) {
 				pParticle = m_pParticles[i];
-				if(pParticle && pParticle->Test()) {
+				if (pParticle && pParticle->Test()) {
 					pParticle->Update(flTimeSinceLastDraw);
 
 					// don't draw in certain spec modes
-					if(g_iUser1 != OBS_MAP_FREE && g_iUser1 != OBS_MAP_CHASE) {
+					if (g_iUser1 != OBS_MAP_FREE && g_iUser1 != OBS_MAP_CHASE) {
 						// unfortunately we have to prepare every particle now
 						// as we can't prepare for a batch of the same type anymore
-						pParticle->Prepare(); 
+						pParticle->Prepare();
 						pParticle->Draw();
 						iDrawn++;
 					}
-				// particle wants to die, so kill it
-				} else {
+					// particle wants to die, so kill it
+				}
+				else {
 					RemoveParticle(pParticle);
 					i--;
 					iParticles--;
@@ -162,7 +164,7 @@ void CParticleSystemManager::UpdateSystems( void )
 	m_flLastDraw = gEngfuncs.GetClientTime();
 }
 
-void CParticleSystemManager::CreateDynamicLight(particle_system_management* pSystem,int radius, int red, int green, int blue,float decay)
+void CParticleSystemManager::CreateDynamicLight(particle_system_management* pSystem, int radius, int red, int green, int blue, float decay)
 {
 	// create dynamic light
 	dlight_t* dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
@@ -176,7 +178,7 @@ void CParticleSystemManager::CreateDynamicLight(particle_system_management* pSys
 }
 
 // handles all the present particle systems
-void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_system_management *pSystem)
+void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_system_management* pSystem)
 {
 	switch (iPreset)
 	{
@@ -196,13 +198,19 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 		// play a sound as well
 		switch (gEngfuncs.pfnRandomLong(0, 2))
 		{
-			case 0:gEngfuncs.pEventAPI->EV_PlaySound(0, pSystem->vPosition, 0, "explosions/explode_dist1.wav", 1.0, ATTN_NONE, 0, PITCH_NORM); break;
-			case 1:gEngfuncs.pEventAPI->EV_PlaySound(0, pSystem->vPosition, 0, "explosions/explode_dist2.wav", 1.0, ATTN_NONE, 0, PITCH_NORM); break;
-			case 2:gEngfuncs.pEventAPI->EV_PlaySound(0, pSystem->vPosition, 0, "explosions/explode_dist3.wav", 1.0, ATTN_NONE, 0, PITCH_NORM); break;
+			case 0:
+				gEngfuncs.pEventAPI->EV_PlaySound(0, pSystem->vPosition, 0, "explosions/explode_dist1.wav", 1.0, ATTN_NONE, 0, PITCH_NORM);
+			break;
+			case 1:
+				gEngfuncs.pEventAPI->EV_PlaySound(0, pSystem->vPosition, 0, "explosions/explode_dist2.wav", 1.0, ATTN_NONE, 0, PITCH_NORM);
+			break;
+			case 2:
+				gEngfuncs.pEventAPI->EV_PlaySound(0, pSystem->vPosition, 0, "explosions/explode_dist3.wav", 1.0, ATTN_NONE, 0, PITCH_NORM);
+			break;
 		}
 
 		// create dynamic light
-		CreateDynamicLight(pSystem,500,254,160,24,0.2);
+		CreateDynamicLight(pSystem, 500, 254, 160, 24, 0.2);
 		break;
 	case iDefaultBlood:
 		gEngfuncs.Con_Printf("iPreset == iDefaultBlood\n");
@@ -218,9 +226,9 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 		if (pSystem == nullptr)
 			return;
 
-		CreateMappedPS("particles/wallsmoke/e_impacts_water_drops.txt", pSystem);
-		CreateMappedPS("particles/wallsmoke/e_impacts_water_core.txt", pSystem);
-		CreateMappedPS("particles/wallsmoke/e_impacts_water_wave.txt", pSystem);
+		CreateMappedPS("particles/impact/impact_water_drops.txt", pSystem);
+		CreateMappedPS("particles/impact/impact_water_core.txt", pSystem);
+		CreateMappedPS("particles/impact/impact_water_wave.txt", pSystem);
 		break;
 	case iDefaultExplosionWater:
 		gEngfuncs.Con_Printf("iPreset == iDefaultExplosionWater\n");
@@ -228,9 +236,9 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 		if (pSystem == nullptr)
 			return;
 
-		CreateMappedPS("particles/wallsmoke/e_impacts_water_drops2.txt", pSystem);
-		CreateMappedPS("particles/wallsmoke/e_impacts_water_core2.txt", pSystem);
-		CreateMappedPS("particles/wallsmoke/e_impacts_water_wave2.txt", pSystem);
+		CreateMappedPS("particles/explosion/explo1_water_drops.txt", pSystem);
+		CreateMappedPS("particles/explosion/explo1_water_core.txt", pSystem);
+		CreateMappedPS("particles/explosion/explo1_water_wave.txt", pSystem);
 		break;
 	case iDefaultBloodRedPit:
 		gEngfuncs.Con_Printf("iPreset == iDefaultBloodRedPit\n");
@@ -279,7 +287,7 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 
 		if (pSystem == nullptr)
 			return;
-		
+
 		CreateMappedPS("particles/grass/hit_grass_core.txt", pSystem);
 		CreateMappedPS("particles/grass/hit_grass.txt", pSystem);
 		break;
@@ -288,7 +296,7 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 
 		if (pSystem == nullptr)
 			return;
-		
+
 		CreateMappedPS("particles/brown/hit_brown_core.txt", pSystem);
 		break;
 	case iDefaultImpactCement:
@@ -296,7 +304,7 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 
 		if (pSystem == nullptr)
 			return;
-		
+
 		CreateMappedPS("particles/cement/hit_cement.txt", pSystem);
 		break;
 	case iDefaultImpactWood:
@@ -309,10 +317,10 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 		break;
 	case iDefaultImpactSand:
 		gEngfuncs.Con_Printf("iPreset == iDefaultImpactSand\n");
-		
+
 		if (pSystem == nullptr)
 			return;
-		
+
 		CreateMappedPS("particles/sand/hit_sand.txt", pSystem);
 		break;
 	case iDefaultRocketTrail:
@@ -320,7 +328,7 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 
 		if (pSystem == nullptr)
 			return;
-		
+
 		CreateMappedPS("particles/rockettrail/trail.txt", pSystem);
 
 		//gEngfuncs.pEventAPI->EV_PlaySound(0, pSystem->vPosition, 0, "particles\\wood\\wood_solid_impact_bullet.wav", 0.15, ATTN_NONE, 0, PITCH_NORM);
@@ -332,7 +340,7 @@ void CParticleSystemManager::CreatePresetPS(unsigned int iPreset, particle_syste
 // flintlock smoke ps
 void CParticleSystemManager::CreateFlintPS(Vector vPosition)
 {
-	if(CheckDrawSystem() == false)
+	if (CheckDrawSystem() == false)
 		return;
 
 	AddSystem(new CFlintlockSmokeParticleSystem(vPosition));
@@ -341,7 +349,7 @@ void CParticleSystemManager::CreateFlintPS(Vector vPosition)
 // barrel smoke ps
 void CParticleSystemManager::CreateBarrelPS(Vector vPosition, Vector vDirection)
 {
-	if(CheckDrawSystem() == false)
+	if (CheckDrawSystem() == false)
 		return;
 
 	AddSystem(new CBarrelSmokeParticleSystem(vPosition, vDirection));
@@ -350,7 +358,7 @@ void CParticleSystemManager::CreateBarrelPS(Vector vPosition, Vector vDirection)
 // spark ps
 void CParticleSystemManager::CreateSparkPS(Vector vPosition, Vector vDirection)
 {
-	if(CheckDrawSystem() == false)
+	if (CheckDrawSystem() == false)
 		return;
 
 	AddSystem(new CSparkParticleSystem(vPosition, vDirection));
@@ -359,7 +367,7 @@ void CParticleSystemManager::CreateSparkPS(Vector vPosition, Vector vDirection)
 // white smoke ps
 void CParticleSystemManager::CreateWhitePS(Vector vPosition, Vector vDirection)
 {
-	if(CheckDrawSystem() == false)
+	if (CheckDrawSystem() == false)
 		return;
 
 	AddSystem(new CWhiteSmokeParticleSystem(vPosition, vDirection));
@@ -368,16 +376,16 @@ void CParticleSystemManager::CreateWhitePS(Vector vPosition, Vector vDirection)
 // brown smoke ps
 void CParticleSystemManager::CreateBrownPS(Vector vPosition, Vector vDirection)
 {
-	if(CheckDrawSystem() == false)
+	if (CheckDrawSystem() == false)
 		return;
 
 	AddSystem(new CBrownSmokeParticleSystem(vPosition, vDirection));
 }
 
 // grass system
-void CParticleSystemManager::CreateGrassPS( char* sFile, particle_system_management* pSystem )
+void CParticleSystemManager::CreateGrassPS(char* sFile, particle_system_management* pSystem)
 {
-	if(pSystem == NULL) {
+	if (pSystem == nullptr) {
 		return;
 	}
 
@@ -389,31 +397,31 @@ void CParticleSystemManager::CreateGrassPS( char* sFile, particle_system_managem
 }
 
 // mapped ps
-void CParticleSystemManager::CreateMappedPS( char* sFile, particle_system_management* pSystem )
+void CParticleSystemManager::CreateMappedPS(char* sFile, particle_system_management* pSystem)
 {
-	if(pSystem == NULL) {
+	if (pSystem == nullptr) {
 		return;
 	}
+
 	// no d3d/software
 	if (IEngineStudio.IsHardware() == false)
 		return;
+
+	gEngfuncs.Con_Printf("CMappedParticleSystem\n");
 
 	AddSystem(new CMappedParticleSystem(sFile, pSystem));
 }
 
 // are we allowed to draw atm
-bool CParticleSystemManager::CheckDrawSystem( void )
+bool CParticleSystemManager::CheckDrawSystem()
 {
 	if (gHUD.m_iHideHUDDisplay & (HIDEHUD_ALL))
 		return false;
 
-//	if(g_iTeamNumber == UNDEFINED || (g_iTeamNumber != SPECS && g_iPlayerClass == UNDEFINED) )
-//		return false;
+	//	if(g_iUser1 == OBS_MAP_FREE || g_iUser1 == OBS_MAP_CHASE)
+	//		return false;
 
-//	if(g_iUser1 == OBS_MAP_FREE || g_iUser1 == OBS_MAP_CHASE)
-//		return false;
-
-	// no d3d/software
+		// no d3d/software
 	if (IEngineStudio.IsHardware() == false)
 		return false;
 
@@ -422,10 +430,10 @@ bool CParticleSystemManager::CheckDrawSystem( void )
 
 // adds a new texture to out cache
 // using a map would be preferable but you can't snprintf into the index
-void CParticleSystemManager::AddTexture(char* sName, particle_texture_s *pTexture) {
+void CParticleSystemManager::AddTexture(char* sName, particle_texture_s* pTexture) {
 	// create a new entry and then fill it with the values
-	particle_texture_cache *pCacheEntry = new particle_texture_cache;
-	_snprintf(pCacheEntry->sTexture, MAX_PARTICLE_PATH-1, "%s\0", sName);
+	particle_texture_cache* pCacheEntry = new particle_texture_cache;
+	_snprintf(pCacheEntry->sTexture, MAX_PARTICLE_PATH - 1, "%s\0", sName);
 	pCacheEntry->pTexture = pTexture;
 
 	// add the cache entry
@@ -437,13 +445,13 @@ particle_texture_s* CParticleSystemManager::HasTexture(char* sName) {
 
 	unsigned int i = 0;
 	unsigned int iTextures = m_pTextures.size();
-	particle_texture_cache *pCacheEntry = NULL;
+	particle_texture_cache* pCacheEntry = nullptr;
 
 	// loop through all cache entries, comparing stored path with parameter path
 	for (; i < iTextures; i++)
 	{
 		pCacheEntry = m_pTextures[i];
-		if(!stricmp(pCacheEntry->sTexture, sName)) {
+		if (!stricmp(pCacheEntry->sTexture, sName)) {
 			return pCacheEntry->pTexture;
 		}
 	}
@@ -452,38 +460,38 @@ particle_texture_s* CParticleSystemManager::HasTexture(char* sName) {
 }
 
 // cache the most used tgas, so we don't get lag on first firing the gun
-void CParticleSystemManager::PrecacheTextures( void ) {
+void CParticleSystemManager::PrecacheTextures() {
 	gEngfuncs.Con_Printf("Caching frequently used particles, this may take a few moments\n");
-	LoadTGA(NULL, const_cast<char*>(FLINTLOCK_SMOKE_PARTICLE));
-	LoadTGA(NULL, const_cast<char*>(BARREL_SMOKE_PARTICLES[0]));
-	LoadTGA(NULL, const_cast<char*>(BARREL_SMOKE_PARTICLES[1]));
-	LoadTGA(NULL, const_cast<char*>(BARREL_SMOKE_PARTICLES[2]));
-	LoadTGA(NULL, const_cast<char*>(BROWN_SMOKE_PARTICLE));
+	LoadTGA(nullptr, const_cast<char*>(FLINTLOCK_SMOKE_PARTICLE));
+	LoadTGA(nullptr, const_cast<char*>(BARREL_SMOKE_PARTICLES[0]));
+	LoadTGA(nullptr, const_cast<char*>(BARREL_SMOKE_PARTICLES[1]));
+	LoadTGA(nullptr, const_cast<char*>(BARREL_SMOKE_PARTICLES[2]));
+	LoadTGA(nullptr, const_cast<char*>(BROWN_SMOKE_PARTICLE));
 	gEngfuncs.Con_Printf("Finished caching frequently used particles, game loading will now continue\n");
 }
 
 // deletes all textures and their entries
-void CParticleSystemManager::RemoveTextures( void ) {
+void CParticleSystemManager::RemoveTextures() {
 
 	unsigned int i = 0;
 	unsigned int iTextures = m_pTextures.size();
-	particle_texture_cache *pCacheEntry = NULL;
+	particle_texture_cache* pCacheEntry = nullptr;
 
 	// loop through all valid entries, deleting all valid textures and entries
 	for (; i < iTextures; i++) {
 		pCacheEntry = m_pTextures[i];
-		if(pCacheEntry) {
-			if(pCacheEntry->pTexture && pCacheEntry->pTexture->imageData) {
-				delete [] pCacheEntry->pTexture->imageData;
-				pCacheEntry->pTexture->imageData = NULL;
+		if (pCacheEntry) {
+			if (pCacheEntry->pTexture && pCacheEntry->pTexture->imageData) {
+				delete[] pCacheEntry->pTexture->imageData;
+				pCacheEntry->pTexture->imageData = nullptr;
 			}
-			glDeleteTextures( 1, pCacheEntry->pTexture->iID );
+			glDeleteTextures(1, pCacheEntry->pTexture->iID);
 			delete pCacheEntry->pTexture;
-			pCacheEntry->pTexture = NULL;
+			pCacheEntry->pTexture = nullptr;
 		}
-		_snprintf(pCacheEntry->sTexture, MAX_PARTICLE_PATH-1, "\0");
+		_snprintf(pCacheEntry->sTexture, MAX_PARTICLE_PATH - 1, "\0");
 		delete pCacheEntry;
-		pCacheEntry = NULL;
+		pCacheEntry = nullptr;
 		m_pTextures.erase(m_pTextures.begin());
 		i--;
 		iTextures--;
@@ -494,12 +502,13 @@ void CParticleSystemManager::RemoveTextures( void ) {
 
 // adds a particle into the global particle tracker
 void CParticleSystemManager::AddParticle(CParticle* pParticle) {
-	if(pParticle->sParticle.bIgnoreSort == true) {
+	if (pParticle->sParticle.bIgnoreSort == true) {
 		m_pUnsortedParticles.push_back(pParticle);
-	} else {
+	}
+	else {
 		m_pParticles.push_back(pParticle);
 	}
-	pParticle = NULL;
+	pParticle = nullptr;
 }
 
 // removes a particle from the global tracker and from the system
@@ -509,9 +518,9 @@ void CParticleSystemManager::RemoveParticle(CParticle* pParticle) {
 
 	// remove a particle from the sorted list
 	for (; i < iParticles; i++) {
-		if(pParticle == m_pParticles[i]) {
+		if (pParticle == m_pParticles[i]) {
 			delete m_pParticles[i];
-			pParticle = NULL;
+			pParticle = nullptr;
 			m_pParticles.erase(m_pParticles.begin() + i);
 			i--;
 			iParticles--;
@@ -522,9 +531,9 @@ void CParticleSystemManager::RemoveParticle(CParticle* pParticle) {
 	// remove a particle from the unsorted list
 	iParticles = m_pUnsortedParticles.size();
 	for (i = 0; i < iParticles; i++) {
-		if(pParticle == m_pUnsortedParticles[i]) {
+		if (pParticle == m_pUnsortedParticles[i]) {
 			delete m_pUnsortedParticles[i];
-			pParticle = NULL;
+			pParticle = nullptr;
 			m_pUnsortedParticles.erase(m_pUnsortedParticles.begin() + i);
 			i--;
 			iParticles--;
@@ -534,14 +543,14 @@ void CParticleSystemManager::RemoveParticle(CParticle* pParticle) {
 }
 
 // remove all trackers in the system
-void CParticleSystemManager::RemoveParticles()  {
+void CParticleSystemManager::RemoveParticles() {
 	unsigned int i = 0;
 	unsigned int iParticles = m_pParticles.size();
 
 	// remove the sorted particles
 	for (i = 0; i < iParticles; i++) {
 		delete m_pParticles[i];
-		m_pParticles[i] = NULL;
+		m_pParticles[i] = nullptr;
 		m_pParticles.erase(m_pParticles.begin() + i);
 		i--;
 		iParticles--;
@@ -552,7 +561,7 @@ void CParticleSystemManager::RemoveParticles()  {
 	iParticles = m_pUnsortedParticles.size();
 	for (i = 0; i < iParticles; i++) {
 		delete m_pUnsortedParticles[i];
-		m_pUnsortedParticles[i] = NULL;
+		m_pUnsortedParticles[i] = nullptr;
 		m_pUnsortedParticles.erase(m_pUnsortedParticles.begin() + i);
 		i--;
 		iParticles--;
@@ -562,23 +571,23 @@ void CParticleSystemManager::RemoveParticles()  {
 
 
 // adds a new system
-void CParticleSystemManager::AddSystem(CParticleSystem *pSystem) {
+void CParticleSystemManager::AddSystem(CParticleSystem* pSystem) {
 	m_pParticleSystems.push_back(pSystem);
 }
 
 // tbh highly inefficent but we shouldn't have any large number of ps's,
 // and we won't be force removing very often so this won't be too bad
-void CParticleSystemManager::RemoveSystem( unsigned int iSystem )
+void CParticleSystemManager::RemoveSystem(unsigned int iSystem)
 {
 	unsigned int i = 0;
 	unsigned int iParticles = m_pParticles.size();
-	CParticle *pParticle = NULL;
+	CParticle* pParticle = nullptr;
 	// remove the sorted particles
 	for (i = 0; i < iParticles; i++) {
 		pParticle = m_pParticles[i];
-		if(pParticle && pParticle->SystemID() == iSystem) {
+		if (pParticle && pParticle->SystemID() == iSystem) {
 			delete pParticle;
-			pParticle = NULL;
+			pParticle = nullptr;
 			m_pParticles.erase(m_pParticles.begin() + i);
 			i--;
 			iParticles--;
@@ -589,24 +598,24 @@ void CParticleSystemManager::RemoveSystem( unsigned int iSystem )
 	iParticles = m_pUnsortedParticles.size();
 	for (i = 0; i < iParticles; i++) {
 		pParticle = m_pUnsortedParticles[i];
-		if(pParticle && pParticle->SystemID() == iSystem) {
+		if (pParticle && pParticle->SystemID() == iSystem) {
 			delete pParticle;
-			pParticle = NULL;
+			pParticle = nullptr;
 			m_pUnsortedParticles.erase(m_pUnsortedParticles.begin() + i);
 			i--;
 			iParticles--;
 		}
 	}
 
-	CParticleSystem *pSystem = NULL;	
+	CParticleSystem* pSystem = nullptr;
 	unsigned int iSystems = m_pParticleSystems.size();
 	for (; i < iSystems; i++)
 	{
 		pSystem = m_pParticleSystems[i];
 		// i != the system id, as the server or the client can generate these
-		if(pSystem && pSystem->SystemID() == iSystem) {
+		if (pSystem && pSystem->SystemID() == iSystem) {
 			delete pSystem;
-			pSystem = NULL;
+			pSystem = nullptr;
 			m_pParticleSystems.erase(m_pParticleSystems.begin() + i);
 			i--;
 			iSystems--;
@@ -616,13 +625,13 @@ void CParticleSystemManager::RemoveSystem( unsigned int iSystem )
 
 
 // deletes all systems
-void CParticleSystemManager::RemoveSystems( void )
+void CParticleSystemManager::RemoveSystems()
 {
 	unsigned int i = 0;
 	unsigned int iSystems = m_pParticleSystems.size();
 	for (; i < iSystems; i++) {
 		delete m_pParticleSystems[i];
-		m_pParticleSystems[i] = NULL;
+		m_pParticleSystems[i] = nullptr;
 		m_pParticleSystems.erase(m_pParticleSystems.begin() + i);
 		i--;
 		iSystems--;

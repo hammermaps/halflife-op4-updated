@@ -29,6 +29,9 @@
 #include "weapons/CKnife.h"
 #include "weapons/CPenguin.h"
 
+#define HULL_PLANE_SKIP
+#include "particle_header.h"
+
 #include "const.h"
 #include "entity_state.h"
 #include "cl_entity.h"
@@ -2324,29 +2327,58 @@ void EV_PenguinFire(event_args_t* args)
 	}
 }
 
+void EV_Effects(event_args_s* args)
+{
+	switch (args->bparam2)
+	{
+	case EXPLO_TYPE_NORMAL:
+		particle_system_management pSystem;
+
+		Vector vecOrigin = args->origin;
+		Vector vecAngles = args->angles;
+
+		pSystem.vPosition = vecOrigin;
+		pSystem.vDirection = vecAngles;
+
+		int m_iExplodeSprite;
+		if (args->bparam1)//water explosion
+		{
+			m_iExplodeSprite = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/WXplo1.spr");
+			pParticleManager->CreatePresetPS(iDefaultExplosionWater, &pSystem);
+		}
+		else
+		{
+			m_iExplodeSprite = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zerogxplode.spr");
+			pParticleManager->CreatePresetPS(iDefaultExplosion, &pSystem);
+		}
+		
+		gEngfuncs.pEfxAPI->R_Explosion(vecOrigin, m_iExplodeSprite, (args->fparam1 - 50) * 0.06, 15, TE_EXPLFLAG_NONE);
+		gEngfuncs.pEfxAPI->R_ParticleExplosion2(vecOrigin, 111, 8);
+
+		gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction(false, true);
+
+		gEngfuncs.pEventAPI->EV_PushPMStates();
+		gEngfuncs.pEventAPI->EV_SetSolidPlayers(-1);
+		break;
+	}
+}
+
 void EV_TrainPitchAdjust( event_args_t *args )
 {
-	int idx;
 	Vector origin;
 
-	unsigned short us_params;
-	int noise;
-	float m_flVolume;
-	int pitch;
-	int stop;
-	
 	char sz[ 256 ];
 
-	idx = args->entindex;
+	int idx = args->entindex;
 	
 	VectorCopy( args->origin, origin );
 
-	us_params = (unsigned short)args->iparam1;
-	stop	  = args->bparam1;
+	unsigned short us_params = (unsigned short)args->iparam1;
+	int stop = args->bparam1;
 
-	m_flVolume	= (float)(us_params & 0x003f)/40.0;
-	noise		= (int)(((us_params) >> 12 ) & 0x0007);
-	pitch		= (int)( 10.0 * (float)( ( us_params >> 6 ) & 0x003f ) );
+	float m_flVolume = (float)(us_params & 0x003f) / 40.0;
+	int noise = (int)(((us_params) >> 12) & 0x0007);
+	int pitch = (int)(10.0 * (float)((us_params >> 6) & 0x003f));
 
 	switch ( noise )
 	{

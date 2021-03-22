@@ -70,5 +70,7 @@ extern int gmsgStatsPlayer;
 extern int gmsgTeamFull;
 extern int gmsgOldWeapon;
 extern int gmsgCustomIcon;
+extern int gmsgParticles;
+extern int gmsgGrassParticles;
 
 void LinkUserMessages();

@@ -49,7 +49,7 @@ extern "C"
 	void EV_SniperRifle(event_args_t* args);
 	void EV_Knife(event_args_t* args);
 	void EV_PenguinFire(event_args_t* args);
-
+	void EV_Effects(event_args_s* args);
 
 	void EV_TrainPitchAdjust(event_args_t* args);
 }

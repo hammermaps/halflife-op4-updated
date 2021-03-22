@@ -48,6 +48,11 @@ DLL_GLOBAL	short	g_sModelIndexWExplosion;// holds the index for the underwater e
 DLL_GLOBAL	short	g_sModelIndexBubbles;// holds the index for the bubbles model
 DLL_GLOBAL	short	g_sModelIndexBloodDrop;// holds the sprite index for the initial blood
 DLL_GLOBAL	short	g_sModelIndexBloodSpray;// holds the sprite index for splattered blood
+DLL_GLOBAL 	unsigned short 	m_usEffects;//special effects event (rocket trail, explosion e.t.c.)
+
+DLL_GLOBAL	short	g_sModelIndexFireball2;// holds the index for the fireball
+DLL_GLOBAL	short	g_sModelIndexFireball3;// holds the index for the fireball
+DLL_GLOBAL	short	g_sModelIndexFireballEnd;// holds the index for the fireball
 
 ItemInfo CBasePlayerItem::ItemInfoArray[MAX_WEAPONS];
 AmmoInfo CBasePlayerItem::AmmoInfoArray[MAX_AMMO_SLOTS];
@@ -420,6 +425,11 @@ void W_Precache()
 	g_sModelIndexLaser = PRECACHE_MODEL( (char *)g_pModelNameLaser );
 	g_sModelIndexLaserDot = PRECACHE_MODEL("sprites/laserdot.spr");
 
+	m_usEffects = PRECACHE_EVENT(1, "events/effects.sc");
+
+	g_sModelIndexFireball2 = PRECACHE_MODEL("sprites/exp2.spr");// fireball
+	g_sModelIndexFireball3 = PRECACHE_MODEL("sprites/exp3.spr");// fireball
+	g_sModelIndexFireballEnd = PRECACHE_MODEL("sprites/exp_end.spr");// fireball
 
 	// used by explosions
 	PRECACHE_MODEL ("models/grenade.mdl");

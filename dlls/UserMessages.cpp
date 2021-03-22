@@ -75,6 +75,9 @@ int gmsgTeamFull = 0;
 int gmsgOldWeapon = 0;
 int gmsgCustomIcon = 0;
 
+int gmsgParticles = 0;
+int gmsgGrassParticles = 0;
+
 void LinkUserMessages()
 {
 	// Already taken care of?
@@ -121,20 +124,23 @@ void LinkUserMessages()
 	gmsgStatusText = REG_USER_MSG("StatusText", -1);
 	gmsgStatusValue = REG_USER_MSG("StatusValue", 3);
 
-	gmsgSpectator = g_engfuncs.pfnRegUserMsg("Spectator", 2);
-	gmsgStatusIcon = g_engfuncs.pfnRegUserMsg("StatusIcon", -1);
-	gmsgPlayerBrowse = g_engfuncs.pfnRegUserMsg("PlyrBrowse", -1);
-	gmsgHudColor = g_engfuncs.pfnRegUserMsg("HudColor", 3);
-	gmsgFlagIcon = g_engfuncs.pfnRegUserMsg("FlagIcon", -1);
-	gmsgFlagTimer = g_engfuncs.pfnRegUserMsg("FlagTimer", -1);
-	gmsgPlayerIcon = g_engfuncs.pfnRegUserMsg("PlayerIcon", -1);
-	gmsgVGUIMenu = g_engfuncs.pfnRegUserMsg("VGUIMenu", -1);
-	gmsgAllowSpec = g_engfuncs.pfnRegUserMsg("AllowSpec", 1);
-	gmsgSetMenuTeam = g_engfuncs.pfnRegUserMsg("SetMenuTeam", 1);
-	gmsgCTFScore = g_engfuncs.pfnRegUserMsg("CTFScore", 2);
-	gmsgStatsInfo = g_engfuncs.pfnRegUserMsg("StatsInfo", -1);
-	gmsgStatsPlayer = g_engfuncs.pfnRegUserMsg("StatsPlayer", 31);
-	gmsgTeamFull = g_engfuncs.pfnRegUserMsg("TeamFull", 1);
-	gmsgOldWeapon = g_engfuncs.pfnRegUserMsg("OldWeapon", 1);
-	gmsgCustomIcon = g_engfuncs.pfnRegUserMsg("CustomIcon", -1);
+	gmsgSpectator = REG_USER_MSG("Spectator", 2);
+	gmsgStatusIcon = REG_USER_MSG("StatusIcon", -1);
+	gmsgPlayerBrowse = REG_USER_MSG("PlyrBrowse", -1);
+	gmsgHudColor = REG_USER_MSG("HudColor", 3);
+	gmsgFlagIcon = REG_USER_MSG("FlagIcon", -1);
+	gmsgFlagTimer = REG_USER_MSG("FlagTimer", -1);
+	gmsgPlayerIcon = REG_USER_MSG("PlayerIcon", -1);
+	gmsgVGUIMenu = REG_USER_MSG("VGUIMenu", -1);
+	gmsgAllowSpec = REG_USER_MSG("AllowSpec", 1);
+	gmsgSetMenuTeam = REG_USER_MSG("SetMenuTeam", 1);
+	gmsgCTFScore = REG_USER_MSG("CTFScore", 2);
+	gmsgStatsInfo = REG_USER_MSG("StatsInfo", -1);
+	gmsgStatsPlayer = REG_USER_MSG("StatsPlayer", 31);
+	gmsgTeamFull = REG_USER_MSG("TeamFull", 1);
+	gmsgOldWeapon = REG_USER_MSG("OldWeapon", 1);
+	gmsgCustomIcon = REG_USER_MSG("CustomIcon", -1);
+
+	gmsgParticles = REG_USER_MSG("Particles", -1);
+	gmsgGrassParticles = REG_USER_MSG("Grass", -1);
 }

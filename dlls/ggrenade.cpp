@@ -12,24 +12,14 @@
 *   without written permission from Valve LLC.
 *
 ****/
-/*
-
-===== generic grenade.cpp ========================================================
-
-*/
 
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
 #include "monsters.h"
 #include "weapons.h"
-#include "nodes.h"
 #include "soundent.h"
 #include "decals.h"
-
-
-//===================grenade
-
 
 LINK_ENTITY_TO_CLASS( grenade, CGrenade );
 
@@ -50,8 +40,6 @@ void CGrenade::Explode( Vector vecSrc, Vector vecAim )
 // UNDONE: temporary scorching for PreAlpha - find a less sleazy permenant solution.
 void CGrenade::Explode( TraceResult *pTrace, int bitsDamageType )
 {
-	float		flRndSound;// sound randomizer
-
 	pev->model = iStringNull;//invisible
 	pev->solid = SOLID_NOT;// intangible
 
@@ -64,24 +52,54 @@ void CGrenade::Explode( TraceResult *pTrace, int bitsDamageType )
 	}
 
 	int iContents = UTIL_PointContents ( pev->origin );
-	
-	MESSAGE_BEGIN( MSG_PAS, SVC_TEMPENTITY, pev->origin );
-		WRITE_BYTE( TE_EXPLOSION );		// This makes a dynamic light and the explosion sprites/sound
-		WRITE_COORD( pev->origin.x );	// Send to PAS because of the sound
-		WRITE_COORD( pev->origin.y );
-		WRITE_COORD( pev->origin.z );
-		if (iContents != CONTENTS_WATER)
+	PLAYBACK_EVENT_FULL(FEV_RELIABLE | FEV_GLOBAL, edict(), m_usEffects, 0.0, (float*)&pev->origin, (float*)&g_vecZero, pev->dmg, 0.0, 0, 0, iContents != CONTENTS_WATER ? 0 : 1, EXPLO_TYPE_NORMAL);
+
+	if (iContents != CONTENTS_WATER)
+	{
+		if (RANDOM_LONG(0, 99) < 80)//100%now
 		{
-			WRITE_SHORT( g_sModelIndexFireball );
+			MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_EXPLOSION);		// This makes a dynamic light and the explosion sprites/sound
+			WRITE_COORD(pev->origin.x);	// Send to PAS because of the sound
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z);
+			WRITE_SHORT(g_sModelIndexFireball2);
+			WRITE_BYTE(20 * .60); // scale * 10 -50
+			WRITE_BYTE(35); // framerate
+			WRITE_BYTE(TE_EXPLFLAG_NONE);
+			MESSAGE_END();
 		}
-		else
+
+		if (RANDOM_LONG(0, 99) < 30)
 		{
-			WRITE_SHORT( g_sModelIndexWExplosion );
+			MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_EXPLOSION);		// This makes a dynamic light and the explosion sprites/sound
+			WRITE_COORD(pev->origin.x);	// Send to PAS because of the sound
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z);
+			WRITE_SHORT(g_sModelIndexFireball3);
+			WRITE_BYTE(50 * .60); // scale * 10 -50
+			WRITE_BYTE(35); // framerate 15
+			WRITE_BYTE(TE_EXPLFLAG_NONE);
+			MESSAGE_END();
 		}
-		WRITE_BYTE( (pev->dmg - 50) * .60  ); // scale * 10
-		WRITE_BYTE( 15  ); // framerate
-		WRITE_BYTE( TE_EXPLFLAG_NONE );
-	MESSAGE_END();
+
+		CSprite* pSprite = CSprite::SpriteCreate("sprites/exp_end.spr", pev->origin, TRUE);
+
+		pSprite->SetTransparency(kRenderTransAlpha, 50, 50, 50, 255, kRenderFxNone);
+		pSprite->SetScale(5.0);
+		pSprite->Expand(RANDOM_FLOAT(10, 15), RANDOM_FLOAT(18.0, 26.0));//expand
+
+		pSprite->pev->avelocity.x = RANDOM_FLOAT(-50, 50);
+		pSprite->pev->avelocity.y = RANDOM_FLOAT(-50, 50);
+		pSprite->pev->avelocity.z = RANDOM_FLOAT(-50, 50);
+
+		pSprite->pev->velocity.z = RANDOM_FLOAT(10, 30);
+		pSprite->pev->velocity.x = RANDOM_FLOAT(-10, 10);
+		pSprite->pev->velocity.y = RANDOM_FLOAT(-10, 10);
+	}
+
+	UTIL_ScreenShake(pev->origin, 12.0, 100.0, 2.0, 1000);
 
 	CSoundEnt::InsertSound ( bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0 );
 	entvars_t *pevOwner;
@@ -103,8 +121,6 @@ void CGrenade::Explode( TraceResult *pTrace, int bitsDamageType )
 		UTIL_DecalTrace( pTrace, DECAL_SCORCH2 );
 	}
 
-	flRndSound = RANDOM_FLOAT( 0 , 1 );
-
 	switch ( RANDOM_LONG( 0, 2 ) )
 	{
 		case 0:	EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris1.wav", 0.55, ATTN_NORM);	break;
@@ -119,12 +135,11 @@ void CGrenade::Explode( TraceResult *pTrace, int bitsDamageType )
 
 	if (iContents != CONTENTS_WATER)
 	{
-		int sparkCount = RANDOM_LONG(0,3);
+		int sparkCount = RANDOM_LONG(1,4);
 		for ( int i = 0; i < sparkCount; i++ )
 			Create( "spark_shower", pev->origin, pTrace->vecPlaneNormal, NULL );
 	}
 }
-
 
 void CGrenade::Smoke()
 {
@@ -172,9 +187,8 @@ void CGrenade::PreDetonate()
 void CGrenade::Detonate()
 {
 	TraceResult tr;
-	Vector		vecSpot;// trace starts here!
 
-	vecSpot = pev->origin + Vector ( 0 , 0 , 8 );
+	Vector vecSpot = pev->origin + Vector(0, 0, 8);
 	UTIL_TraceLine ( vecSpot, vecSpot + Vector ( 0, 0, -40 ),  ignore_monsters, ENT(pev), & tr);
 
 	Explode( &tr, DMG_BLAST );
@@ -187,11 +201,10 @@ void CGrenade::Detonate()
 void CGrenade::ExplodeTouch( CBaseEntity *pOther )
 {
 	TraceResult tr;
-	Vector		vecSpot;// trace starts here!
 
 	pev->enemy = pOther->edict();
 
-	vecSpot = pev->origin - pev->velocity.Normalize() * 32;
+	Vector vecSpot = pev->origin - pev->velocity.Normalize() * 32;
 	UTIL_TraceLine( vecSpot, vecSpot + pev->velocity.Normalize() * 64, ignore_monsters, ENT(pev), &tr );
 
 	Explode( &tr, DMG_BLAST );

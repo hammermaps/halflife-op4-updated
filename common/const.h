@@ -791,5 +791,14 @@ enum WaterLevel
 	WATERLEVEL_HEAD = 3
 };
 
+/**
+*	@brief Constants for entvars_t::waterlevel
+*	@see entvars_t::waterlevel
+*/
+enum ExplosionType
+{
+	EXPLO_TYPE_NORMAL = 0,
+};
+
 #endif
 

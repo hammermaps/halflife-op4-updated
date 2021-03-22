@@ -43,11 +43,11 @@ unsigned char uTgaHeader[12] = {0,0,2, 0,0,0,0,0,0,0,0,0};
 unsigned char cTgaHeader[12] = {0,0,10,0,0,0,0,0,0,0,0,0};
 
 // loads a texture to the pointer
-particle_texture_s * LoadTGA(particle_texture_s *pTexture = NULL, char* filename = "")
+particle_texture_s * LoadTGA(particle_texture_s *pTexture = nullptr, char* filename = "")
 {
 	// perform a texture lookup.  return the cached entry or create a new texture
 	pTexture = pParticleManager->HasTexture(filename);
-	if(pTexture != NULL) {
+	if(pTexture != nullptr) {
 		return pTexture;
 	}
 	else {
@@ -59,16 +59,16 @@ particle_texture_s * LoadTGA(particle_texture_s *pTexture = NULL, char* filename
 	_snprintf(szFilename, sizeof(szFilename) - 1, "%s/%s\0", gEngfuncs.pfnGetGameDirectory(), filename);
 
 	// load the file
-	FILE* fTga = NULL;
+	FILE* fTga = nullptr;
 	fTga = fopen(szFilename, "rb");
 
 	// check for file exists
-	if(fTga == NULL)
+	if(fTga == nullptr)
 	{
 		_snprintf(szFilename, sizeof(szFilename) - 1, "Could not open: %s",  filename);
 
 		MessageBox(NULL, szFilename, "ERROR", MB_OK);
-		return NULL;
+		return nullptr;
 	}
 
 	// allocate the memory for these
@@ -82,12 +82,12 @@ particle_texture_s * LoadTGA(particle_texture_s *pTexture = NULL, char* filename
 		fclose(fTga);
 
 		delete pTgaHeader;
-		pTgaHeader = NULL;
+		pTgaHeader = nullptr;
 		delete pTga;
-		pTga = NULL;
+		pTga = nullptr;
 		delete pTexture;
-		pTexture = NULL;
-		return NULL;
+		pTexture = nullptr;
+		return nullptr;
 	}
 
 	// check for uncompressed tga header

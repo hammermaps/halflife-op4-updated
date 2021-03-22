@@ -29,7 +29,7 @@
 #endif
 
 
-static char *memfgets( byte *pMemFile, int fileSize, int &filePos, char *pBuffer, int bufferSize );
+char *memfgets( byte *pMemFile, int fileSize, int &filePos, char *pBuffer, int bufferSize );
 
 
 // ==================== GENERIC AMBIENT SOUND ======================================
@@ -1487,7 +1487,7 @@ char grgchTextureType[CTEXTURESMAX];						// parallel array of texture types
 // save in array.  Only works first time called, 
 // ignored on subsequent calls.
 
-static char *memfgets( byte *pMemFile, int fileSize, int &filePos, char *pBuffer, int bufferSize )
+char *memfgets( byte *pMemFile, int fileSize, int &filePos, char *pBuffer, int bufferSize )
 {
 	// Bullet-proofing
 	if ( !pMemFile || !pBuffer )
