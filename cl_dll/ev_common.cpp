@@ -102,9 +102,7 @@ Figure out the height of the gun
 */
 void EV_GetGunPosition( event_args_t *args, float *pos, float *origin )
 {
-	int idx;
-
-	idx = args->entindex;
+	int idx = args->entindex;
 
 	Vector view_ofs = VEC_VIEW;
 
@@ -134,11 +132,44 @@ Bullet shell casings
 */
 void EV_EjectBrass( float *origin, float *velocity, float rotation, int model, int soundtype )
 {
-	Vector endpos;
-	VectorClear( endpos );
+	Vector ShellVelocity, endpos;
+	Vector up, right, forward;
+	
+	float fR, fU;
+	fR = gEngfuncs.pfnRandomFloat(30, 50);
+	fU = gEngfuncs.pfnRandomFloat(75, 100);
+
+	VectorClear(endpos);
 	endpos[1] = rotation;
-	gEngfuncs.pEfxAPI->R_TempModel( origin, velocity, endpos, 2.5, model, soundtype );
+	AngleVectors(endpos, forward, right, up);
+
+	for (int i = 0; i < 3; i++)
+		ShellVelocity[i] = -forward[i] * fR + up[i] * fU + right[i] * 35;
+
+	TEMPENTITY* shell = gEngfuncs.pEfxAPI->R_TempModel(origin, ShellVelocity, endpos, 2.5, model, soundtype);
+	
+	//shell->flags |= (FTENT_CLIENTCUSTOM);
+	//shell->callback = EV_EjectBrassCallback;
+	//shell->entity.curstate.framerate = gEngfuncs.pfnRandomLong(70, 140);
 }
+
+/*
+void EV_EjectBrassCallback(struct tempent_s* ent, float frametime, float currenttime)
+{
+	if (ent->entity.curstate.framerate <= 1)
+		return;
+
+	if (gEngfuncs.PM_PointContents(ent->entity.origin, NULL) == CONTENTS_WATER)
+		return;
+
+	Vector VecSpread;
+	VecSpread.x = 0.2;
+	VecSpread.y = 0.2;
+	VecSpread.z = 0.4;
+
+	//g_pRenderManager->AddSystem(new CPSBlastCone(1, 1, 30, ent->entity.origin, Vector(0, 0, 1), VecSpread, 6, 6, 15, 100, 100, 100, 0.08, -0.09, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/particles_black.spr"), FALSE, PARTICLE_BLACK_5, kRenderTransAlpha, 0.1), 0, -1);
+	//ent->entity.curstate.framerate -= 1;
+}*/
 
 /*
 =================

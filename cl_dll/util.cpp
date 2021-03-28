@@ -40,3 +40,11 @@ HSPRITE LoadSprite(const char *pszName)
 	return SPR_Load(sz);
 }
 
+Vector VectorRandom()
+{
+	Vector newVector;
+	newVector.x = gEngfuncs.pfnRandomFloat(-1.0, 1.0);
+	newVector.y = gEngfuncs.pfnRandomFloat(-1.0, 1.0);
+	newVector.z = gEngfuncs.pfnRandomFloat(-1.0, 1.0);
+	return newVector;
+}

@@ -29,6 +29,8 @@
 
 int nanmask = 255<<23;
 
+Vector vector_origin = Vector({ 0,0,0 });
+
 float	anglemod(float a)
 {
 	a = (360.0/65536) * ((int)(a*(65536/360.0)) & 65535);

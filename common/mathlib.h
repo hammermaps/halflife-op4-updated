@@ -22,6 +22,8 @@ typedef float vec_t;
 
 #include "vector.h"
 
+extern Vector vector_origin;
+
 typedef vec_t vec4_t[4];	// x,y,z,w
 typedef vec_t vec5_t[5];
 

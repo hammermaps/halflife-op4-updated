@@ -12,10 +12,9 @@ void EV_HLDM_GunshotDecalTrace( pmtrace_t *pTrace, char *decalName );
 void EV_HLDM_DecalGunshot( pmtrace_t *pTrace, int iBulletType );
 int EV_HLDM_CheckTracer( int idx, float *vecSrc, float *end, float *forward, float *right, int iBulletType, int iTracerFreq, int *tracerCount );
 void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int cShots, float *vecSrc, float *vecDirShooting, float flDistance, int iBulletType, int iTracerFreq, int *tracerCount, float flSpreadX, float flSpreadY );
-void EV_HLDM_DynamicLight(Vector origin, float MinRadius, float MaxRadius, float r, float g, float b, float life);
-void inline EV_HLDM_MuzzleFlash(Vector origin, float amount) {
-	const float radius = static_cast<float>(amount * 100);
-	EV_HLDM_DynamicLight(origin, radius, radius, 255, 255, 128, 0.01f);
+void EV_HLDM_DynamicLight(Vector origin, float amount, float r, float g, float b, float life);
+void inline EV_HLDM_MuzzleFlash(Vector origin, float radius) {
+	EV_HLDM_DynamicLight(origin, radius, 255, 255, 128, 0.01f);
 };
 void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd);
 

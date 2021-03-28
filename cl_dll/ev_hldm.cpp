@@ -63,16 +63,63 @@ void V_PunchAxis( int axis, float punch );
 void VectorAngles( const float *forward, float *angles );
 
 extern cvar_t *cl_lw;
+extern cvar_t* cl_wallgib_life;
+extern cvar_t* cl_gibs_cvar;
 
-void EV_HLDM_DynamicLight(Vector origin, float MinRadius, float MaxRadius, float r, float g, float b, float life)
+void EV_HLDM_DynamicLight(Vector origin, float radius, float r, float g, float b, float life)
 {
 	dlight_t* dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
 	dl->origin = origin;
-	dl->radius = gEngfuncs.pfnRandomFloat(MinRadius, MaxRadius);
 	dl->color.r = r;
 	dl->color.g = g;
 	dl->color.b = b;
+	dl->radius = radius * 100;
 	dl->die = gEngfuncs.GetClientTime() + life;
+}
+
+void EV_WallGib(Vector origin, float random, float scale, float life, int count, int skin, char flags)
+{
+	Vector velocity;
+
+	for (int i = 0; i < count; i++)
+	{
+		Vector dir = (VectorRandom() + VectorRandom());
+		VectorNormalize(dir);
+		VectorScale(dir, random, velocity);
+
+		TEMPENTITY* WallGib = gEngfuncs.pEfxAPI->R_TempModel(origin, velocity, vector_origin, life, gEngfuncs.pEventAPI->EV_FindModelIndex("models/w_gibs_all.mdl"), 0);
+		WallGib->entity.curstate.skin = skin;
+		WallGib->entity.curstate.scale = scale;
+		WallGib->flags |= (flags);
+
+		if (WallGib->entity.curstate.skin == GIB_GLASS)
+		{
+			WallGib->entity.curstate.body = gEngfuncs.pfnRandomLong(14, 19);
+			WallGib->entity.curstate.rendermode = kRenderTransTexture;
+			WallGib->entity.curstate.renderamt = 128;
+		}
+		else if (WallGib->entity.curstate.skin == GIB_SNOWROCK)
+		{
+			WallGib->entity.curstate.body = gEngfuncs.pfnRandomLong(0, 7);
+			WallGib->entity.curstate.rendermode = kRenderTransTexture;
+			WallGib->entity.curstate.renderamt = 128;
+		}
+		else if (WallGib->entity.curstate.skin == GIB_WOOD)
+		{
+			WallGib->entity.curstate.body = gEngfuncs.pfnRandomLong(8, 13);
+			WallGib->entity.baseline.sequence = 2;
+		}
+		else if (WallGib->entity.curstate.skin == GIB_METALL)
+		{
+			WallGib->entity.curstate.body = gEngfuncs.pfnRandomLong(20, 27);
+		}
+		else if (WallGib->entity.curstate.skin == GIB_GRATE)
+		{
+			WallGib->entity.curstate.body = gEngfuncs.pfnRandomLong(28, 35);
+		}
+		else
+			WallGib->entity.curstate.body = gEngfuncs.pfnRandomLong(0, 7);
+	}
 }
 
 void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
@@ -131,7 +178,6 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 		switch (chTextureType)
 		{
 		case CHAR_TEX_TILE:
-
 			switch (gEngfuncs.pfnRandomLong(0, 2))
 			{
 			case 0:gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "bulletimpact/tile1.wav", 1.5, ATTN_NORM, 0, PITCH_NORM); break;
@@ -139,7 +185,7 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 			case 2:gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "bulletimpact/tile3.wav", 1.5, ATTN_NORM, 0, PITCH_NORM); break;
 			}
 
-		//	EV_Wallgib(pTrace->endpos, gEngfuncs.pfnRandomFloat(300, 600), gEngfuncs.pfnRandomFloat(1, 1.8), gHUD.WallgibGiblifeCvar->value, gHUD.GibsCvar->value, GIB_TILE, 0);
+			EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(250, 500), gEngfuncs.pfnRandomFloat(1, 1.8), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_TILE, 0);
 
 			fDoPuffs = true;
 			a = 128; //128
@@ -156,7 +202,7 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 			case 2:gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "bulletimpact/concrete3.wav", 1.5, ATTN_NORM, 0, PITCH_NORM); break;
 			}
 
-		//	EV_Wallgib(pTrace->endpos, gEngfuncs.pfnRandomFloat(250, 500), gEngfuncs.pfnRandomFloat(1, 1.8), gHUD.WallgibGiblifeCvar->value, gHUD.GibsCvar->value, GIB_CONCRETE, 0);
+			EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(250, 500), gEngfuncs.pfnRandomFloat(1, 1.8), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_CONCRETE, 0);
 
 			fDoPuffs = true;
 			a = 128; //128
@@ -169,16 +215,14 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 		case CHAR_TEX_GRATE:
 			if (contents != CONTENTS_WATER)
 			{
-
 				//DYN Licht
-				EV_HLDM_DynamicLight(pTrace->endpos, 40, 65, 254, 110, 25, 0.15);
+				EV_HLDM_DynamicLight(pTrace->endpos, 0.2, 254, 110, 25, 0.15);
 
-		//		EV_Wallgib(pTrace->endpos, gEngfuncs.pfnRandomFloat(200, 400), gEngfuncs.pfnRandomFloat(2, 4), gHUD.WallgibGiblifeCvar->value, gHUD.GibsCvar->value, GIB_GRATE, 0);
+				EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(250, 500), gEngfuncs.pfnRandomFloat(1, 1.8), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_GRATE, 0);
 
 				fDoSparks = (gEngfuncs.pfnRandomLong(1, 4) == 1);
 
 				gEngfuncs.pEfxAPI->R_TempSprite(pTrace->endpos, vec3_origin, 0.1, m_iMetalGlow, kRenderGlow, kRenderFxNoDissipation, 200.0 / 255.0, 0.3, FTENT_FADEOUT);
-				EV_HLDM_MuzzleFlash(pTrace->endpos, 0.8 + gEngfuncs.pfnRandomFloat(-0.2, 0.2)); //1.0
 
 				VectorAdd(pTrace->endpos, pTrace->plane.normal, fwd);
 
@@ -219,14 +263,13 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 			{
 
 				//DYN Licht
-				EV_HLDM_DynamicLight(pTrace->endpos, 40, 65, 254, 110, 25, 0.15);
+				EV_HLDM_DynamicLight(pTrace->endpos, 0.2, 254, 110, 25, 0.15);
 
-		//		EV_Wallgib(pTrace->endpos, gEngfuncs.pfnRandomFloat(200, 400), gEngfuncs.pfnRandomFloat(2, 4), gHUD.WallgibGiblifeCvar->value, gHUD.GibsCvar->value, GIB_METALL, 0);
+				EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(250, 500), gEngfuncs.pfnRandomFloat(1, 1.8), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_METALL, FTENT_SMOKETRAIL);
 
 				fDoSparks = (gEngfuncs.pfnRandomLong(1, 4) == 1);
 
 				gEngfuncs.pEfxAPI->R_TempSprite(pTrace->endpos, vec3_origin, 0.1, m_iMetalGlow, kRenderGlow, kRenderFxNoDissipation, 200.0 / 255.0, 0.3, FTENT_FADEOUT);
-				EV_HLDM_MuzzleFlash(pTrace->endpos, 0.8 + gEngfuncs.pfnRandomFloat(-0.2, 0.2)); //1.0
 
 				VectorAdd(pTrace->endpos, pTrace->plane.normal, fwd);
 
@@ -263,8 +306,9 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 
 
 		case CHAR_TEX_DIRT:
-			EV_HLDM_DynamicLight(pTrace->endpos, 40, 65, 254, 110, 25, 0.15);
-		//	EV_Wallgib(pTrace->endpos, gEngfuncs.pfnRandomFloat(300, 600), gEngfuncs.pfnRandomFloat(1, 1.8), gHUD.WallgibGiblifeCvar->value, gHUD.GibsCvar->value, GIB_DIRT, FTENT_SMOKETRAIL);
+			EV_HLDM_DynamicLight(pTrace->endpos, 0.2, 254, 110, 25, 0.15);
+			
+			EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(300, 600), gEngfuncs.pfnRandomFloat(1, 1.8), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_DIRT, 0);
 
 			a = 250;
 			r = 97;
@@ -275,7 +319,7 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 		case CHAR_TEX_GRASS:
 			EV_DynLight(pTrace->endpos, 40, 65, 254, 110, 25, 0.15);
 
-			EV_Wallgib(pTrace->endpos, gEngfuncs.pfnRandomFloat(300, 600), gEngfuncs.pfnRandomFloat(1, 1.8), gHUD.WallgibGiblifeCvar->value, gHUD.GibsCvar->value, GIB_GRASS, 0);
+			EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(300, 600), gEngfuncs.pfnRandomFloat(1, 1.8), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_GRASS, 0);
 
 			a = 250;
 			r = 97;
@@ -286,7 +330,7 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 		case CHAR_TEX_WOOD:
 			fDoPuffs = false; //NO Smoke
 
-		//	EV_Wallgib(pTrace->endpos, gEngfuncs.pfnRandomFloat(250, 500), gEngfuncs.pfnRandomFloat(1.5, 4), gHUD.WallgibGiblifeCvar->value, gHUD.GibsCvar->value, GIB_WOOD, FTENT_SMOKETRAIL);
+			EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(250, 500), gEngfuncs.pfnRandomFloat(1.5, 4), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_WOOD, 0);
 
 			switch (gEngfuncs.pfnRandomLong(0, 2))
 			{
@@ -313,10 +357,22 @@ void EV_HLDM_SmokePuff(pmtrace_t* pTrace, float* vecSrc, float* vecEnd)
 			case 2:gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "bulletimpact/glass3.wav", 1.5, ATTN_NORM, 0, PITCH_NORM); break;
 			}
 
-			//EV_Wallgib(pTrace->endpos, gEngfuncs.pfnRandomFloat(200, 400), gEngfuncs.pfnRandomFloat(1.5, 4), gHUD.WallgibGiblifeCvar->value, gHUD.GibsCvar->value, GIB_GLASS, 0);
+			EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(200, 400), gEngfuncs.pfnRandomFloat(1.5, 4), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_GLASS, 0);
 
 			break;
+		case CHAR_TEX_SNOW:
+			fDoPuffs = false; //NO Smoke
 
+		/*	switch (gEngfuncs.pfnRandomLong(0, 2))
+			{
+			case 0:gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "bulletimpact/glass1.wav", 1.5, ATTN_NORM, 0, PITCH_NORM); break;
+			case 1:gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "bulletimpact/glass2.wav", 1.5, ATTN_NORM, 0, PITCH_NORM); break;
+			case 2:gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "bulletimpact/glass3.wav", 1.5, ATTN_NORM, 0, PITCH_NORM); break;
+			}
+			*/
+			EV_WallGib(pTrace->endpos, gEngfuncs.pfnRandomFloat(200, 400), gEngfuncs.pfnRandomFloat(1.5, 4), cl_wallgib_life->value, cl_gibs_cvar->value, GIB_SNOW, 0);
+
+			break;
 		case CHAR_TEX_SLOSH:
 			fDoPuffs = false; //NO Smoke
 
@@ -657,8 +713,7 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 	int i;
 	pmtrace_t tr;
 	int iShot;
-	int tracer;
-	
+
 	for ( iShot = 1; iShot <= cShots; iShot++ )	
 	{
 		Vector vecDir, vecEnd;
@@ -700,7 +755,7 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 		gEngfuncs.pEventAPI->EV_SetTraceHull( 2 );
 		gEngfuncs.pEventAPI->EV_PlayerTrace( vecSrc, vecEnd, PM_STUDIO_BOX, -1, &tr );
 
-		tracer = EV_HLDM_CheckTracer( idx, vecSrc, tr.endpos, forward, right, iBulletType, iTracerFreq, tracerCount );
+		int tracer = EV_HLDM_CheckTracer(idx, vecSrc, tr.endpos, forward, right, iBulletType, iTracerFreq, tracerCount);
 
 		// do damage, paint decals
 		if ( tr.fraction != 1.0 )
@@ -709,13 +764,11 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 			{
 			default:
 			case BULLET_PLAYER_9MM:		
-				
 				EV_HLDM_PlayTextureSound( idx, &tr, vecSrc, vecEnd, iBulletType );
 				EV_HLDM_DecalGunshot( &tr, iBulletType );
 				EV_HLDM_SmokePuff(&tr, vecSrc, vecEnd);
 					break;
 			case BULLET_PLAYER_MP5:		
-				
 				if ( !tracer )
 				{
 					EV_HLDM_PlayTextureSound( idx, &tr, vecSrc, vecEnd, iBulletType );
@@ -726,10 +779,8 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 			case BULLET_PLAYER_BUCKSHOT:
 				EV_HLDM_DecalGunshot( &tr, iBulletType );
 				EV_HLDM_SmokePuff(&tr, vecSrc, vecEnd);
-			
 				break;
 			case BULLET_PLAYER_357:
-				
 				EV_HLDM_PlayTextureSound( idx, &tr, vecSrc, vecEnd, iBulletType );
 				EV_HLDM_DecalGunshot( &tr, iBulletType );
 				EV_HLDM_SmokePuff(&tr, vecSrc, vecEnd);
@@ -764,33 +815,31 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 //======================
 void EV_FireGlock1( event_args_t *args )
 {
-	int idx;
 	Vector origin;
 	Vector angles;
 	Vector velocity;
-	int empty;
 
 	Vector ShellVelocity;
 	Vector ShellOrigin;
-	int shell;
 	Vector vecSrc, vecAiming;
 	Vector up, right, forward;
 	
-	idx = args->entindex;
+	int idx = args->entindex;
 	VectorCopy( args->origin, origin );
 	VectorCopy( args->angles, angles );
 	VectorCopy( args->velocity, velocity );
 
-	empty = args->bparam1;
+	int empty = args->bparam1;
 	AngleVectors( angles, forward, right, up );
 
-	shell = gEngfuncs.pEventAPI->EV_FindModelIndex ("models/shell.mdl");// brass shell
+	int shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");// brass shell
 
 	if ( EV_IsLocal( idx ) )
 	{
 		EV_MuzzleFlash();
+		
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( empty ? GLOCK_SHOOT_EMPTY : GLOCK_SHOOT, 2 );
-
+		
 		V_PunchAxis( 0, -2.0 );
 	}
 
@@ -798,7 +847,7 @@ void EV_FireGlock1( event_args_t *args )
 
 	EV_EjectBrass ( ShellOrigin, ShellVelocity, angles[ YAW ], shell, TE_BOUNCE_SHELL ); 
 
-	EV_HLDM_MuzzleFlash(vecSrc, 0.2 + gEngfuncs.pfnRandomFloat(-0.2, 0.2)); //1.0
+	EV_HLDM_MuzzleFlash(origin,1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
 	
 	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/pl_gun3.wav", gEngfuncs.pfnRandomFloat(0.92, 1.0), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong( 0, 3 ) );
 
@@ -811,41 +860,36 @@ void EV_FireGlock1( event_args_t *args )
 
 void EV_FireGlock2( event_args_t *args )
 {
-	int idx;
 	Vector origin;
 	Vector angles;
 	Vector velocity;
 	
 	Vector ShellVelocity;
 	Vector ShellOrigin;
-	int shell;
 	Vector vecSrc, vecAiming;
-	Vector vecSpread;
 	Vector up, right, forward;
 
-	idx = args->entindex;
+	int idx = args->entindex;
 	VectorCopy( args->origin, origin );
 	VectorCopy( args->angles, angles );
 	VectorCopy( args->velocity, velocity );
 
 	AngleVectors( angles, forward, right, up );
 
-	shell = gEngfuncs.pEventAPI->EV_FindModelIndex ("models/shell.mdl");// brass shell
+	int shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");// brass shell
 
 	if ( EV_IsLocal( idx ) )
 	{
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( GLOCK_SHOOT, 2 );
-
+		EV_HLDM_MuzzleFlash(origin, 1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
 		V_PunchAxis( 0, -2.0 );
 	}
 
 	EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4 );
 
 	EV_EjectBrass ( ShellOrigin, ShellVelocity, angles[ YAW ], shell, TE_BOUNCE_SHELL );
-
-	EV_HLDM_MuzzleFlash(vecSrc, 0.2 + gEngfuncs.pfnRandomFloat(-0.2, 0.2)); //1.0
 
 	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/pl_gun3.wav", gEngfuncs.pfnRandomFloat(0.92, 1.0), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong( 0, 3 ) );
 
@@ -893,6 +937,7 @@ void EV_FireShotGunDouble( event_args_t *args )
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( SHOTGUN_FIRE2, 2 );
+		EV_HLDM_MuzzleFlash(origin, 1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
 		V_PunchAxis( 0, -10.0 );
 	}
 
@@ -947,7 +992,7 @@ void EV_FireShotGunSingle( event_args_t *args )
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( SHOTGUN_FIRE, 2 );
-
+		EV_HLDM_MuzzleFlash(origin, 1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
 		V_PunchAxis( 0, -5.0 );
 	}
 
@@ -1004,7 +1049,7 @@ void EV_FireMP5( event_args_t *args )
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( MP5_FIRE1 + gEngfuncs.pfnRandomLong(0,2), 2 );
-
+		EV_HLDM_MuzzleFlash(origin, 1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
 		V_PunchAxis( 0, gEngfuncs.pfnRandomFloat( -2, 2 ) );
 	}
 
@@ -1097,7 +1142,7 @@ void EV_FirePython( event_args_t *args )
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( PYTHON_FIRE1, body );
-
+		EV_HLDM_MuzzleFlash(origin, 1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
 		V_PunchAxis( 0, -10.0 );
 
 		SetLocalBody( WEAPON_PYTHON, body );
@@ -1950,7 +1995,8 @@ void EV_FireEagle( event_args_t* args )
 		-9.0, 14.0, 9.0 );
 
 	EV_EjectBrass( ShellOrigin, ShellVelocity, args->angles[ 1 ], iShell, TE_BOUNCE_SHELL );
-
+	EV_HLDM_MuzzleFlash(args->origin, 1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
+	
 	gEngfuncs.pEventAPI->EV_PlaySound(
 		args->entindex,
 		args->origin, CHAN_WEAPON, "weapons/desert_eagle_fire.wav",
@@ -2066,6 +2112,7 @@ void EV_FireM249( event_args_t* args )
 		SetLocalBody( WEAPON_M249, iBody );
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( gEngfuncs.pfnRandomLong( 0, 2 ) + M249_SHOOT1, iBody );
+		EV_HLDM_MuzzleFlash(args->origin, 1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
 		V_PunchAxis( 0, gEngfuncs.pfnRandomFloat( -2, 2 ) );
 		V_PunchAxis( 1, gEngfuncs.pfnRandomFloat( -1, 1 ) );
 	}
@@ -2234,6 +2281,7 @@ void EV_SniperRifle( event_args_t* args )
 	{
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( iClip <= 0 ? SNIPERRIFLE_FIRELASTROUND : SNIPERRIFLE_FIRE, 0 );
+		EV_HLDM_MuzzleFlash(args->origin, 1.0 + gEngfuncs.pfnRandomFloat(0.2, 0.6));
 		V_PunchAxis( 0, -2.0 );
 	}
 
@@ -2245,8 +2293,6 @@ void EV_SniperRifle( event_args_t* args )
 	Vector vecAiming = forward;
 
 	EV_GetGunPosition( args, vecSrc, vecOrigin );
-
-	
 
 	EV_HLDM_FireBullets(
 		idx,

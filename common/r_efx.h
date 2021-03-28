@@ -85,6 +85,24 @@ color24 gTracerColors[] =
 #define FTENT_NOMODEL			0x00040000 // Doesn't have a model, never try to draw ( it just triggers other things )
 #define FTENT_CLIENTCUSTOM		0x00080000 // Must specify callback.  Callback function is responsible for killing tempent and updating fields ( unless other flags specify how to do things )
 
+#define GIB_BRICK	0
+#define GIB_ROCK	1
+#define GIB_ASPHALT	2
+#define GIB_FLESH	3
+#define GIB_CONCRETE	4
+#define GIB_TILE	5
+#define GIB_SNOW	6
+#define GIB_GRASS	7
+#define GIB_DIRT	8
+#define GIB_SAND	9
+#define GIB_SANDWALL	10
+#define GIB_SNOWROCK	11
+#define GIB_LEAVES	12
+#define GIB_GLASS	13//Not a skin, just submodels
+#define GIB_WOOD	14
+#define GIB_METALL	15
+#define GIB_GRATE	16
+
 typedef struct tempent_s
 {
 	int			flags;

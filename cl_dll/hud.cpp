@@ -90,6 +90,8 @@ cvar_t *cl_lw = NULL;
 cvar_t* cl_rollangle = nullptr;
 cvar_t* cl_rollspeed = nullptr;
 cvar_t* cl_bobtilt = nullptr;
+cvar_t* cl_wallgib_life = nullptr;
+cvar_t* cl_gibs_cvar = nullptr;
 
 void ShutdownInput ();
 
@@ -406,6 +408,8 @@ void CHud :: Init()
 	cl_rollangle = CVAR_CREATE("cl_rollangle", "2.0", FCVAR_ARCHIVE);
 	cl_rollspeed = CVAR_CREATE("cl_rollspeed", "200", FCVAR_ARCHIVE);
 	cl_bobtilt = CVAR_CREATE("cl_bobtilt", "0", FCVAR_ARCHIVE);
+	cl_wallgib_life = CVAR_CREATE("cl_wallgib_giblife", "4", FCVAR_ARCHIVE);
+	cl_gibs_cvar = CVAR_CREATE("cl_gibs_cvar", "8", FCVAR_ARCHIVE);
 
 	g_ParticleCount = CVAR_CREATE("cl_particlecount", "100", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
 	g_ParticleDebug = CVAR_CREATE("cl_particledebug", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);

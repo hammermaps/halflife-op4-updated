@@ -611,6 +611,18 @@ void CHoundeye :: SonicAttack ()
 		WRITE_BYTE( 0 );		// speed
 	MESSAGE_END();
 
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_DLIGHT);
+		WRITE_COORD(pev->origin.x);	// X
+		WRITE_COORD(pev->origin.y);	// Y
+		WRITE_COORD(pev->origin.z);	// Z
+		WRITE_BYTE(32);
+	
+		WriteBeamColor();
+	
+		WRITE_BYTE(2);		// time * 10
+		WRITE_BYTE(0);		// decay * 0.1
+	MESSAGE_END();
 
 	CBaseEntity *pEntity = NULL;
 	// iterate on all entities in the vicinity.

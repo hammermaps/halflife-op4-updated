@@ -408,17 +408,13 @@ void CISlave :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				if ( !trace.fStartSolid )
 				{
 					CBaseEntity *pNew = Create( "monster_alien_slave", m_hDead->pev->origin, m_hDead->pev->angles );
-					CBaseMonster *pNewMonster = pNew->MyMonsterPointer( );
+					pNew->pev->model = m_hDead->pev->model;
 					pNew->pev->spawnflags |= 1;
+					
 					WackBeam( -1, pNew );
 					WackBeam( 1, pNew );
 					UTIL_Remove( m_hDead );
 					EMIT_SOUND_DYN( ENT(pev), CHAN_WEAPON, "hassault/hw_shoot1.wav", 1, ATTN_NORM, 0, RANDOM_LONG( 130, 160 ) );
-
-					/*
-					CBaseEntity *pEffect = Create( "test_effect", pNew->Center(), pev->angles );
-					pEffect->Use( this, this, USE_ON, 1 );
-					*/
 					break;
 				}
 			}
@@ -467,8 +463,6 @@ BOOL CISlave :: CheckRangeAttack1 ( float flDot, float flDist )
 //=========================================================
 BOOL CISlave :: CheckRangeAttack2 ( float flDot, float flDist )
 {
-	return FALSE;
-
 	if (m_flNextAttack > gpGlobals->time)
 	{
 		return FALSE;
@@ -772,6 +766,20 @@ void CISlave :: BeamGlow( )
 	if (b > 255)
 		b = 255;
 
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+	WRITE_BYTE(TE_DLIGHT);
+	WRITE_COORD(pev->origin.x);	// X
+	WRITE_COORD(pev->origin.y);	// Y
+	WRITE_COORD(pev->origin.z);	// Z
+	WRITE_BYTE(8);		// radius * 0.1
+	WRITE_BYTE(255);		// r
+	WRITE_BYTE(180);		// g
+	WRITE_BYTE(96);		// b
+	WRITE_BYTE(10);		// time * 10
+	WRITE_BYTE(0);		// decay * 0.1
+	MESSAGE_END();
+
+	
 	for (int i = 0; i < m_iBeams; i++)
 	{
 		if (m_pBeam[i]->GetBrightness() != 255) 

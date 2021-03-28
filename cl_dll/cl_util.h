@@ -169,3 +169,4 @@ void VectorInverse ( float *v );
 #pragma warning( disable: 4305 )
 
 HSPRITE LoadSprite(const char *pszName);
+Vector VectorRandom();

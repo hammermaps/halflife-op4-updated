@@ -966,6 +966,19 @@ void COFMedicAlly :: Shoot ()
 		pszSoundName = "weapons/desert_eagle_fire.wav";
 	}
 
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_DLIGHT);
+	WRITE_COORD(vecShootOrigin.x); // origin
+	WRITE_COORD(vecShootOrigin.y);
+	WRITE_COORD(vecShootOrigin.z);
+	WRITE_BYTE(20);     // radius
+	WRITE_BYTE(255);     // R
+	WRITE_BYTE(255);     // G
+	WRITE_BYTE(128);     // B
+	WRITE_BYTE(0);     // life * 10
+	WRITE_BYTE(0); // decay
+	MESSAGE_END();
+
 	const auto random = RANDOM_LONG(0, 20);
 
 	const auto pitch = random <= 10 ? random + 95 : 100;
