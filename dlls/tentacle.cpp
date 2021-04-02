@@ -71,8 +71,7 @@ public:
 	void Killed( entvars_t *pevAttacker, int iGib ) override;
 
 	MONSTERSTATE GetIdealState () override { return MONSTERSTATE_IDLE; }
-	//TODO: should override base, but has different signature
-	int CanPlaySequence( BOOL fDisregardState ) { return TRUE; }
+	int CanPlaySequence(int interruptFlags) override { return TRUE; }
 
 	int Classify() override;
 

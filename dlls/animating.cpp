@@ -47,7 +47,7 @@ float CBaseAnimating :: StudioFrameAdvance ( float flInterval )
 	if (flInterval == 0.0)
 	{
 		flInterval = (gpGlobals->time - pev->animtime);
-		if (flInterval < 0.0)
+		if (flInterval <= 0.001)
 		{
 			pev->animtime = gpGlobals->time;
 			return 0.0;
@@ -246,6 +246,15 @@ int CBaseAnimating :: GetBodygroup( int iGroup )
 	return ::GetBodygroup( GET_MODEL_PTR( ENT(pev) ), pev, iGroup );
 }
 
+int CBaseAnimating::GetBoneCount(void)
+{
+	return ::GetBoneCount(GET_MODEL_PTR(ENT(pev)));
+}
+
+void CBaseAnimating::SetBones(float(*data)[3], int datasize)
+{
+	::SetBones(GET_MODEL_PTR(ENT(pev)), data, datasize);
+}
 
 int CBaseAnimating :: ExtractBbox( int sequence, float *mins, float *maxs )
 {

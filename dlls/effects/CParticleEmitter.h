@@ -31,6 +31,10 @@
 #ifndef PATICLE_EMITTER
 #define PATICLE_EMITTER
 
+#ifndef PARTICLE_DEFS_H
+#include <particle_defs.h>
+#endif
+
 const unsigned int SF_START_ON = 1;
 const unsigned int SF_TRIGGERABLE = 2;
 
@@ -43,7 +47,7 @@ public:
     void MakeAware(CBaseEntity* pEnt);
     void EXPORT Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
     int ObjectCaps() override { return CBaseEntity::ObjectCaps() | FCAP_MASTER; }
-    BOOL IsTriggered(CBaseEntity* pActivator) override;
+    STATE GetState(CBaseEntity* pEntity) override;
 
     bool bIsOn;
     char sParticleDefintionFile[MAX_PARTICLE_PATH];

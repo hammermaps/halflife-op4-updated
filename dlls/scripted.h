@@ -27,21 +27,16 @@
 #define SF_SCRIPT_NOINTERRUPT		32
 #define SF_SCRIPT_OVERRIDESTATE		64
 #define SF_SCRIPT_NOSCRIPTMOVEMENT	128
-
-/**
-*	@brief Don't reset the entity's state after completing the script
-*	For chaining scripts without sequence changes
-*/
-constexpr auto SF_SCRIPT_NORESETENTITY = 256;
+#define SF_SCRIPT_STAYDEAD			256 // LRC- signifies that the animation kills the monster
+										// (needed because the monster animations don't use AnimEvent 1000 properly)
 
 #define SCRIPT_BREAK_CONDITIONS		(bits_COND_LIGHT_DAMAGE|bits_COND_HEAVY_DAMAGE)
 
-enum SS_INTERRUPT
-{
-	SS_INTERRUPT_IDLE = 0,
-	SS_INTERRUPT_BY_NAME,
-	SS_INTERRUPT_AI,
-};
+//LRC - rearranged into flags
+#define SS_INTERRUPT_IDLE		0x0
+#define SS_INTERRUPT_ALERT		0x1
+#define SS_INTERRUPT_ANYSTATE	0x2
+#define SS_INTERRUPT_SCRIPTS	0x4
 
 // when a monster finishes an AI scripted sequence, we can choose
 // a schedule to place them in. These defines are the aliases to
@@ -52,48 +47,71 @@ enum SS_INTERRUPT
 class CCineMonster : public CBaseMonster
 {
 public:
-	void Spawn() override;
-	void KeyValue( KeyValueData *pkvd ) override;
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value ) override;
-	void Blocked( CBaseEntity *pOther ) override;
-	void Touch( CBaseEntity *pOther ) override;
-	int	 ObjectCaps() override { return (CBaseMonster :: ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
-	void Activate() override;
+	void Spawn( void );
+	virtual void KeyValue( KeyValueData *pkvd );
+	virtual void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	virtual void Blocked( CBaseEntity *pOther );
+	virtual void Touch( CBaseEntity *pOther );
+	virtual int	 ObjectCaps( void ) { return (CBaseMonster :: ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
+	virtual void Activate( void );
 
-	int		Save( CSave &save ) override;
-	int		Restore( CRestore &restore ) override;
+	virtual int		Save( CSave &save );
+	virtual int		Restore( CRestore &restore );
 	
 	static	TYPEDESCRIPTION m_SaveData[];
 
 	//LRC: states for script entities
-	virtual STATE GetState() { return m_iState; };
+	virtual STATE	GetState( void ) { return m_iState; };
 	STATE	m_iState;
 
 	// void EXPORT CineSpawnThink();
-	void EXPORT CineThink();
-	void Pain();
-	void Die();
+	void EXPORT CineThink( void );
+	void EXPORT InitIdleThink( void ); //LRC
+	void Pain( void );
+	void Die( void );
 	void DelayStart( int state );
-	BOOL FindEntity();
-	virtual void PossessEntity();
+	CBaseMonster* FindEntity( const char* sName, CBaseEntity *pActivator );
+	virtual void PossessEntity( void );
+
+	inline BOOL IsAction( void ) { return FClassnameIs(pev,"scripted_action"); }; //LRC
+
+	//LRC: Should the monster do a precise attack for this scripted_action?
+	// (Do a precise attack if we'll be turning to face the target, but we haven't just walked to the target.)
+	BOOL PreciseAttack( void )
+	{
+	//	if (m_fTurnType != 1) { ALERT(at_console,"preciseattack fails check 1\n"); return FALSE; }
+	//	if (m_fMoveTo == 0) { ALERT(at_console,"preciseattack fails check 2\n"); return FALSE; }
+	//	if (m_fMoveTo != 5 && m_iszAttack == 0) { ALERT(at_console,"preciseattack fails check 3\n"); return FALSE; }
+	//	ALERT(at_console,"preciseattack passes!\n");
+	//	return TRUE;
+		return m_fTurnType == 1 && ( m_fMoveTo == 5 || (m_fMoveTo != 0 && !FStrEq(STRING(m_iszAttack), STRING(m_iszMoveTarget)) ));
+	};
 
 	void ReleaseEntity( CBaseMonster *pEntity );
-	void CancelScript();
+	void CancelScript( void );
 	virtual BOOL StartSequence( CBaseMonster *pTarget, int iszSeq, BOOL completeOnEmpty );
-	virtual BOOL FCanOverrideState ();
 	void SequenceDone ( CBaseMonster *pMonster );
 	virtual void FixScriptMonsterSchedule( CBaseMonster *pMonster );
-	BOOL	CanInterrupt();
+	BOOL	CanInterrupt( void );
 	void	AllowInterrupt( BOOL fAllow );
-	int		IgnoreConditions() override;
+	int		IgnoreConditions( void );
 
 	int	m_iszIdle;		// string index for idle animation
 	int	m_iszPlay;		// string index for scripted animation
 	int m_iszEntity;	// entity that is wanted for this script
+	int m_iszAttack;	// entity to attack
+	int m_iszMoveTarget; // entity to move to
+	int m_iszFireOnBegin; // entity to fire when the sequence _starts_.
 	int m_fMoveTo;
+	int m_fTurnType;
+	int m_fAction;
 	int m_iFinishSchedule;
 	float m_flRadius;		// range to search
-	float m_flRepeat;	// repeat rate
+//LRC- this does nothing!!	float m_flRepeat;	// repeat rate
+	int m_iRepeats; //LRC - number of times to repeat the animation
+	int m_iRepeatsLeft; //LRC
+	float m_fRepeatFrame; //LRC
+	int m_iPriority; //LRC
 
 	int m_iDelay;
 	float m_startTime;
@@ -105,13 +123,6 @@ public:
 	BOOL m_interruptable;
 };
 
-class CCineAI : public CCineMonster
-{
-	BOOL StartSequence( CBaseMonster *pTarget, int iszSeq, BOOL completeOnEmpty ) override;
-	void PossessEntity() override;
-	BOOL FCanOverrideState () override;
-	void FixScriptMonsterSchedule( CBaseMonster *pMonster ) override;
-};
-
+//LRC - removed CCineAI, obsolete
 
 #endif		//SCRIPTED_H

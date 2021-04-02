@@ -34,6 +34,7 @@ public:
 
 	void Spawn() override;
 	void Precache() override;
+	void UpdateOnRemove() override;
 	int  Classify() override { return CLASS_ALIEN_MILITARY; }
 	int  BloodColor() override { return BLOOD_COLOR_YELLOW; }
 	void Killed( entvars_t *pevAttacker, int iGib ) override;
@@ -344,7 +345,25 @@ void CNihilanth::Precache()
 	PRECACHE_SOUND("debris/beamstart7.wav");
 }
 
+void CNihilanth::UpdateOnRemove()
+{
+	CBaseMonster::UpdateOnRemove();
 
+	if (m_pBall)
+	{
+		UTIL_Remove(m_pBall);
+		m_pBall = nullptr;
+	}
+
+	for (auto& hSphere : m_hSphere)
+	{
+		if (CBaseEntity* pSphere = hSphere)
+		{
+			UTIL_Remove(pSphere);
+			hSphere = nullptr;
+		}
+	}
+}
 
 void CNihilanth :: PainSound()
 {

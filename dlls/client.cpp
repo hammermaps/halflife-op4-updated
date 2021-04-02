@@ -39,6 +39,7 @@
 #include "usercmd.h"
 #include "netadr.h"
 #include "pm_shared.h"
+#include "movewith.h"
 #include "UserMessages.h"
 
 #include "ctf/CTFGoal.h"
@@ -409,7 +410,7 @@ void Host_Say( edict_t *pEntity, int teamonly )
 	}
 
 // remove quotes if present
-	if (*p == '"')
+	if (p && *p == '"')
 	{
 		p++;
 		p[strlen(p)-1] = 0;
@@ -537,6 +538,35 @@ void ClientCommand( edict_t *pEntity )
 	if ( FStrEq(pcmd, "say" ) )
 	{
 		Host_Say( pEntity, 0 );
+	}
+	
+	else if ( FStrEq(pcmd, "fire") ) //LRC - trigger entities manually
+	{
+		CBaseEntity* pPlayer = CBaseEntity::Instance(pEntity);
+		if (CMD_ARGC() > 1)
+		{
+			FireTargets(CMD_ARGV(1), pPlayer, pPlayer, USE_TOGGLE, 0);
+		}
+		else
+		{
+			TraceResult tr;
+			UTIL_MakeVectors(pev->v_angle);
+			UTIL_TraceLine(
+				pev->origin + pev->view_ofs,
+				pev->origin + pev->view_ofs + gpGlobals->v_forward * 1000,
+				dont_ignore_monsters, pEntity, &tr
+			);
+
+			if (tr.pHit)
+			{
+				CBaseEntity* pHitEnt = CBaseEntity::Instance(tr.pHit);
+				if (pHitEnt)
+				{
+					pHitEnt->Use(pPlayer, pPlayer, USE_TOGGLE, 0);
+					ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, UTIL_VarArgs("Fired %s \"%s\"\n", STRING(pHitEnt->pev->classname), STRING(pHitEnt->pev->targetname)));
+				}
+			}
+		}
 	}
 	else if ( FStrEq(pcmd, "say_team" ) )
 	{
@@ -820,6 +850,9 @@ void ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	LinkUserMessages();
 }
 
+// a cached version of gpGlobals->frametime. The engine sets frametime to 0 if the player is frozen... so we just cache it in prethink,
+// allowing it to be restored later and used by CheckDesiredList.
+float cached_frametime = 0.0f;
 
 /*
 ================
@@ -835,6 +868,8 @@ void PlayerPreThink( edict_t *pEntity )
 
 	if (pPlayer)
 		pPlayer->PreThink( );
+
+	cached_frametime = gpGlobals->frametime;
 }
 
 /*
@@ -851,6 +886,13 @@ void PlayerPostThink( edict_t *pEntity )
 
 	if (pPlayer)
 		pPlayer->PostThink( );
+
+	// use the old frametime, even if the engine has reset it
+	gpGlobals->frametime = cached_frametime;
+
+	//LRC - moved to here from CBasePlayer::PostThink, so that
+	// things don't stop when the player dies
+	CheckDesiredList( );
 }
 
 
@@ -883,6 +925,9 @@ void StartFrame()
 
 	gpGlobals->teamplay = teamplay.value;
 	g_ulFrameCount++;
+
+//	CheckDesiredList(); //LRC
+	CheckAssistList(); //LRC
 }
 
 
@@ -1029,7 +1074,7 @@ const char *GetGameDescription()
 	if ( g_pGameRules ) // this function may be called before the world has spawned, and the game rules initialized
 		return g_pGameRules->GetGameDescription();
 	else
-		return "Opposing Force";
+		return "Half-Life: Generations";
 }
 
 /*
@@ -1200,7 +1245,7 @@ int AddToFullPack( struct entity_state_s *state, int e, edict_t *ent, edict_t *h
 	int					i;
 
 	// don't send if flagged for NODRAW and it's not the host getting the message
-	if ( ( ent->v.effects & EF_NODRAW ) &&
+	if ( ( ent->v.effects == EF_NODRAW ) &&
 		 ( ent != host ) )
 		return 0;
 

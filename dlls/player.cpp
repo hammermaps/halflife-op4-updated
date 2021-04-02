@@ -2888,7 +2888,7 @@ BOOL IsSpawnPointValid( CBaseEntity *pPlayer, CBaseEntity *pSpot )
 {
 	CBaseEntity *ent = NULL;
 
-	if ( !pSpot->IsTriggered( pPlayer ) )
+	if (pSpot->GetState(pPlayer) != STATE_ON)
 	{
 		return FALSE;
 	}

@@ -26,6 +26,7 @@
 #include	"decals.h"
 #include	"soundent.h"
 #include	"game.h"
+#include	"scripted.h"
 
 #define		SQUID_SPRINT_DIST	256 // how close the squid has to get before starting to sprint and refusing to swerve
 
@@ -226,6 +227,7 @@ public:
 	float m_flNextSpitTime;// last time the bullsquid used the spit attack.
 };
 LINK_ENTITY_TO_CLASS( monster_bullchicken, CBullsquid );
+LINK_ENTITY_TO_CLASS( monster_bullsquid, CBullsquid ); //LRC - let's get the right name...
 
 TYPEDESCRIPTION	CBullsquid::m_SaveData[] = 
 {
@@ -425,7 +427,7 @@ int CBullsquid :: ISoundMask ()
 //=========================================================
 int	CBullsquid :: Classify ()
 {
-	return	CLASS_ALIEN_PREDATOR;
+	return m_iClass?m_iClass:CLASS_ALIEN_PREDATOR;
 }
 
 //=========================================================
@@ -535,38 +537,46 @@ void CBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				Vector	vecSpitOffset;
 				Vector	vecSpitDir;
 
-				UTIL_MakeVectors ( pev->angles );
+				UTIL_MakeVectors(pev->angles);
 
 				// !!!HACKHACK - the spot at which the spit originates (in front of the mouth) was measured in 3ds and hardcoded here.
 				// we should be able to read the position of bones at runtime for this info.
-				vecSpitOffset = ( gpGlobals->v_right * 8 + gpGlobals->v_forward * 37 + gpGlobals->v_up * 23 );		
-				vecSpitOffset = ( pev->origin + vecSpitOffset );
-				vecSpitDir = ( ( m_hEnemy->pev->origin + m_hEnemy->pev->view_ofs ) - vecSpitOffset ).Normalize();
+				vecSpitOffset = (gpGlobals->v_right * 8 + gpGlobals->v_forward * 37 + gpGlobals->v_up * 23);
+				vecSpitOffset = (pev->origin + vecSpitOffset);
+				if (m_pCine) // LRC- are we being told to do this by a scripted_action?
+				{
+					if (m_hTargetEnt != NULL && m_pCine->PreciseAttack())
+						vecSpitDir = ((m_hTargetEnt->pev->origin) - vecSpitOffset).Normalize();
+					else
+						vecSpitDir = gpGlobals->v_forward;
+				}
+				else
+					vecSpitDir = ((m_hEnemy->pev->origin + m_hEnemy->pev->view_ofs) - vecSpitOffset).Normalize();
 
-				vecSpitDir.x += RANDOM_FLOAT( -0.05, 0.05 );
-				vecSpitDir.y += RANDOM_FLOAT( -0.05, 0.05 );
-				vecSpitDir.z += RANDOM_FLOAT( -0.05, 0 );
+				vecSpitDir.x += RANDOM_FLOAT(-0.05, 0.05);
+				vecSpitDir.y += RANDOM_FLOAT(-0.05, 0.05);
+				vecSpitDir.z += RANDOM_FLOAT(-0.05, 0);
 
 
 				// do stuff for this event.
 				AttackSound();
 
 				// spew the spittle temporary ents.
-				MESSAGE_BEGIN( MSG_PVS, SVC_TEMPENTITY, vecSpitOffset );
-					WRITE_BYTE( TE_SPRITE_SPRAY );
-					WRITE_COORD( vecSpitOffset.x);	// pos
-					WRITE_COORD( vecSpitOffset.y);	
-					WRITE_COORD( vecSpitOffset.z);	
-					WRITE_COORD( vecSpitDir.x);	// dir
-					WRITE_COORD( vecSpitDir.y);	
-					WRITE_COORD( vecSpitDir.z);	
-					WRITE_SHORT( iSquidSpitSprite );	// model
-					WRITE_BYTE ( 15 );			// count
-					WRITE_BYTE ( 210 );			// speed
-					WRITE_BYTE ( 25 );			// noise ( client will divide by 100 )
+				MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSpitOffset);
+				WRITE_BYTE(TE_SPRITE_SPRAY);
+				WRITE_COORD(vecSpitOffset.x);	// pos
+				WRITE_COORD(vecSpitOffset.y);
+				WRITE_COORD(vecSpitOffset.z);
+				WRITE_COORD(vecSpitDir.x);	// dir
+				WRITE_COORD(vecSpitDir.y);
+				WRITE_COORD(vecSpitDir.z);
+				WRITE_SHORT(iSquidSpitSprite);	// model
+				WRITE_BYTE(15);			// count
+				WRITE_BYTE(210);			// speed
+				WRITE_BYTE(25);			// noise ( client will divide by 100 )
 				MESSAGE_END();
 
-				CSquidSpit::Shoot( pev, vecSpitOffset, vecSpitDir * 900 );
+				CSquidSpit::Shoot(pev, vecSpitOffset, vecSpitDir * 900);
 			}
 		}
 		break;
@@ -673,14 +683,18 @@ void CBullsquid :: Spawn()
 {
 	Precache( );
 
-	SET_MODEL(ENT(pev), "models/bullsquid.mdl");
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/bullsquid.mdl");
 	UTIL_SetSize( pev, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	pev->effects		= 0;
-	pev->health			= gSkillData.bullsquidHealth;
+	if (pev->health == 0)
+		pev->health			= gSkillData.bullsquidHealth;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
@@ -695,7 +709,10 @@ void CBullsquid :: Spawn()
 //=========================================================
 void CBullsquid :: Precache()
 {
-	PRECACHE_MODEL("models/bullsquid.mdl");
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/bullsquid.mdl");
 	
 	PRECACHE_MODEL("sprites/bigspit.spr");// spit projectile.
 	

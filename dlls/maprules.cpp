@@ -355,7 +355,7 @@ public:
 	void		Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value ) override;
 	int			ObjectCaps() override { return CRulePointEntity:: ObjectCaps() | FCAP_MASTER; }
 
-	BOOL		IsTriggered( CBaseEntity *pActivator ) override;
+	BOOL		IsTriggered( CBaseEntity *pActivator );
 	const char	*TeamID() override;
 	inline BOOL RemoveOnFire() { return (pev->spawnflags & SF_TEAMMASTER_FIREONCE) ? TRUE : FALSE; }
 	inline BOOL AnyTeam() { return (pev->spawnflags & SF_TEAMMASTER_ANYTEAM) ? TRUE : FALSE; }

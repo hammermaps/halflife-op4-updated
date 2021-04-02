@@ -60,7 +60,8 @@ void CBaseEntity::InitMoveWith(void) { } //LRC
 void CBaseEntity::SetNextThink(float delay, BOOL correctSpeed) { }//LRC
 void CBaseEntity::AbsoluteNextThink(float time, BOOL correctSpeed) { }//LRC
 void CBaseEntity::ThinkCorrection() { }//LRC
-//
+void CBaseEntity::UpdateOnRemove() { }
+
 // CBaseDelay Stubs
 void CBaseDelay :: KeyValue( struct KeyValueData_s * ) { }
 int CBaseDelay::Restore( class CRestore & ) { return 1; }
@@ -214,7 +215,7 @@ int CBaseMonster :: FindHintNode () { return NO_NODE; }
 void CBaseMonster::ReportAIState() { }
 void CBaseMonster :: KeyValue( KeyValueData *pkvd ) { }
 BOOL CBaseMonster :: FCheckAITrigger () { return FALSE; }
-int CBaseMonster :: CanPlaySequence( BOOL fDisregardMonsterState, int interruptLevel ) { return FALSE; }
+int CBaseMonster::CanPlaySequence(int interruptLevel) { return FALSE; } //LRC - prototype changed
 BOOL CBaseMonster :: FindLateralCover ( const Vector &vecThreat, const Vector &vecViewOffset ) { return FALSE; }
 Vector CBaseMonster :: ShootAtEnemy( const Vector &shootOrigin ) { return g_vecZero; }
 BOOL CBaseMonster :: FacingIdeal() { return FALSE; }

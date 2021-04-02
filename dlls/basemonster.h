@@ -35,8 +35,6 @@ public:
 			SCRIPT_WALK_TO_MARK,
 			SCRIPT_RUN_TO_MARK,
 		} SCRIPTSTATE;
-
-
 	
 		// these fields have been added in the process of reworking the state machine. (sjb)
 		EHANDLE				m_hEnemy;		 // the entity that the monster is fighting.
@@ -47,6 +45,7 @@ public:
 		float				m_flFieldOfView;// width of monster's field of view ( dot product )
 		float				m_flWaitFinished;// if we're told to wait, this is the time that the wait will be over.
 		float				m_flMoveWaitFinished;
+		float				m_flLastYawTime;
 
 		Activity			m_Activity;// what the monster is doing (animation)
 		Activity			m_IdealActivity;// monster should switch to this activity
@@ -110,10 +109,8 @@ public:
 	SCRIPTSTATE			m_scriptState;		// internal cinematic state
 	CCineMonster		*m_pCine;
 
-	float m_flLastYawTime;
-
-	int		Save( CSave &save ) override;
-	int		Restore( CRestore &restore ) override;
+	int	Save( CSave &save ) override;
+	int	Restore( CRestore &restore ) override;
 	
 	static	TYPEDESCRIPTION m_SaveData[];
 
@@ -121,7 +118,6 @@ public:
 
 // monster use function
 	void EXPORT			MonsterUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	void EXPORT			CorpseUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
 	// LRC- to allow level-designers to change monster allegiances
 	int					m_iClass;
@@ -197,8 +193,7 @@ public:
 		virtual Schedule_t *GetScheduleOfType( int Type );
 		virtual Schedule_t *GetSchedule();
 		virtual void ScheduleChange() {}
-		// virtual int CanPlaySequence() { return ((m_pCine == NULL) && (m_MonsterState == MONSTERSTATE_NONE || m_MonsterState == MONSTERSTATE_IDLE || m_IdealMonsterState == MONSTERSTATE_IDLE)); }
-		virtual int CanPlaySequence( BOOL fDisregardState, int interruptLevel );
+		virtual int CanPlaySequence(int interruptFlags);
 		virtual int CanPlaySentence( BOOL fDisregardState ) { return IsAlive(); }
 		virtual void PlaySentence( const char *pszSentence, float duration, float volume, float attenuation );
 		virtual void PlayScriptedSentence( const char *pszSentence, float duration, float volume, float attenuation, BOOL bConcurrent, CBaseEntity *pListener );
@@ -287,7 +282,7 @@ public:
 
 		BOOL FCheckAITrigger();// checks and, if necessary, fires the monster's trigger target. 
 		BOOL NoFriendlyFire();
-
+	
 		BOOL BBoxFlat();
 
 		// PrescheduleThink 
@@ -305,6 +300,7 @@ public:
 	virtual void GibMonster();
 	BOOL		 ShouldGibMonster( int iGib );
 	void		 CallGibMonster();
+	virtual int		HasCustomGibs() { return 0; } //LRC
 	virtual BOOL	HasHumanGibs();
 	virtual BOOL	HasAlienGibs();
 	virtual void	FadeMonster();	// Called instead of GibMonster() when gibs are disabled
@@ -316,11 +312,11 @@ public:
 
 	int TakeHealth( float flHealth, int bitsDamageType ) override;
 	int TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-	int			DeadTakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
+	int	DeadTakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
 
 	void RadiusDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType );
 	void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType );
-        int		IsMoving() override { return m_movementGoal != MOVEGOAL_NONE; }
+    int	 IsMoving() override { return m_movementGoal != MOVEGOAL_NONE; }
 
 	void RouteClear();
 	void RouteNew();
@@ -341,7 +337,17 @@ public:
 	BOOL CineCleanup( );
 
 	CBaseEntity* DropItem ( const char *pszItemName, const Vector &vecPos, const Vector &vecAng );// drop an item.
+	void StartPatrol( CBaseEntity *path );
 
+	CBaseEntity* DropItem ( char *pszItemName, const Vector &vecPos, const Vector &vecAng );// drop an item.
+
+	//LRC
+	float	CalcRatio( CBaseEntity *pLocus )
+	{
+		/*ALERT(at_console, "monster CR: %f/%f = %f\n", pev->health, pev->max_health, pev->health / pev->max_health);*/
+		return pev->health / pev->max_health;
+	}
+	
 	BOOL JumpToTarget( Activity movementAct, float waitTime );
 
 	//Shock rifle shock effect

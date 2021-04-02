@@ -3140,32 +3140,57 @@ BOOL CBaseMonster :: FCheckAITrigger ()
 // will be sucked into the script no matter what state it is
 // in. ONLY Scripted AI ents should allow this.
 //=========================================================	
-int CBaseMonster :: CanPlaySequence( BOOL fDisregardMonsterState, int interruptLevel )
+
+//LRC - to help debug when sequences won't play...
+#define DEBUG_CANTPLAY
+
+int CBaseMonster::CanPlaySequence(int interruptFlags)
 {
-	if ( m_pCine || !IsAlive() || m_MonsterState == MONSTERSTATE_PRONE )
+	if (m_pCine)
 	{
+		if (interruptFlags & SS_INTERRUPT_SCRIPTS)
+		{
+			return true;
+		}
+		else
+		{
+#ifdef DEBUG_CANTPLAY
+			ALERT(at_console, "CANTPLAY: Already playing %s \"%s\"!\n", STRING(m_pCine->pev->classname), STRING(m_pCine->pev->targetname));
+#endif
+			return false;
+		}
+	}
+	else if (!IsAlive() || m_MonsterState == MONSTERSTATE_PRONE)
+	{
+#ifdef DEBUG_CANTPLAY
+		ALERT(at_console, "CANTPLAY: Dead/Barnacled!\n");
+#endif
 		// monster is already running a scripted sequence or dead!
 		return FALSE;
 	}
-	
-	if ( fDisregardMonsterState )
+
+	if (interruptFlags & SS_INTERRUPT_ANYSTATE)
 	{
 		// ok to go, no matter what the monster state. (scripted AI)
 		return TRUE;
 	}
 
-	if ( m_MonsterState == MONSTERSTATE_NONE || m_MonsterState == MONSTERSTATE_IDLE || m_IdealMonsterState == MONSTERSTATE_IDLE )
+	if (m_MonsterState == MONSTERSTATE_NONE || m_MonsterState == MONSTERSTATE_IDLE || m_IdealMonsterState == MONSTERSTATE_IDLE)
 	{
 		// ok to go, but only in these states
 		return TRUE;
 	}
-	
-	if ( m_MonsterState == MONSTERSTATE_ALERT && interruptLevel >= SS_INTERRUPT_BY_NAME )
+
+	if (m_MonsterState == MONSTERSTATE_ALERT && interruptFlags & SS_INTERRUPT_ALERT)
 		return TRUE;
 
 	// unknown situation
+#ifdef DEBUG_CANTPLAY
+	ALERT(at_console, "CANTPLAY: non-interruptable state.\n");
+#endif
 	return FALSE;
 }
+
 
 
 //=========================================================

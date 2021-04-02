@@ -375,7 +375,12 @@ public:
 	};
 #endif
 
-	void UpdateOnRemove();
+	/**
+	*	Called when an entity is removed at runtime. Gives entities a chance to respond to it. Not called during map change or shutdown.
+	*	Call the baseclass version after handling it.
+	*	Used to be non-virtual - Solokiller
+	*/
+	virtual void UpdateOnRemove();
 
 	// common member functions
 	void EXPORT SUB_Remove();
@@ -816,7 +821,6 @@ public:
 	void Spawn() override;
 	void PostSpawn() override; //LRC
 	void Precache() override;
-	void RotSpawn();
 	void KeyValue(KeyValueData* pkvd) override;
 
 	void ButtonActivate();
@@ -826,6 +830,7 @@ public:
 	void EXPORT TriggerAndWait();
 	void EXPORT ButtonReturn();
 	void EXPORT ButtonBackHome();
+	void EXPORT ButtonUse_IgnorePlayer(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 	void EXPORT ButtonUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
@@ -839,7 +844,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 	// Buttons that don't take damage can be IMPULSE used
-	virtual int ObjectCaps(void);
+	virtual int	ObjectCaps();
 
 	BOOL m_fStayPushed; // button stays pushed in until touched again?
 	BOOL m_fRotating; // a rotating button?  default is a sliding button.

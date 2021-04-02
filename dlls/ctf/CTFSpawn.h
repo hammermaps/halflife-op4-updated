@@ -26,7 +26,7 @@ public:
 
 	void Spawn() override;
 
-	BOOL IsTriggered( CBaseEntity* pEntity ) override;
+	STATE  GetState(CBaseEntity* pEntity) override; // LRC
 
 	CTFTeam team_no;
 	bool m_fState;

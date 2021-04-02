@@ -565,7 +565,8 @@ void CBaseEntity::DontThink()
 		m_fPevNextThink = 0;
 	}
 
-	ALERT(at_console, "DontThink for %s\n", STRING(pev->targetname));
+	//if(pev->targetname)
+	//ALERT(at_console, "DontThink for %s\n", STRING(pev->targetname));
 }
 
 //LRC
@@ -601,7 +602,8 @@ void CBaseEntity::SetNextThink(float delay, BOOL correctSpeed)
 		SetEternalThink();
 		UTIL_MarkForAssist(this, correctSpeed);
 
-		ALERT(at_console, "SetAssistedThink for %s: %f\n", STRING(pev->targetname), m_fNextThink);
+		//if (pev->targetname) 
+		//ALERT(at_console, "SetAssistedThink for %s: %f\n", STRING(pev->targetname), m_fNextThink);
 	}
 	else
 	{
@@ -617,8 +619,8 @@ void CBaseEntity::SetNextThink(float delay, BOOL correctSpeed)
 
 		m_fPevNextThink = m_fNextThink = pev->nextthink;
 
-		if (pev->classname) 
-			ALERT(at_console, "SetNormThink for %s: %f\n", STRING(pev->targetname), m_fNextThink);
+		//if (pev->classname) 
+		//	ALERT(at_console, "SetNormThink for %s: %f\n", STRING(pev->targetname), m_fNextThink);
 	}
 }
 

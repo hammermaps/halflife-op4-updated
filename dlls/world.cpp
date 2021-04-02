@@ -117,97 +117,94 @@ BODY QUE
 class CDecal : public CBaseEntity
 {
 public:
-	void	Spawn() override;
-	void	KeyValue( KeyValueData *pkvd ) override;
-	void	EXPORT StaticDecal();
-	void	EXPORT TriggerDecal( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void	Spawn(void);
+	void	KeyValue(KeyValueData* pkvd);
+	void	EXPORT StaticDecal(void);
+	void	EXPORT TriggerDecal(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 };
 
-LINK_ENTITY_TO_CLASS( infodecal, CDecal );
+LINK_ENTITY_TO_CLASS(infodecal, CDecal);
 
 // UNDONE:  These won't get sent to joining players in multi-player
-void CDecal :: Spawn()
+void CDecal::Spawn(void)
 {
-	if ( pev->skin < 0 || (gpGlobals->deathmatch && FBitSet( pev->spawnflags, SF_DECAL_NOTINDEATHMATCH )) )
+	if (pev->skin < 0 || (gpGlobals->deathmatch && FBitSet(pev->spawnflags, SF_DECAL_NOTINDEATHMATCH)))
 	{
 		REMOVE_ENTITY(ENT(pev));
 		return;
 	}
 
-	if ( FStringNull ( pev->targetname ) )
+	if (FStringNull(pev->targetname))
 	{
-		SetThink( &CDecal::StaticDecal );
+		SetThink(&CDecal::StaticDecal);
 		// if there's no targetname, the decal will spray itself on as soon as the world is done spawning.
 		SetNextThink(0);
 	}
 	else
 	{
 		// if there IS a targetname, the decal sprays itself on when it is triggered.
-		SetThink ( &CDecal::SUB_DoNothing );
-		SetUse( &CDecal::TriggerDecal);
+		SetThink(&CDecal::SUB_DoNothing);
+		SetUse(&CDecal::TriggerDecal);
 	}
 }
 
-void CDecal :: TriggerDecal ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void CDecal::TriggerDecal(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
 	// this is set up as a USE function for infodecals that have targetnames, so that the
 	// decal doesn't get applied until it is fired. (usually by a scripted sequence)
 	TraceResult trace;
 	int			entityIndex;
 
-	UTIL_TraceLine( pev->origin - Vector(5,5,5), pev->origin + Vector(5,5,5),  ignore_monsters, ENT(pev), &trace );
+	UTIL_TraceLine(pev->origin - Vector(5, 5, 5), pev->origin + Vector(5, 5, 5), ignore_monsters, ENT(pev), &trace);
 
-	MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE( TE_BSPDECAL );
-		WRITE_COORD( pev->origin.x );
-		WRITE_COORD( pev->origin.y );
-		WRITE_COORD( pev->origin.z );
-		WRITE_SHORT( (int)pev->skin );
-		entityIndex = (short)ENTINDEX(trace.pHit);
-		WRITE_SHORT( entityIndex );
-		if ( entityIndex )
-			WRITE_SHORT( (int)VARS(trace.pHit)->modelindex );
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_BSPDECAL);
+	WRITE_COORD(pev->origin.x);
+	WRITE_COORD(pev->origin.y);
+	WRITE_COORD(pev->origin.z);
+	WRITE_SHORT((int)pev->skin);
+	entityIndex = (short)ENTINDEX(trace.pHit);
+	WRITE_SHORT(entityIndex);
+	if (entityIndex)
+		WRITE_SHORT((int)VARS(trace.pHit)->modelindex);
 	MESSAGE_END();
 
-	SetThink( &CDecal::SUB_Remove );
+	SetThink(&CDecal::SUB_Remove);
 	SetNextThink(0.1);
 }
 
-
-void CDecal :: StaticDecal()
+void CDecal::StaticDecal(void)
 {
 	TraceResult trace;
 	int			entityIndex, modelIndex;
 
-	UTIL_TraceLine( pev->origin - Vector(5,5,5), pev->origin + Vector(5,5,5),  ignore_monsters, ENT(pev), &trace );
+	UTIL_TraceLine(pev->origin - Vector(5, 5, 5), pev->origin + Vector(5, 5, 5), ignore_monsters, ENT(pev), &trace);
 
 	entityIndex = (short)ENTINDEX(trace.pHit);
-	if ( entityIndex )
+	if (entityIndex)
 		modelIndex = (int)VARS(trace.pHit)->modelindex;
 	else
 		modelIndex = 0;
 
-	g_engfuncs.pfnStaticDecal( pev->origin, (int)pev->skin, entityIndex, modelIndex );
+	g_engfuncs.pfnStaticDecal(pev->origin, (int)pev->skin, entityIndex, modelIndex);
 
 	SUB_Remove();
 }
 
-
-void CDecal :: KeyValue( KeyValueData *pkvd )
+void CDecal::KeyValue(KeyValueData* pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "texture"))
 	{
-		pev->skin = DECAL_INDEX( pkvd->szValue );
-		
+		pev->skin = DECAL_INDEX(pkvd->szValue);
+
 		// Found
-		if ( pev->skin >= 0 )
+		if (pev->skin >= 0)
 			return;
-		ALERT( at_console, "Can't find decal %s\n", pkvd->szValue );
+		ALERT(at_console, "Can't find decal %s\n", pkvd->szValue);
 	}
 	else
-		CBaseEntity::KeyValue( pkvd );
+		CBaseEntity::KeyValue(pkvd);
 }
-
 
 // Body queue class here.... It's really just CBaseEntity
 class CCorpse : public CBaseEntity
@@ -476,6 +473,8 @@ LINK_ENTITY_TO_CLASS( worldspawn, CWorld );
 
 extern DLL_GLOBAL BOOL		g_fGameOver;
 
+BOOL g_startSuit; //LRC
+
 void CWorld :: Spawn()
 {
 	g_fGameOver = FALSE;
@@ -490,6 +489,12 @@ void CWorld :: Spawn()
 
 void CWorld :: Precache()
 {
+	//LRC - set up the world lists
+	g_pWorld = this;
+	m_pAssistLink = NULL;
+	m_pFirstAlias = NULL;
+	//	ALERT(at_console, "Clearing AssistList\n");
+
 	g_pLastSpawn = NULL;
 	
 #if 1
@@ -506,6 +511,7 @@ void CWorld :: Precache()
 	if (g_pGameRules)
 	{
 		delete g_pGameRules;
+		g_pGameRules = nullptr;
 	}
 
 	g_pGameRules = InstallGameRules( this );
@@ -550,16 +556,8 @@ void CWorld :: Precache()
 	PRECACHE_SOUND( "common/bodydrop3.wav" );// dead bodies hitting the ground (animation events)
 	PRECACHE_SOUND( "common/bodydrop4.wav" );
 	
-	g_Language = (int)CVAR_GET_FLOAT( "sv_language" );
-	if ( g_Language == LANGUAGE_GERMAN )
-	{
-		PRECACHE_MODEL( "models/germangibs.mdl" );
-	}
-	else
-	{
-		PRECACHE_MODEL( "models/hgibs.mdl" );
-		PRECACHE_MODEL( "models/agibs.mdl" );
-	}
+	PRECACHE_MODEL( "models/hgibs.mdl" );
+	PRECACHE_MODEL( "models/agibs.mdl" );
 
 	PRECACHE_SOUND ("weapons/ric1.wav");
 	PRECACHE_SOUND ("weapons/ric2.wav");
@@ -579,58 +577,27 @@ void CWorld :: Precache()
 
 	PRECACHE_SOUND("explosions/underwater_explode3.wav");
 	PRECACHE_SOUND("explosions/underwater_explode4.wav");
-//
-// Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
-//
+
+	PRECACHE_MODEL("sprites/null.spr"); //LRC
+	
+	//
+	// Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
+	//
+	int i;
 
 	// 0 normal
-	LIGHT_STYLE(0, "m");
-	
-	// 1 FLICKER (first variety)
-	LIGHT_STYLE(1, "mmnmmommommnonmmonqnmmo");
-	
-	// 2 SLOW STRONG PULSE
-	LIGHT_STYLE(2, "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba");
-	
-	// 3 CANDLE (first variety)
-	LIGHT_STYLE(3, "mmmmmaaaaammmmmaaaaaabcdefgabcdefg");
-	
-	// 4 FAST STROBE
-	LIGHT_STYLE(4, "mamamamamama");
-	
-	// 5 GENTLE PULSE 1
-	LIGHT_STYLE(5,"jklmnopqrstuvwxyzyxwvutsrqponmlkj");
-	
-	// 6 FLICKER (second variety)
-	LIGHT_STYLE(6, "nmonqnmomnmomomno");
-	
-	// 7 CANDLE (second variety)
-	LIGHT_STYLE(7, "mmmaaaabcdefgmmmmaaaammmaamm");
-	
-	// 8 CANDLE (third variety)
-	LIGHT_STYLE(8, "mmmaaammmaaammmabcdefaaaammmmabcdefmmmaaaa");
-	
-	// 9 SLOW STROBE (fourth variety)
-	LIGHT_STYLE(9, "aaaaaaaazzzzzzzz");
-	
-	// 10 FLUORESCENT FLICKER
-	LIGHT_STYLE(10, "mmamammmmammamamaaamammma");
+	for (i = 0; i <= 13; i++)
+	{
+		LIGHT_STYLE(i, (char*)STRING(GetStdLightStyle(i)));
+	}
 
-	// 11 SLOW PULSE NOT FADE TO BLACK
-	LIGHT_STYLE(11, "abcdefghijklmnopqrrqponmlkjihgfedcba");
-	
-	// 12 UNDERWATER LIGHT MUTATION
-	// this light only distorts the lightmap - no contribution
-	// is made to the brightness of affected surfaces
-	LIGHT_STYLE(12, "mmnnmmnnnmmnn");
-	
 	// styles 32-62 are assigned by the light program for switchable lights
 
 	// 63 testing
 	LIGHT_STYLE(63, "a");
 
-	for ( int i = 0; i < ARRAYSIZE(gDecals); i++ )
-		gDecals[i].index = DECAL_INDEX( gDecals[i].name );
+	for (i = 0; i < ARRAYSIZE(gDecals); i++)
+		gDecals[i].index = DECAL_INDEX(gDecals[i].name);
 
 // init the WorldGraph.
 	WorldGraph.InitGraph();
@@ -779,6 +746,18 @@ void CWorld :: KeyValue( KeyValueData *pkvd )
 		}
 		pkvd->fHandled = TRUE;
 	}
+	//LRC- let map designers start the player with his suit already on
+	else if (FStrEq(pkvd->szKeyName, "startsuit"))
+	{
+		g_startSuit = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "allowmonsters"))
+	{
+		CVAR_SET_FLOAT("mp_allowmonsters", atof(pkvd->szValue));
+		pkvd->fHandled = TRUE;
+	}
+	//LRC- ends
 	else
 		CBaseEntity::KeyValue( pkvd );
 }

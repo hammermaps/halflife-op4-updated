@@ -72,5 +72,6 @@ extern int gmsgOldWeapon;
 extern int gmsgCustomIcon;
 extern int gmsgParticles;
 extern int gmsgGrassParticles;
+extern int gmsgAddShine;
 
 void LinkUserMessages();

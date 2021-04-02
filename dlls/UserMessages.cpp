@@ -77,6 +77,7 @@ int gmsgCustomIcon = 0;
 
 int gmsgParticles = 0;
 int gmsgGrassParticles = 0;
+int gmsgAddShine = 0;
 
 void LinkUserMessages()
 {
@@ -120,6 +121,7 @@ void LinkUserMessages()
 	gmsgFade = REG_USER_MSG("ScreenFade", sizeof(ScreenFade));
 	gmsgAmmoX = REG_USER_MSG("AmmoX", 2);
 	gmsgTeamNames = REG_USER_MSG("TeamNames", -1);
+	gmsgAddShine = REG_USER_MSG("AddShine", -1); //LRC
 
 	gmsgStatusText = REG_USER_MSG("StatusText", -1);
 	gmsgStatusValue = REG_USER_MSG("StatusValue", 3);

@@ -31,14 +31,15 @@
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
-#include "particle_defs.h"
 #include "CParticleEmitter.h"
 #include <ctype.h>
 
 extern char* memfgets(byte* pMemFile, int fileSize, int& filePos, char* pBuffer, int bufferSize);
 
+extern int gmsgParticles;
+
 // create ourselves a particle emitter
-void CParticleEmitter::Spawn(void)
+void CParticleEmitter::Spawn()
 {
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_NONE;
@@ -55,7 +56,8 @@ void CParticleEmitter::Spawn(void)
 	else
 		bIsOn = false;
 
-	IsTriggered(NULL);
+	GetState(nullptr);
+	
 	iID = ++iParticleIDCount;
 	flTimeTurnedOn = 0.0;
 }
@@ -72,8 +74,6 @@ void CParticleEmitter::KeyValue(KeyValueData* pkvd)
 		CBaseEntity::KeyValue(pkvd);
 	}
 }
-
-extern int gmsgParticles;
 
 // Let the player know there is a particleemitter
 void CParticleEmitter::MakeAware(CBaseEntity* pEnt)
@@ -162,16 +162,17 @@ void CParticleEmitter::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TY
 }
 
 // is the particle system on.
-BOOL CParticleEmitter::IsTriggered(CBaseEntity*) {
+STATE CParticleEmitter::GetState(CBaseEntity* pEntity)
+{
 	// not on so it isn't triggered
 	if (bIsOn == false)
-		return false;
-
+		return STATE_OFF;
+	
 	int iFileSize = 0; int iPos = 0;
 	byte* pFile = g_engfuncs.pfnLoadFileForMe(sParticleDefintionFile, &iFileSize);
 	if (!pFile) {
 		ALERT(at_console, "Bad Mapped Particle definition file specified %s\n", sParticleDefintionFile);
-		return false;
+		return STATE_OFF;
 	}
 
 	char sBuffer[512]; char sSetting[64]; char sValue[64]; bool bFound = false;
@@ -218,18 +219,18 @@ BOOL CParticleEmitter::IsTriggered(CBaseEntity*) {
 
 	// defaults to -1
 	if (bFound == false)
-		return true;
+		return STATE_ON;
 
 	// infinite so it must be on
 	if (atof(sValue) == -1.0)
-		return true;
+		return STATE_ON;
 
 	// the time the system life + the time it was turned on is in the future
 	if (atof(sValue) + flTimeTurnedOn + 0.1 > gpGlobals->time)
-		return true;
+		return STATE_ON;
 
 	// not in the future so its dead
-	return false;
+	return STATE_OFF;
 }
 
 LINK_ENTITY_TO_CLASS(env_particleemitter, CParticleEmitter);

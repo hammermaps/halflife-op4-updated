@@ -14,15 +14,22 @@
 ****/
 
 #include "extdll.h"
-#include "util.h"
 
+#ifndef UTIL_H
+#include "util.h"
+#endif
+
+#ifndef _STUDIO_H_
 #include "studio.h"
+#endif
 
 #ifndef ACTIVITY_H
 #include "activity.h"
 #endif
 
+#ifndef ACTIVITYMAP_H
 #include "activitymap.h"
+#endif
 
 #ifndef ANIMATION_H
 #include "animation.h"
@@ -32,11 +39,9 @@
 #include "scriptevent.h"
 #endif
 
-extern globalvars_t				*gpGlobals;
+extern globalvars_t	*gpGlobals;
 
 #pragma warning( disable : 4244 )
-
-
 
 int ExtractBbox( void *pmodel, int sequence, float *mins, float *maxs )
 {
@@ -489,9 +494,7 @@ void SetBodygroup( void *pmodel, entvars_t *pev, int iGroup, int iValue )
 
 int GetBodygroup( void *pmodel, entvars_t *pev, int iGroup )
 {
-	studiohdr_t *pstudiohdr;
-	
-	pstudiohdr = (studiohdr_t *)pmodel;
+	studiohdr_t* pstudiohdr = (studiohdr_t*)pmodel;
 	if (! pstudiohdr)
 		return 0;
 
@@ -506,4 +509,40 @@ int GetBodygroup( void *pmodel, entvars_t *pev, int iGroup )
 	int iCurrent = (pev->body / pbodypart->base) % pbodypart->nummodels;
 
 	return iCurrent;
+}
+
+//LRC
+int GetBoneCount(void* pmodel)
+{
+	studiohdr_t* pstudiohdr = (studiohdr_t*)pmodel;
+	if (!pstudiohdr)
+	{
+		ALERT(at_error, "Bad header in SetBones!\n");
+		return 0;
+	}
+
+	return pstudiohdr->numbones;
+}
+
+//LRC
+void SetBones(void* pmodel, float(*data)[3], int datasize)
+{
+	studiohdr_t* pstudiohdr = (studiohdr_t*)pmodel;
+	if (!pstudiohdr)
+	{
+		ALERT(at_error, "Bad header in SetBones!\n");
+		return;
+	}
+
+	mstudiobone_t* pbone = (mstudiobone_t*)((byte*)pstudiohdr + pstudiohdr->boneindex);
+
+	int limit = V_min(pstudiohdr->numbones, datasize);
+	// go through the bones
+	for (int i = 0; i < limit; i++, pbone++)
+	{
+		//		ALERT(at_console, " %s\n", pbone->name);
+		for (int j = 0; j < 3; j++)
+			pbone->value[j] = data[i][j];
+	}
+	//	ALERT(at_console, "List ends.\n");
 }

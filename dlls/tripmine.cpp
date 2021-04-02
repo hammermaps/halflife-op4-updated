@@ -30,7 +30,8 @@ class CTripmineGrenade : public CGrenade
 {
 	void Spawn() override;
 	void Precache() override;
-
+	void UpdateOnRemove() override;
+	
 	int		Save( CSave &save ) override;
 	int		Restore( CRestore &restore ) override;
 
@@ -127,6 +128,12 @@ void CTripmineGrenade :: Spawn()
 	m_vecEnd = pev->origin + m_vecDir * 2048;
 }
 
+void CTripmineGrenade::UpdateOnRemove()
+{
+	CGrenade::UpdateOnRemove();
+
+	KillBeam();
+}
 
 void CTripmineGrenade :: Precache()
 {
