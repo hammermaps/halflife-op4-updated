@@ -254,7 +254,10 @@ int CCrowbar::Swing( int fFirst )
 				}
 				m_pPlayer->m_iWeaponVolume = CROWBAR_BODYHIT_VOLUME;
 				if ( !pEntity->IsAlive() )
-					  return TRUE;
+				{
+					m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.25; //LRC: corrected half-life bug
+					return TRUE;
+				}
 				else
 					  flVol = 0.1;
 

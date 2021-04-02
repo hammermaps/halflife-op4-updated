@@ -27,6 +27,7 @@
 #include "nodes.h"
 #include "doors.h"
 #include "movewith.h"
+#include "player.h"
 
 extern CGraph WorldGraph;
 
@@ -52,8 +53,9 @@ void CNullEntity::Spawn()
 {
 	REMOVE_ENTITY(ENT(pev));
 }
-
-LINK_ENTITY_TO_CLASS(info_null, CNullEntity);
+LINK_ENTITY_TO_CLASS(info_null,CNullEntity);
+LINK_ENTITY_TO_CLASS(info_texlights,CNullEntity); // don't complain about Merl's new info entities
+LINK_ENTITY_TO_CLASS(info_compile_parameters,CNullEntity);
 
 class CBaseDMStart : public CPointEntity
 {
@@ -165,9 +167,16 @@ void CBaseEntity::UpdateOnRemove()
 			}
 		}
 	}
+	
+	if ( pev->globalname )
+		gGlobalState.EntitySetState( pev->globalname, GLOBAL_DEAD );
 
-	if (pev->globalname)
-		gGlobalState.EntitySetState(pev->globalname, GLOBAL_DEAD);
+	// tell owner ( if any ) that we're dead.This is mostly for MonsterMaker functionality.
+	//Killtarget didn't do this before, so the counter broke. - Solokiller
+	if (CBaseEntity* pOwner = Instance(pev->owner))
+	{
+		pOwner->DeathNotice(pev);
+	}
 }
 
 // Convenient way to delay removing oneself
@@ -368,6 +377,19 @@ void CBaseDelay::SUB_UseTargets(CBaseEntity* pActivator, USE_TYPE useType, float
 		//LRC - Valve had a hacked thing here to avoid breaking
 		// save/restore. In Spirit that's not a problem.
 		// I've moved m_hActivator into this class, for the "elegant" fix.
+		// This code is not as ugly as that code
+		//if ( pActivator && pActivator->IsPlayer() )		// If a player activates, then save it
+		//{
+		//	pTemp->pev->owner = pActivator->edict();
+		//}
+		//else
+		//{
+		//	pTemp->pev->owner = NULL;
+		//}
+	
+		//LRC - Valve had a hacked thing here to avoid breaking
+		// save/restore. In Spirit that's not a problem.
+		// I've moved m_hActivator into this class, for the "elegant" fix.
 		pTemp->m_hActivator = pActivator;
 
 		return;
@@ -417,34 +439,38 @@ void SetMovedir(entvars_t* pev)
 
 void CBaseDelay::DelayThink()
 {
+	CBaseEntity *pActivator = NULL;
+
 	// The use type is cached (and stashed) in pev->button
-	SUB_UseTargets(m_hActivator, (USE_TYPE)pev->button, 0);
+	// The use type is cached (and stashed) in pev->button
+	SUB_UseTargets( m_hActivator, (USE_TYPE)pev->button, 0 );
 	REMOVE_ENTITY(ENT(pev));
 }
 
 // Global Savedata for Toggle
 TYPEDESCRIPTION CBaseToggle::m_SaveData[] =
 {
-	DEFINE_FIELD(CBaseToggle, m_toggle_state, FIELD_INTEGER),
-	DEFINE_FIELD(CBaseToggle, m_flActivateFinished, FIELD_TIME),
-	DEFINE_FIELD(CBaseToggle, m_flMoveDistance, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseToggle, m_flWait, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseToggle, m_flLip, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseToggle, m_flTWidth, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseToggle, m_flTLength, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseToggle, m_vecPosition1, FIELD_POSITION_VECTOR),
-	DEFINE_FIELD(CBaseToggle, m_vecPosition2, FIELD_POSITION_VECTOR),
-	DEFINE_FIELD(CBaseToggle, m_vecAngle1, FIELD_VECTOR),		// UNDONE: Position could go through transition, but also angle?
-	DEFINE_FIELD(CBaseToggle, m_vecAngle2, FIELD_VECTOR),		// UNDONE: Position could go through transition, but also angle?
-	DEFINE_FIELD(CBaseToggle, m_cTriggersLeft, FIELD_INTEGER),
-	DEFINE_FIELD(CBaseToggle, m_flHeight, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseToggle, m_pfnCallWhenMoveDone, FIELD_FUNCTION),
-	DEFINE_FIELD(CBaseToggle, m_vecFinalDest, FIELD_POSITION_VECTOR),
-	DEFINE_FIELD(CBaseToggle, m_flLinearMoveSpeed, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseToggle, m_flAngularMoveSpeed, FIELD_FLOAT), //LRC
-	DEFINE_FIELD(CBaseToggle, m_vecFinalAngle, FIELD_VECTOR),
-	DEFINE_FIELD(CBaseToggle, m_sMaster, FIELD_STRING),
-	DEFINE_FIELD(CBaseToggle, m_bitsDamageInflict, FIELD_INTEGER),	// damage type inflicted
+	DEFINE_FIELD( CBaseToggle, m_toggle_state, FIELD_INTEGER ),
+	DEFINE_FIELD( CBaseToggle, m_flActivateFinished, FIELD_TIME ),
+	DEFINE_FIELD( CBaseToggle, m_flMoveDistance, FIELD_FLOAT ),
+	DEFINE_FIELD( CBaseToggle, m_flWait, FIELD_FLOAT ),
+	DEFINE_FIELD( CBaseToggle, m_flLip, FIELD_FLOAT ),
+	DEFINE_FIELD( CBaseToggle, m_flTWidth, FIELD_FLOAT ),
+	DEFINE_FIELD( CBaseToggle, m_flTLength, FIELD_FLOAT ),
+	DEFINE_FIELD( CBaseToggle, m_vecPosition1, FIELD_POSITION_VECTOR ),
+	DEFINE_FIELD( CBaseToggle, m_vecPosition2, FIELD_POSITION_VECTOR ),
+	DEFINE_FIELD( CBaseToggle, m_vecAngle1, FIELD_VECTOR ),		// UNDONE: Position could go through transition, but also angle?
+	DEFINE_FIELD( CBaseToggle, m_vecAngle2, FIELD_VECTOR ),		// UNDONE: Position could go through transition, but also angle?
+	DEFINE_FIELD( CBaseToggle, m_cTriggersLeft, FIELD_INTEGER ),
+	DEFINE_FIELD( CBaseToggle, m_flHeight, FIELD_FLOAT ),
+//	DEFINE_FIELD( CBaseToggle, m_hActivator, FIELD_EHANDLE ),
+	DEFINE_FIELD( CBaseToggle, m_pfnCallWhenMoveDone, FIELD_FUNCTION ),
+	DEFINE_FIELD( CBaseToggle, m_vecFinalDest, FIELD_POSITION_VECTOR ),
+	DEFINE_FIELD( CBaseToggle, m_flLinearMoveSpeed, FIELD_FLOAT ),
+	DEFINE_FIELD( CBaseToggle, m_flAngularMoveSpeed, FIELD_FLOAT ), //LRC
+	DEFINE_FIELD( CBaseToggle, m_vecFinalAngle, FIELD_VECTOR ),
+	DEFINE_FIELD( CBaseToggle, m_sMaster, FIELD_STRING),
+	DEFINE_FIELD( CBaseToggle, m_bitsDamageInflict, FIELD_INTEGER ),	// damage type inflicted
 };
 
 IMPLEMENT_SAVERESTORE(CBaseToggle, CBaseAnimating);
@@ -690,12 +716,15 @@ float CBaseToggle::AxisValue(int flags, const Vector& angles)
 
 void CBaseToggle::AxisDir(entvars_t* pev)
 {
-	if (FBitSet(pev->spawnflags, SF_DOOR_ROTATE_Z))
-		pev->movedir = Vector(0, 0, 1); // around z-axis
-	else if (FBitSet(pev->spawnflags, SF_DOOR_ROTATE_X))
-		pev->movedir = Vector(1, 0, 0); // around x-axis
+	if ( pev->movedir != g_vecZero) //LRC
+		return;
+
+	if ( FBitSet(pev->spawnflags, SF_DOOR_ROTATE_Z) )
+		pev->movedir = Vector ( 0, 0, 1 );	// around z-axis
+	else if ( FBitSet(pev->spawnflags, SF_DOOR_ROTATE_X) )
+		pev->movedir = Vector ( 1, 0, 0 );	// around x-axis
 	else
-		pev->movedir = Vector(0, 1, 0); // around y-axis
+		pev->movedir = Vector ( 0, 1, 0 );		// around y-axis
 }
 
 
