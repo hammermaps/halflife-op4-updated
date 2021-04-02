@@ -367,7 +367,7 @@ void COFPitWormUp::Spawn()
 	SetThink( &COFPitWormUp::StartupThink );
 	SetTouch( &COFPitWormUp::HitTouch );
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	m_vecDesired = { 1, 0, 0 };
 
@@ -456,12 +456,12 @@ void COFPitWormUp::StartupThink()
 
 	m_flNextRangeTime = gpGlobals->time;
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 void COFPitWormUp::HuntThink()
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	DispatchAnimEvents();
 	StudioFrameAdvance();
 
@@ -586,7 +586,7 @@ void COFPitWormUp::HuntThink()
 
 void COFPitWormUp::DyingThink()
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	DispatchAnimEvents();
 	StudioFrameAdvance();
@@ -606,7 +606,7 @@ void COFPitWormUp::DyingThink()
 				pev->deadflag = DEAD_DEAD;
 
 				SetThink( &COFPitWormUp::SUB_Remove );
-				pev->nextthink = gpGlobals->time + 0.1;
+				SetNextThink(0.1);
 			}
 		}
 	}
@@ -654,7 +654,7 @@ void COFPitWormUp::DyingThink()
 void COFPitWormUp::NullThink()
 {
 	StudioFrameAdvance();
-	pev->nextthink = gpGlobals->time + 0.5;
+	SetNextThink(0.5);
 }
 
 void COFPitWormUp::HitTouch( CBaseEntity* pOther )
@@ -708,7 +708,7 @@ void COFPitWormUp::CommandUse( CBaseEntity* pActivator, CBaseEntity* pCaller, US
 void COFPitWormUp::StartupUse( CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &COFPitWormUp::HuntThink );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	SetUse( &COFPitWormUp::CommandUse );
 }
 
@@ -1465,7 +1465,7 @@ void COFInfoPW::KeyValue( KeyValueData* pkvd )
 void COFInfoPW::Spawn()
 {
 	SetThink( &COFInfoPW::StartNode );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 void COFInfoPW::StartNode()
@@ -1509,7 +1509,7 @@ void COFPitWormGib::Spawn()
 
 	UTIL_SetSize( pev, { -8, -8, -4 }, { 8, 8, 16 } );
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	SetThink( &COFPitWormGib::GibFloat );
 }
 
@@ -1533,7 +1533,7 @@ void COFPitWormGib::GibFloat()
 		pev->velocity.z -= 8.0;
 	}
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 class COFPitWormGibShooter : public CBaseEntity
@@ -1608,7 +1608,7 @@ void COFPitWormGibShooter::KeyValue( KeyValueData *pkvd )
 void COFPitWormGibShooter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &COFPitWormGibShooter::ShootThink );
-	pev->nextthink = gpGlobals->time;
+	SetNextThink(0);
 }
 
 void COFPitWormGibShooter::Spawn()
@@ -1649,15 +1649,15 @@ COFPitWormGib *COFPitWormGibShooter::CreateGib()
 
 void COFPitWormGibShooter::ShootThink()
 {
-	pev->nextthink = gpGlobals->time + m_flDelay;
+	SetNextThink(m_flDelay);
 
 	Vector vecShootDir;
 
 	vecShootDir = pev->movedir;
 
-	vecShootDir = vecShootDir + gpGlobals->v_right * RANDOM_FLOAT( -1, 1 ) * m_flVariance;;
-	vecShootDir = vecShootDir + gpGlobals->v_forward * RANDOM_FLOAT( -1, 1 ) * m_flVariance;;
-	vecShootDir = vecShootDir + gpGlobals->v_up * RANDOM_FLOAT( -1, 1 ) * m_flVariance;;
+	vecShootDir = vecShootDir + gpGlobals->v_right * RANDOM_FLOAT( -1, 1 ) * m_flVariance;
+	vecShootDir = vecShootDir + gpGlobals->v_forward * RANDOM_FLOAT( -1, 1 ) * m_flVariance;
+	vecShootDir = vecShootDir + gpGlobals->v_up * RANDOM_FLOAT( -1, 1 ) * m_flVariance;
 
 	vecShootDir = vecShootDir.Normalize();
 	COFPitWormGib *pGib = CreateGib();
@@ -1670,7 +1670,7 @@ void COFPitWormGibShooter::ShootThink()
 
 	SetUse( nullptr );
 	SetThink( &COFPitWormGibShooter::SUB_Remove );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 #define bits_MEMORY_ADVANCE_NODE	(bits_MEMORY_CUSTOM2)
@@ -2012,7 +2012,7 @@ void COFPitWorm::StartMonster()
 	// Delay drop to floor to make sure each door in the level has had its chance to spawn
 	// Spread think times so that they don't all happen at the same time (Carmack)
 	SetThink(&CBaseMonster::CallMonsterThink);
-	pev->nextthink += RANDOM_FLOAT(0.1, 0.4); // spread think times.
+	AbsoluteNextThink(m_fNextThink + RANDOM_FLOAT(0.1, 0.4)); // spread think times.
 }
 
 void COFPitWorm::Spawn()
@@ -2405,7 +2405,7 @@ void COFPitWorm::StrafeBeam()
 void COFPitWorm::StartupUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
 	SetThink(&COFPitWorm::CallMonsterThink);
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	SetUse(nullptr);
 }
 

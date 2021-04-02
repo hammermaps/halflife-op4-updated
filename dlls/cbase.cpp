@@ -842,7 +842,7 @@ void CBaseEntity :: MakeDormant()
 	// Don't draw
 	SetBits( pev->effects, EF_NODRAW );
 	// Don't think
-	pev->nextthink = 0;
+	DontThink();
 	// Relink
 	UTIL_SetOrigin( this, pev->origin );
 }

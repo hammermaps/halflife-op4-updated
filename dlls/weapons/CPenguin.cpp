@@ -83,7 +83,7 @@ void CPenguin::Holster(int skiplocal)
 	{
 		m_pPlayer->pev->weapons &= ~(1 << WEAPON_PENGUIN);
 		SetThink(&CPenguin::DestroyItem);
-		pev->nextthink = gpGlobals->time + 0.1;
+		SetNextThink(0.1);
 	}
 }
 

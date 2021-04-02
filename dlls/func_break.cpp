@@ -482,7 +482,7 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 			m_flDelay = 0.1;
 		}
 
-		pev->nextthink = pev->ltime + m_flDelay;
+		SetNextThink(m_flDelay);
 
 	}
 
@@ -759,7 +759,7 @@ void CBreakable::Die()
 	SUB_UseTargets( NULL, USE_TOGGLE, 0 );
 
 	SetThink( &CBreakable::SUB_Remove );
-	pev->nextthink = pev->ltime + 0.1;
+	SetNextThink(0.1);
 	if ( m_iszSpawnObject )
 		CBaseEntity::Create( (char *)STRING(m_iszSpawnObject), VecBModelOrigin(pev), pev->angles, edict() );
 
@@ -992,7 +992,7 @@ void CPushable :: Move( CBaseEntity *pOther, int push )
 				m_lastSound = RANDOM_LONG(0,2);
 				EMIT_SOUND(ENT(pev), CHAN_WEAPON, m_soundNames[m_lastSound], 0.5, ATTN_NORM);
 	//			SetThink( StopSound );
-	//			pev->nextthink = pev->ltime + 0.1;
+	//			SetNextThink(0.1);
 			}
 			else
 				STOP_SOUND( ENT(pev), CHAN_WEAPON, m_soundNames[m_lastSound] );

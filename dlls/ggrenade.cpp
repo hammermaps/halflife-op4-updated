@@ -131,7 +131,7 @@ void CGrenade::Explode( TraceResult *pTrace, int bitsDamageType )
 	pev->effects |= EF_NODRAW;
 	SetThink( &CGrenade::Smoke );
 	pev->velocity = g_vecZero;
-	pev->nextthink = gpGlobals->time + 0.3;
+	SetNextThink(0.3);
 
 	if (iContents != CONTENTS_WATER)
 	{
@@ -172,7 +172,7 @@ void CGrenade::Killed( entvars_t *pevAttacker, int iGib )
 void CGrenade::DetonateUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &CGrenade::Detonate );
-	pev->nextthink = gpGlobals->time;
+	SetNextThink(0);
 }
 
 void CGrenade::PreDetonate()
@@ -180,7 +180,7 @@ void CGrenade::PreDetonate()
 	CSoundEnt::InsertSound ( bits_SOUND_DANGER, pev->origin, 400, 0.3 );
 
 	SetThink( &CGrenade::Detonate );
-	pev->nextthink = gpGlobals->time + 1;
+	SetNextThink(1);
 }
 
 
@@ -220,7 +220,7 @@ void CGrenade::DangerSoundThink()
 	}
 
 	CSoundEnt::InsertSound ( bits_SOUND_DANGER, pev->origin + pev->velocity * 0.5, pev->velocity.Length( ), 0.2 );
-	pev->nextthink = gpGlobals->time + 0.2;
+	SetNextThink(0.2);
 
 	if (pev->waterlevel != 0)
 	{
@@ -335,7 +335,7 @@ void CGrenade :: TumbleThink()
 	}
 
 	StudioFrameAdvance( );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	if (pev->dmgtime - 1 < gpGlobals->time)
 	{
@@ -382,7 +382,7 @@ CGrenade *CGrenade::ShootContact( entvars_t *pevOwner, Vector vecStart, Vector v
 	
 	// make monsters afaid of it while in the air
 	pGrenade->SetThink( &CGrenade::DangerSoundThink );
-	pGrenade->pev->nextthink = gpGlobals->time;
+	pGrenade->SetNextThink(0);
 	
 	// Tumble in air
 	pGrenade->pev->avelocity.x = RANDOM_FLOAT ( -100, -500 );
@@ -413,10 +413,10 @@ CGrenade * CGrenade:: ShootTimed( entvars_t *pevOwner, Vector vecStart, Vector v
 
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->SetThink( &CGrenade::TumbleThink );
-	pGrenade->pev->nextthink = gpGlobals->time + 0.1;
+	pGrenade->SetNextThink(0.1);
 	if (time < 0.1)
 	{
-		pGrenade->pev->nextthink = gpGlobals->time;
+		pGrenade->SetNextThink(0);
 		pGrenade->pev->velocity = Vector( 0, 0, 0 );
 	}
 		

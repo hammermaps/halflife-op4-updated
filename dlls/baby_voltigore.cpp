@@ -848,7 +848,7 @@ void COFBabyVoltigore :: StartTask ( Task_t *pTask )
 
 			for( auto i = 0; i < 3; ++i )
 			{
-				CBeam* pBeam = CBeam::BeamCreate("sprites/lgtning.spr", 50);;
+				CBeam* pBeam = CBeam::BeamCreate("sprites/lgtning.spr", 50);
 				m_pBeam[ m_iBeams ] = pBeam;
 
 				if( !pBeam)

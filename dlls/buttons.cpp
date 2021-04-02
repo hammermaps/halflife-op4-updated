@@ -174,7 +174,7 @@ void CMultiSource::Spawn()
 
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_NONE;
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	pev->spawnflags |= SF_MULTI_INIT;	// Until it's initialized
 	SetThink(&CMultiSource::Register);
 }
@@ -463,7 +463,7 @@ void CBaseButton::Spawn( )
 	if ( FBitSet ( pev->spawnflags, SF_BUTTON_SPARK_IF_OFF ) )// this button should spark in OFF state
 	{
 		SetThink ( &CBaseButton::ButtonSpark );
-		pev->nextthink = gpGlobals->time + 0.5;// no hurry, make sure everything else spawns
+		SetNextThink(0.5);// no hurry, make sure everything else spawns
 	}
 
 	SetMovedir(pev);
@@ -575,7 +575,7 @@ void DoSpark(entvars_t *pev, const Vector &location )
 void CBaseButton::ButtonSpark ()
 {
 	SetThink ( &CBaseButton::ButtonSpark );
-	pev->nextthink = pev->ltime + ( 0.1 + RANDOM_FLOAT ( 0, 1.5 ) );// spark again at random interval
+	SetNextThink( 0.1 + RANDOM_FLOAT ( 0, 1.5 ));// spark again at random interval
 
 	DoSpark( pev, pev->mins );
 }
@@ -720,7 +720,7 @@ void CBaseButton::TriggerAndWait()
 	}
 	else
 	{
-		pev->nextthink = pev->ltime + m_flWait;
+		SetNextThink(m_flWait);
 		SetThink( &CBaseButton::ButtonReturn );
 	}
 	
@@ -797,7 +797,7 @@ void CBaseButton::ButtonBackHome()
 	if ( FBitSet ( pev->spawnflags, SF_BUTTON_SPARK_IF_OFF ) )
 	{
 		SetThink ( &CBaseButton::ButtonSpark );
-		pev->nextthink = gpGlobals->time + 0.5;// no hurry.
+		SetNextThink(0.5);// no hurry.
 	}
 }
 
@@ -1035,16 +1035,18 @@ void CMomentaryRotButton::UpdateSelf( float value )
 		fplaysound = TRUE;
 		m_direction = -m_direction;
 	}
+	
 	m_lastUsed = 1;
 
-	pev->nextthink = pev->ltime + 0.1;
+	SetNextThink(0.1);
 	if ( m_direction > 0 && value >= 1.0 )
 	{
 		pev->avelocity = g_vecZero;
 		pev->angles = m_end;
 		return;
 	}
-	else if ( m_direction < 0 && value <= 0 )
+	
+	if ( m_direction < 0 && value <= 0 )
 	{
 		pev->avelocity = g_vecZero;
 		pev->angles = m_start;
@@ -1054,11 +1056,16 @@ void CMomentaryRotButton::UpdateSelf( float value )
 	if (fplaysound)
 		PlaySound();
 
-	// HACKHACK -- If we're going slow, we'll get multiple player packets per frame, bump nexthink on each one to avoid stalling
-	if ( pev->nextthink < pev->ltime )
-		pev->nextthink = pev->ltime + 0.1;
+	// HACKHACK -- If we're going slow, we'll get multiple player packets per frame;
+	// bump nexthink on each one to avoid stalling
+	//LRC- that is to say: our avelocity will get us to the target point in 0.1 secs.
+	// If we're being told to move further than that, wait that much longer.
+	if (m_fNextThink < pev->ltime)
+		SetNextThink(0.1);
 	else
-		pev->nextthink += 0.1;
+	{
+		AbsoluteNextThink(m_fNextThink + 0.1);
+	}
 	
 	pev->avelocity = (m_direction * pev->speed) * pev->movedir;
 	SetThink( &CMomentaryRotButton::Off );
@@ -1090,7 +1097,7 @@ void CMomentaryRotButton::Off()
 	if ( FBitSet( pev->spawnflags, SF_PENDULUM_AUTO_RETURN ) && m_returnSpeed > 0 )
 	{
 		SetThink( &CMomentaryRotButton::Return );
-		pev->nextthink = pev->ltime + 0.1;
+		SetNextThink(0.1);
 		m_direction = -1;
 	}
 	else
@@ -1113,13 +1120,13 @@ void CMomentaryRotButton::UpdateSelfReturn( float value )
 	{
 		pev->avelocity = g_vecZero;
 		pev->angles = m_start;
-		pev->nextthink = -1;
+		DontThink();
 		SetThink( NULL );
 	}
 	else
 	{
 		pev->avelocity = -m_returnSpeed * pev->movedir;
-		pev->nextthink = pev->ltime + 0.1;
+		SetNextThink(0.1);
 	}
 }
 
@@ -1175,7 +1182,7 @@ void CEnvSpark::Spawn()
 	else
 		SetThink(&CEnvSpark::SparkThink);
 		
-	pev->nextthink = gpGlobals->time + ( 0.1 + RANDOM_FLOAT ( 0, 1.5 ) );
+	SetNextThink(( 0.1 + RANDOM_FLOAT ( 0, 1.5 ) ));
 
 	if (m_flDelay <= 0)
 		m_flDelay = 1.5;
@@ -1214,7 +1221,7 @@ void CEnvSpark::KeyValue( KeyValueData *pkvd )
 
 void EXPORT CEnvSpark::SparkThink()
 {
-	pev->nextthink = gpGlobals->time + 0.1 + RANDOM_FLOAT (0, m_flDelay);
+	SetNextThink(RANDOM_FLOAT (0, m_flDelay));
 	DoSpark( pev, pev->origin );
 }
 
@@ -1222,7 +1229,7 @@ void EXPORT CEnvSpark::SparkStart(CBaseEntity *pActivator, CBaseEntity *pCaller,
 {
 	SetUse(&CEnvSpark::SparkStop);
 	SetThink(&CEnvSpark::SparkThink);
-	pev->nextthink = gpGlobals->time + (0.1 + RANDOM_FLOAT ( 0, m_flDelay));
+	SetNextThink((0.1 + RANDOM_FLOAT ( 0, m_flDelay)));
 }
 
 void EXPORT CEnvSpark::SparkStop(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )

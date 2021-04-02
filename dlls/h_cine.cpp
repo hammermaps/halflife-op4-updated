@@ -137,7 +137,7 @@ void CLegacyCineMonster :: Use( CBaseEntity *pActivator, CBaseEntity *pCaller, U
 {
 	pev->animtime = 0;	// reset the sequence
 	SetThink( &CLegacyCineMonster::CineThink );
-	pev->nextthink = gpGlobals->time;
+	SetNextThink(0);
 }
 
 //
@@ -167,7 +167,7 @@ void CLegacyCineMonster :: CineThink()
 	if (!pev->animtime)
 		ResetSequenceInfo( );
 
-	pev->nextthink = gpGlobals->time + 1.0;
+	SetNextThink(1.0);
 
 	UpdateShockEffect();
 
@@ -199,7 +199,7 @@ void CCineBlood :: BloodGush ()
 {
 	Vector	vecSplatDir;
 	TraceResult	tr;
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	UTIL_MakeVectors(pev->angles);
 	if ( pev->health-- < 0 )
@@ -231,7 +231,7 @@ void CCineBlood :: BloodGush ()
 void CCineBlood :: BloodStart ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &CCineBlood::BloodGush );
-	pev->nextthink = gpGlobals->time;// now!
+	SetNextThink(0);
 }
 
 void CCineBlood :: Spawn ()

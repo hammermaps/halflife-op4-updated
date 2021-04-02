@@ -52,7 +52,7 @@ void CTFGoalBase::BaseThink()
     g_engfuncs.pfnWriteByte(255);
     g_engfuncs.pfnWriteCoord(0);
     g_engfuncs.pfnMessageEnd();
-    pev->nextthink = gpGlobals->time + 20.0;
+    SetNextThink(20.0);
 }
 
 void CTFGoalBase::Spawn()
@@ -101,7 +101,7 @@ void CTFGoalBase::Spawn()
         }
 
         SetThink(&CTFGoalBase::BaseThink);
-        pev->nextthink = gpGlobals->time + 0.1;
+        SetNextThink(0.1);
     }
 }
 

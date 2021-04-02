@@ -1169,7 +1169,7 @@ void CBMortar:: Spawn()
 
 void CBMortar::Animate()
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	if ( gpGlobals->time > pev->dmgtime )
 	{
@@ -1195,7 +1195,7 @@ CBMortar *CBMortar::Shoot( edict_t *pOwner, Vector vecStart, Vector vecVelocity 
 	pSpit->pev->owner = pOwner;
 	pSpit->pev->scale = 2.5;
 	pSpit->SetThink ( &CBMortar::Animate );
-	pSpit->pev->nextthink = gpGlobals->time + 0.1;
+	pSpit->SetNextThink(0.1);
 
 	return pSpit;
 }

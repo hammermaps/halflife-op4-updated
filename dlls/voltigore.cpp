@@ -196,7 +196,7 @@ void COFChargedBolt::LaunchChargedBolt( const Vector& vecAim, edict_t* pOwner, i
 	SetTouch( &COFChargedBolt::ChargedBoltTouch );
 	SetThink( &COFChargedBolt::FlyThink );
 
-	pev->nextthink = gpGlobals->time + 0.15;
+	SetNextThink(0.15);
 }
 
 void COFChargedBolt::SetAttachment( CBaseAnimating* pAttachEnt, int iAttachIdx )
@@ -213,7 +213,7 @@ void COFChargedBolt::SetAttachment( CBaseAnimating* pAttachEnt, int iAttachIdx )
 
 	SetThink( &COFChargedBolt::AttachThink );
 
-	pev->nextthink = gpGlobals->time + 0.05;
+	SetNextThink(0.05);
 }
 
 //=========================================================
@@ -281,14 +281,14 @@ void COFChargedBolt::AttachThink()
 	m_pAttachEnt->GetAttachment( m_iAttachIdx, vecOrigin, vecAngles );
 	UTIL_SetOrigin( this, vecOrigin );
 
-	pev->nextthink = gpGlobals->time + 0.05;
+	SetNextThink(0.05);
 }
 
 void COFChargedBolt::FlyThink()
 {
 	ArmBeam( -1 );
 	ArmBeam( 1 );
-	pev->nextthink = gpGlobals->time + 0.05;
+	SetNextThink(0.05);
 }
 
 void COFChargedBolt::ChargedBoltTouch( CBaseEntity* pOther )
@@ -323,7 +323,7 @@ void COFChargedBolt::ChargedBoltTouch( CBaseEntity* pOther )
 	RadiusDamage( pev->origin, pev, pevOwner, gSkillData.voltigoreDmgBeam, 128.0, CLASS_NONE, DMG_ALWAYSGIB | DMG_SHOCK );
 
 	SetThink( &COFChargedBolt::ShutdownChargedBolt );
-	pev->nextthink = gpGlobals->time + 0.5;
+	SetNextThink(0.5);
 }
 
 class COFVoltigore : public CSquadMonster
@@ -1301,7 +1301,7 @@ void COFVoltigore::CallDeathGibThink()
 
 void COFVoltigore::DeathGibThink()
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	DispatchAnimEvents( 0.1 );
 	StudioFrameAdvance( 0.0 );
 
@@ -1367,7 +1367,7 @@ void COFVoltigore::DeathGibThink()
 			}
 
 			pBeam->SetThink( &CBaseEntity::SUB_Remove );
-			pBeam->pev->nextthink = gpGlobals->time + 0.6;
+			pBeam->SetNextThink(0.6);
 		}
 
 		ClearMultiDamage();
@@ -1404,7 +1404,7 @@ void COFVoltigore::GibMonster()
 
 	// don't remove players!
 	SetThink( &CBaseMonster::SUB_Remove );
-	pev->nextthink = gpGlobals->time + 0.15;
+	SetNextThink(0.15);
 
 	//Note: the original didn't have the violence check
 	if( CVAR_GET_FLOAT( "violence_agibs" ) != 0 )	// Should never get here, but someone might call it directly

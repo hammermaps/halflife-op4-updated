@@ -127,7 +127,7 @@ void CCycler :: Spawn( )
 	m_flFrameRate		= 75;
 	m_flGroundSpeed		= 0;
 
-	pev->nextthink		+= 1.0;
+	AbsoluteNextThink(m_fNextThink + 1.0);
 
 	ResetSequenceInfo( );
 
@@ -150,7 +150,7 @@ void CCycler :: Spawn( )
 //
 void CCycler :: Think()
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	if (m_animate)
 	{
@@ -441,7 +441,7 @@ void CWreckage::Precache( )
 void CWreckage::Think()
 {
 	StudioFrameAdvance( );
-	pev->nextthink = gpGlobals->time + 0.2;
+	SetNextThink(0.2);
 
 	UpdateShockEffect();
 

@@ -57,7 +57,7 @@ void CFuncGrass::Spawn()
 	
 	if (!g_pGameRules->IsMultiplayer())
 	{
-		pev->nextthink = gpGlobals->time + 1.0;
+		SetNextThink(1.0);
 		SetThink(&CFuncGrass::GrassThink);
 	}
 }
@@ -73,7 +73,7 @@ void CFuncGrass::GrassThink()
 		m_fGrassActive = true;
 		m_fGrassDeactivated = false;
 		SetThink(&CFuncGrass::GrassTurnOn);
-		pev->nextthink = gpGlobals->time + 0.001;
+		SetNextThink(0.001);
 	}
 }
 
@@ -104,7 +104,7 @@ void CFuncGrass::GrassTurnOn()
 	
 	m_fGrassNoUpdate = true;
 	SetThink(&CFuncGrass::GrassThinkContinous);
-	pev->nextthink = gpGlobals->time + 0.5;
+	SetNextThink(0.5);
 }
 
 void CFuncGrass::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
@@ -114,14 +114,14 @@ void CFuncGrass::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 		m_fGrassActive = true;
 		m_fGrassDeactivated = false;
 		SetThink(&CFuncGrass::GrassTurnOn);
-		pev->nextthink = gpGlobals->time + 0.1;
+		SetNextThink(0.1);
 	}
 	else
 	{
 		m_fGrassActive = false;
 		m_fGrassDeactivated = true;
 		SetThink(&CFuncGrass::GrassTurnOn);
-		pev->nextthink = gpGlobals->time + 0.001;
+		SetNextThink(0.001);
 	}
 }
 
@@ -130,13 +130,13 @@ void CFuncGrass::GrassThinkContinous()
 	if (!m_fGrassNoUpdate && m_fGrassActive && !m_fGrassDeactivated)
 	{
 		SetThink(&CFuncGrass::GrassTurnOn);
-		pev->nextthink = gpGlobals->time + 0.001;
+		SetNextThink(0.001);
 		ALERT(at_console, "Activating Grass!!!\n");
 	}
 	else
 	{
 		SetThink(&CFuncGrass::GrassThinkContinous);
-		pev->nextthink = gpGlobals->time + 0.1;
+		SetNextThink(0.1);
 		ALERT(at_console, "Thinking!!!\n");
 	}
 }

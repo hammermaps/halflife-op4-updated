@@ -121,7 +121,7 @@ void COFGeneWormCloud::GeneWormCloudThink()
 {
 	RunGeneWormCloud( ( gpGlobals->time - m_lastTime ) * pev->framerate );
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	m_lastTime = gpGlobals->time;
 }
 
@@ -135,7 +135,7 @@ void COFGeneWormCloud::GeneWormCloudTouch( CBaseEntity* pOther )
 			pOther->TakeDamage( pev, pev, gSkillData.geneWormDmgSpit, DMG_ACID );
 		}
 
-		pev->nextthink = gpGlobals->time;
+		SetNextThink(0);
 		SetThink( nullptr );
 		UTIL_Remove( this );
 	}
@@ -176,7 +176,7 @@ void COFGeneWormCloud::TurnOn()
 	if( pev->framerate != 0 && m_maxFrame > 1.0 || pev->spawnflags & 2 )
 	{
 		SetThink( &COFGeneWormCloud::GeneWormCloudThink );
-		pev->nextthink = gpGlobals->time;
+		SetNextThink(0);
 		m_lastTime = gpGlobals->time;
 	}
 
@@ -330,7 +330,7 @@ void COFGeneWormSpawn::GeneWormSpawnThink()
 {
 	RunGeneWormSpawn( ( gpGlobals->time - m_lastTime ) * pev->framerate );
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	m_lastTime = gpGlobals->time;
 }
 
@@ -444,7 +444,7 @@ void COFGeneWormSpawn::TurnOn()
 	if( pev->framerate != 0 && m_maxFrame > 1.0 || pev->spawnflags & 2 )
 	{
 		SetThink( &COFGeneWormSpawn::GeneWormSpawnThink );
-		pev->nextthink = gpGlobals->time;
+		SetNextThink(0);
 		m_lastTime = gpGlobals->time;
 	}
 
@@ -544,7 +544,7 @@ void COFGeneWormSpawn::CreateWarpBeams( int side )
 	}
 
 	m_pBeam[ m_iBeams ]->SetThink( &CBeam::SUB_Remove );
-	m_pBeam[ m_iBeams ]->pev->nextthink = gpGlobals->time + 1;
+	m_pBeam[ m_iBeams ]->SetNextThink(1);
 
 	++m_iBeams;
 }
@@ -775,7 +775,7 @@ void COFGeneWorm::Spawn()
 	m_flFieldOfView = 0.5;
 
 	SetThink( &COFGeneWorm::StartupThink );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	m_iWasHit = 0;
 	m_fRightEyeHit = false;
@@ -831,14 +831,14 @@ void COFGeneWorm::StartupThink()
 	SetThink( &COFGeneWorm::HuntThink );
 	SetUse( &COFGeneWorm::CommandUse );
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	SetTouch( &COFGeneWorm::HitTouch );
 }
 
 void COFGeneWorm::HuntThink()
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	if( !m_fActivated )
 		return;
@@ -1072,7 +1072,7 @@ void COFGeneWorm::HuntThink()
 
 void COFGeneWorm::DyingThink()
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	DispatchAnimEvents();
 	StudioFrameAdvance();
@@ -1115,13 +1115,13 @@ void COFGeneWorm::DyingThink()
 		for( auto pTrooper : UTIL_FindEntitiesByClassname( "monster_shocktrooper" ) )
 		{
 			pTrooper->SetThink( &CBaseEntity::SUB_FadeOut );
-			pTrooper->pev->nextthink = gpGlobals->time + 0.1;
+			pTrooper->SetNextThink(0.1);
 		}
 
 		for( auto pRoach : UTIL_FindEntitiesByClassname( "monster_shockroach" ) )
 		{
 			pRoach->SetThink( &CBaseEntity::SUB_FadeOut );
-			pRoach->pev->nextthink = gpGlobals->time + 0.1;
+			pRoach->SetNextThink(0.1);
 		}
 	}
 
@@ -1166,7 +1166,7 @@ void COFGeneWorm::DyingThink()
 void COFGeneWorm::NullThink()
 {
 	StudioFrameAdvance();
-	pev->nextthink = gpGlobals->time + 0.5;
+	SetNextThink(0.5);
 }
 
 void COFGeneWorm::HitTouch( CBaseEntity* pOther )

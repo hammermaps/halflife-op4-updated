@@ -186,7 +186,7 @@ public:
 	float			m_fNextThink; // LRC - for SetNextThink and SetPhysThink. Marks the time when a think will be performed - not necessarily the same as pev->nextthink!
 	float			m_fPevNextThink; // LRC - always set equal to pev->nextthink, so that we can tell when the latter gets changed by the @#$^¬! engine.
 	int				m_iLFlags; // LRC- a new set of flags. (pev->spawnflags and pev->flags are full...)
-	virtual void	DesiredAction() {}; // LRC - for postponing stuff until PostThink time, not as a think.
+	virtual void	DesiredAction() {} // LRC - for postponing stuff until PostThink time, not as a think.
 	int				m_iStyle; // LRC - almost anything can have a lightstyle these days...
 
 	Vector			m_vecSpawnOffset; // LRC- To fix things which (for example) MoveWith a door which Starts Open.

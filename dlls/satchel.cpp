@@ -63,7 +63,7 @@ void CSatchelCharge :: Spawn()
 	SetTouch( &CSatchelCharge::SatchelSlide );
 	SetUse( &CSatchelCharge::DetonateUse );
 	SetThink( &CSatchelCharge::SatchelThink );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	pev->gravity = 0.5;
 	pev->friction = 0.8;
@@ -107,7 +107,7 @@ void CSatchelCharge::SatchelSlide( CBaseEntity *pOther )
 void CSatchelCharge :: SatchelThink()
 {
 	StudioFrameAdvance( );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	if (!IsInWorld())
 	{
@@ -311,7 +311,7 @@ void CSatchel::Holster( int skiplocal /* = 0 */ )
 	{
 		m_pPlayer->pev->weapons &= ~(1<<WEAPON_SATCHEL);
 		SetThink( &CSatchel::DestroyItem );
-		pev->nextthink = gpGlobals->time + 0.1;
+		SetNextThink(0.1);
 	}
 }
 

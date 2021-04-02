@@ -161,11 +161,11 @@ void CWarpBall::WarpBallUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_T
 			m_pBeams->pev->solid = 0;
 			m_pBeams->Precache();
 			m_pBeams->SetThink(&CLightning::StrikeThink);
-			m_pBeams->pev->nextthink = gpGlobals->time + 0.1;
+			m_pBeams->SetNextThink(0.1);
 		}
 
 		SetThink(&CWarpBall::BallThink);
-		pev->nextthink = gpGlobals->time + 0.1;
+		SetNextThink(0.1);
 
 		m_flLastTime = gpGlobals->time;
 		m_fBeamsCleared = 0;
@@ -225,11 +225,11 @@ void CWarpBall::BallThink()
 			if (pev->frame >= (m_flMaxFrame - 4.0))
 			{
 				m_pBeams->SetThink(nullptr);
-				m_pBeams->pev->nextthink = gpGlobals->time;
+				m_pBeams->SetNextThink(0);
 			}
 		}
 
-		pev->nextthink = gpGlobals->time + 0.1;
+		SetNextThink(0.1);
 		m_flLastTime = gpGlobals->time;
 	}
 }

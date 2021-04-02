@@ -128,7 +128,7 @@ void CGrappleTip::Spawn()
 
 	pev->gravity = 1;
 
-	pev->nextthink = gpGlobals->time + 0.02;
+	SetNextThink(0.02);
 
 	m_bIsStuck = false;
 	m_bMissed = false;
@@ -174,7 +174,7 @@ void CGrappleTip::FlyThink()
 	}
 #endif
 
-	pev->nextthink = gpGlobals->time + 0.02;
+	SetNextThink(0.02);
 }
 
 void CGrappleTip::OffsetThink()
@@ -221,7 +221,7 @@ void CGrappleTip::TongueTouch( CBaseEntity* pOther )
 	m_GrappleType = targetClass;
 
 	SetThink( &CGrappleTip::OffsetThink );
-	pev->nextthink = gpGlobals->time + 0.02;
+	SetNextThink(0.02);
 
 	SetTouch( nullptr );
 }

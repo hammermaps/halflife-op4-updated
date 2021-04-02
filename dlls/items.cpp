@@ -151,7 +151,7 @@ CBaseEntity* CItem::Respawn()
 	UTIL_SetOrigin( this, g_pGameRules->VecItemRespawnSpot( this ) );// blip to whereever you should respawn.
 
 	SetThink ( &CItem::Materialize );
-	pev->nextthink = g_pGameRules->FlItemRespawnTime( this ); 
+	AbsoluteNextThink(g_pGameRules->FlItemRespawnTime(this));
 	return this;
 }
 

@@ -72,7 +72,7 @@ void CTFGoal::Spawn()
     UTIL_SetOrigin(this, pev->origin);
 
     SetThink(&CTFGoal::PlaceGoal);
-    pev->nextthink = gpGlobals->time + 0.2;
+    SetNextThink(0.2);
 }
 
 void CTFGoal::SetObjectCollisionBox()
@@ -113,7 +113,7 @@ void CTFGoal::SetObjectCollisionBox()
 void CTFGoal::StartGoal()
 {
     SetThink(&CTFGoal::PlaceGoal);
-    pev->nextthink = gpGlobals->time + 0.2;
+    SetNextThink(0.2);
 }
 
 void CTFGoal::PlaceGoal()

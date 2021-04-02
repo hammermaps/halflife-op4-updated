@@ -87,7 +87,7 @@ void CMortarShell::Spawn()
 	//Deal twice the damage that the RPG does
 	pev->dmg = 2 * gSkillData.plrDmgRPG;
 
-	pev->nextthink = gpGlobals->time + 0.01;
+	SetNextThink(0.01);
 	m_flIgniteTime  = gpGlobals->time;
 	m_iSoundedOff = false;
 }
@@ -117,7 +117,7 @@ void CMortarShell::BurnThink()
 		SetThink( &CMortarShell::FlyThink );
 	}
 
-	pev->nextthink = gpGlobals->time + 0.01;
+	SetNextThink(0.01);
 }
 
 void CMortarShell::FlyThink()
@@ -131,7 +131,7 @@ void CMortarShell::FlyThink()
 		EMIT_SOUND( edict(), CHAN_VOICE, "weapons/ofmortar.wav", RANDOM_FLOAT( 0.8, 0.9 ), ATTN_NONE );
 	}
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 void CMortarShell::MortarExplodeTouch( CBaseEntity* pOther )
@@ -201,7 +201,7 @@ void CMortarShell::MortarExplodeTouch( CBaseEntity* pOther )
 
 	pev->velocity = g_vecZero;
 
-	pev->nextthink = gpGlobals->time + 0.3;
+	SetNextThink(0.3);
 
 	if( contents != CONTENTS_WATER )
 	{
@@ -410,7 +410,7 @@ void COp4Mortar::Spawn()
 
 	m_hEnemy = nullptr;
 
-	pev->nextthink = gpGlobals->time + 0.01;
+	SetNextThink(0.01);
 	SetThink( &COp4Mortar::MortarThink );
 }
 
@@ -432,7 +432,7 @@ void COp4Mortar::MortarThink()
 
 	UpdateShockEffect();
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	if( pev->spawnflags & SF_MORTAR_ACTIVE )
 	{

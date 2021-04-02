@@ -229,7 +229,7 @@ void CBaseDelay :: SUB_UseTargets( CBaseEntity *pActivator, USE_TYPE useType, fl
 		CBaseDelay *pTemp = GetClassPtr( (CBaseDelay *)NULL);
 		pTemp->pev->classname = MAKE_STRING("DelayedUse");
 
-		pTemp->pev->nextthink = gpGlobals->time + m_flDelay;
+		pTemp->SetNextThink(m_flDelay);
 
 		pTemp->SetThink( &CBaseDelay::DelayThink );
 		
@@ -425,7 +425,7 @@ void CBaseToggle ::  LinearMove( Vector	vecDest, float flSpeed )
 	float flTravelTime = vecDestDelta.Length() / flSpeed;
 
 	// set nextthink to trigger a call to LinearMoveDone when dest is reached
-	pev->nextthink = pev->ltime + flTravelTime;
+	SetNextThink(flTravelTime);
 	SetThink( &CBaseToggle::LinearMoveDone );
 
 	// scale the destdelta vector by the time spent traveling to get velocity
@@ -450,7 +450,7 @@ void CBaseToggle :: LinearMoveDone()
 
 	UTIL_SetOrigin(this, m_vecFinalDest);
 	pev->velocity = g_vecZero;
-	pev->nextthink = -1;
+	DontThink();
 	if ( m_pfnCallWhenMoveDone )
 		(this->*m_pfnCallWhenMoveDone)();
 }
@@ -493,7 +493,7 @@ void CBaseToggle :: AngularMove( Vector vecDestAngle, float flSpeed )
 	float flTravelTime = vecDestDelta.Length() / flSpeed;
 
 	// set nextthink to trigger a call to AngularMoveDone when dest is reached
-	pev->nextthink = pev->ltime + flTravelTime;
+	SetNextThink(flTravelTime);
 	SetThink( &CBaseToggle::AngularMoveDone );
 
 	// scale the destdelta vector by the time spent traveling to get velocity
@@ -510,7 +510,7 @@ void CBaseToggle :: AngularMoveDone()
 {
 	pev->angles = m_vecFinalAngle;
 	pev->avelocity = g_vecZero;
-	pev->nextthink = -1;
+	DontThink();
 	if ( m_pfnCallWhenMoveDone )
 		(this->*m_pfnCallWhenMoveDone)();
 }

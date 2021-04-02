@@ -66,7 +66,7 @@ public:
 	int	ObjectCaps() override { return CBaseEntity :: ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 
 	inline BOOL IsActive() { return (pev->spawnflags & SF_TANK_ACTIVE)?TRUE:FALSE; }
-	inline void TankActivate() { pev->spawnflags |= SF_TANK_ACTIVE; pev->nextthink = pev->ltime + 0.1; m_fireLast = 0; }
+	inline void TankActivate() { pev->spawnflags |= SF_TANK_ACTIVE; SetNextThink(0.1); m_fireLast = 0; }
 	inline void TankDeactivate() { pev->spawnflags &= ~SF_TANK_ACTIVE; m_fireLast = 0; StopRotSound(); }
 	inline BOOL CanFire() { return (gpGlobals->time - m_lastSightTime) < m_persist; }
 	BOOL		InRange( float range );
@@ -195,7 +195,7 @@ void COFFuncTank :: Spawn()
 	m_pitchCenter = pev->angles.x;
 
 	if ( IsActive() )
-		pev->nextthink = pev->ltime + 1.0;
+		SetNextThink(1.0);
 
 	m_sightOrigin = BarrelPosition(); // Point at the end of the barrel
 
@@ -381,7 +381,7 @@ BOOL COFFuncTank :: StartControl( CBasePlayer *pController )
 	m_pController->m_iHideHUD |= HIDEHUD_WEAPONS;
 	m_vecControllerUsePos = m_pController->pev->origin;
 	
-	pev->nextthink = pev->ltime + 0.1;
+	SetNextThink(0.1);
 	
 	return TRUE;
 }
@@ -399,11 +399,11 @@ void COFFuncTank :: StopControl()
 
 	m_pController->m_iHideHUD &= ~HIDEHUD_WEAPONS;
 
-	pev->nextthink = 0;
+	DontThink();
 	m_pController = NULL;
 
 	if ( IsActive() )
-		pev->nextthink = pev->ltime + 1.0;
+		SetNextThink(1.0);
 }
 
 // Called each frame by the player's ItemPostFrame
@@ -610,19 +610,19 @@ void COFFuncTank::TrackTarget()
 		// Tanks attempt to mirror the player's angles
 		angles = m_pController->pev->v_angle;
 		angles[0] = 0 - angles[0];
-		pev->nextthink = pev->ltime + 0.05;
+		SetNextThink(0.05);
 	}
 	else
 	{
 		if ( IsActive() )
-			pev->nextthink = pev->ltime + 0.1;
+			SetNextThink(0.1);
 		else
 			return;
 
 		if ( FNullEnt( pPlayer ) )
 		{
 			if ( IsActive() )
-				pev->nextthink = pev->ltime + 2;	// Wait 2 secs
+				SetNextThink(2);	// Wait 2 secs
 			return;
 		}
 
@@ -995,7 +995,7 @@ void COFFuncTankLaser::Fire( const Vector &barrelEnd, const Vector &forward, ent
 				m_pLaser->TurnOn();
 				m_pLaser->pev->dmgtime = gpGlobals->time - 1.0;
 				m_pLaser->FireAtPoint( tr );
-				m_pLaser->pev->nextthink = 0;
+				m_pLaser->DontThink();
 			}
 			COFFuncTank::Fire( barrelEnd, forward, pev );
 		}
@@ -1159,7 +1159,7 @@ void COFFuncTankControls::Spawn()
 	UTIL_SetSize( pev, pev->mins, pev->maxs );
 	UTIL_SetOrigin( this, pev->origin );
 	
-	pev->nextthink = gpGlobals->time + 0.3;	// After all the func_tank's have spawned
+	SetNextThink(0.3);	// After all the func_tank's have spawned
 
 	CBaseEntity::Spawn();
 }

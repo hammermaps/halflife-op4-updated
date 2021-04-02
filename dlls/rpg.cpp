@@ -66,7 +66,7 @@ void CLaserSpot::Suspend( float flSuspendTime )
 	pev->effects |= EF_NODRAW;
 	
 	SetThink( &CLaserSpot::Revive );
-	pev->nextthink = gpGlobals->time + flSuspendTime;
+	SetNextThink(flSuspendTime);
 }
 
 //=========================================================
@@ -128,7 +128,7 @@ void CRpgRocket :: Spawn()
 	pev->velocity = gpGlobals->v_forward * 250;
 	pev->gravity = 0.5;
 
-	pev->nextthink = gpGlobals->time + 0.4;
+	SetNextThink(0.4);
 
 	pev->dmg = gSkillData.plrDmgRPG;
 }
@@ -186,7 +186,7 @@ void CRpgRocket :: IgniteThink()
 
 	// set to follow laser spot
 	SetThink( &CRpgRocket::FollowThink );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 
@@ -261,7 +261,7 @@ void CRpgRocket :: FollowThink()
 	}
 	// ALERT( at_console, "%.0f\n", flSpeed );
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 #endif
 

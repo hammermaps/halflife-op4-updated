@@ -759,7 +759,7 @@ void CBasePlayer::PackDeadPlayerItems()
 	pWeaponBox->pev->angles.z = 0;
 
 	pWeaponBox->SetThink( &CWeaponBox::Kill );
-	pWeaponBox->pev->nextthink = gpGlobals->time + 120;
+	pWeaponBox->SetNextThink(120);
 
 // back these two lists up to their first elements
 	iPA = 0;
@@ -918,7 +918,7 @@ void CBasePlayer::Killed( entvars_t *pevAttacker, int iGib )
 	pev->angles.z = 0;
 
 	SetThink(&CBasePlayer::PlayerDeathThink);
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 
@@ -1355,7 +1355,7 @@ void CBasePlayer::PlayerDeathThink()
 	//ALERT(at_console, "Respawn\n");
 
 	respawn(pev, !(m_afPhysicsFlags & PFLAG_OBSERVER) );// don't copy a corpse if we're in deathcam.
-	pev->nextthink = -1;
+	DontThink();
 }
 
 //=========================================================
@@ -3485,7 +3485,7 @@ void CSprayCan::Spawn ( entvars_t *pevOwner )
 	pev->owner = ENT(pevOwner);
 	pev->frame = 0;
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/sprayer.wav", 1, ATTN_NORM);
 }
 
@@ -3524,7 +3524,7 @@ void CSprayCan::Think()
 			UTIL_Remove( this );
 	}
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 class	CBloodSplat : public CBaseEntity
@@ -3541,7 +3541,7 @@ void CBloodSplat::Spawn ( entvars_t *pevOwner )
 	pev->owner = ENT(pevOwner);
 
 	SetThink ( &CBloodSplat::Spray );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 void CBloodSplat::Spray ()
@@ -3556,7 +3556,7 @@ void CBloodSplat::Spray ()
 		UTIL_BloodDecalTrace( &tr, BLOOD_COLOR_RED );
 	}
 	SetThink ( &CBloodSplat::SUB_Remove );
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 //==============================================
@@ -3992,7 +3992,7 @@ int CBasePlayer::RemovePlayerItem( CBasePlayerItem *pItem )
 	{
 		ResetAutoaim( );
 		pItem->Holster( );
-		pItem->pev->nextthink = 0;// crowbar may be trying to swing again, etc.
+		pItem->DontThink();// crowbar may be trying to swing again, etc.
 		pItem->SetThink( NULL );
 		m_pActiveItem = NULL;
 		pev->viewmodel = 0;
@@ -5477,7 +5477,7 @@ void CRevertSaved :: KeyValue( KeyValueData *pkvd )
 void CRevertSaved :: Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	UTIL_ScreenFadeAll( pev->rendercolor, Duration(), HoldTime(), pev->renderamt, FFADE_OUT );
-	pev->nextthink = gpGlobals->time + MessageTime();
+	SetNextThink(MessageTime());
 	SetThink( &CRevertSaved::MessageThink );
 }
 
@@ -5488,7 +5488,7 @@ void CRevertSaved :: MessageThink()
 	float nextThink = LoadTime() - MessageTime();
 	if ( nextThink > 0 ) 
 	{
-		pev->nextthink = gpGlobals->time + nextThink;
+		SetNextThink(nextThink);
 		SetThink( &CRevertSaved::LoadThink );
 	}
 	else
@@ -5521,7 +5521,7 @@ void CInfoIntermission::Spawn()
 	pev->effects = EF_NODRAW;
 	pev->v_angle = g_vecZero;
 
-	pev->nextthink = gpGlobals->time + 2;// let targets spawn!
+	SetNextThink(2);// let targets spawn!
 
 }
 

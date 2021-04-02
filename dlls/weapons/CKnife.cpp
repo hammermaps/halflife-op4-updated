@@ -233,7 +233,7 @@ bool CKnife::Swing( const bool bFirst )
 		m_pPlayer->m_iWeaponVolume = flVol * KNIFE_WALLHIT_VOLUME;
 
 		SetThink( &CKnife::Smack );
-		pev->nextthink = gpGlobals->time + 0.2;
+		SetNextThink(0.2);
 #endif
 	}
 	return bDidHit;

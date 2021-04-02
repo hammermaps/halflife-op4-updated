@@ -173,7 +173,7 @@ void CAutoTrigger::Spawn()
 
 void CAutoTrigger::Precache()
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 }
 
 
@@ -410,7 +410,7 @@ void CMultiManager :: ManagerThink ()
 		SetUse ( &CMultiManager::ManagerUse );// allow manager re-use 
 	}
 	else
-		pev->nextthink = m_startTime + m_flTargetDelay[ m_index ];
+		AbsoluteNextThink(m_startTime + m_flTargetDelay[m_index]);
 }
 
 CMultiManager *CMultiManager::Clone()
@@ -449,7 +449,7 @@ void CMultiManager :: ManagerUse ( CBaseEntity *pActivator, CBaseEntity *pCaller
 	SetUse( NULL );// disable use until all targets have fired
 
 	SetThink ( &CMultiManager::ManagerThink );
-	pev->nextthink = gpGlobals->time;
+	SetNextThink(0);
 }
 
 #if _DEBUG
@@ -614,7 +614,7 @@ void CTriggerMonsterJump :: Spawn ()
 	
 	InitTrigger ();
 
-	pev->nextthink = 0;
+	DontThink();
 	pev->speed = 200;
 	m_flHeight = 150;
 
@@ -653,7 +653,7 @@ void CTriggerMonsterJump :: Touch( CBaseEntity *pOther )
 	// toss the monster!
 	pevOther->velocity = pev->movedir * pev->speed;
 	pevOther->velocity.z += m_flHeight;
-	pev->nextthink = gpGlobals->time;
+	SetNextThink(0);
 }
 
 
@@ -769,7 +769,7 @@ void CTargetCDAudio :: Spawn()
 	pev->movetype = MOVETYPE_NONE;
 
 	if ( pev->scale > 0 )
-		pev->nextthink = gpGlobals->time + 1.0;
+		SetNextThink(1.0);
 }
 
 void CTargetCDAudio::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
@@ -789,7 +789,7 @@ void CTargetCDAudio::Think()
 	if ( !pClient )
 		return;
 	
-	pev->nextthink = gpGlobals->time + 0.5;
+	SetNextThink(0.5);
 
 	if ( (pClient->v.origin - pev->origin).Length() <= pev->scale )
 		Play();
@@ -826,7 +826,7 @@ void CTriggerHurt :: Spawn()
 	if (m_bitsDamageInflict & DMG_RADIATION)
 	{
 		SetThink ( &CTriggerHurt::RadiationThink );
-		pev->nextthink = gpGlobals->time + RANDOM_FLOAT(0.0, 0.5); 
+		SetNextThink(RANDOM_FLOAT(0.0, 0.5));
 	}
 
 	if ( FBitSet (pev->spawnflags, SF_TRIGGER_HURT_START_OFF) )// if flagged to Start Turned Off, make trigger nonsolid.
@@ -892,7 +892,7 @@ void CTriggerHurt :: RadiationThink()
 			pPlayer->m_flgeigerRange = flRange;
 	}
 
-	pev->nextthink = gpGlobals->time + 0.25;
+	SetNextThink(0.25);
 }
 
 //
@@ -1182,14 +1182,14 @@ void CBaseTrigger :: ActivateMultiTrigger( CBaseEntity *pActivator )
 	if (m_flWait > 0)
 	{
 		SetThink( &CBaseTrigger::MultiWaitOver );
-		pev->nextthink = gpGlobals->time + m_flWait;
+		SetNextThink(m_flWait);
 	}
 	else
 	{
 		// we can't just remove (self) here, because this is a touch function
 		// called while C code is looping through area links...
 		SetTouch( NULL );
-		pev->nextthink = gpGlobals->time + 0.1;
+		SetNextThink(0.1);
 		SetThink(  &CBaseTrigger::SUB_Remove );
 	}
 }
@@ -1315,7 +1315,7 @@ void CFireAndDie::Spawn()
 void CFireAndDie::Precache()
 {
 	// This gets called on restore
-	pev->nextthink = gpGlobals->time + m_flDelay;
+	SetNextThink(m_flDelay);
 }
 
 
@@ -1737,7 +1737,7 @@ void NextLevel()
 	if (pChange->pev->nextthink < gpGlobals->time)
 	{
 		pChange->SetThink( &CChangeLevel::ExecuteChangeLevel );
-		pChange->pev->nextthink = gpGlobals->time + 0.1;
+		pChange->SetNextThink(0.1);
 	}
 }
 
@@ -2325,7 +2325,7 @@ void CTriggerCamera::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 
 	// follow the player down
 	SetThink( &CTriggerCamera::FollowTarget );
-	pev->nextthink = gpGlobals->time;
+	SetNextThink(0);
 
 	m_moveDistance = 0;
 	Move();
@@ -2389,7 +2389,7 @@ void CTriggerCamera::FollowTarget( )
 			pev->velocity = g_vecZero;
 	}
 
-	pev->nextthink = gpGlobals->time;
+	SetNextThink(0);
 
 	Move();
 }
@@ -2486,7 +2486,7 @@ int CTriggerPlayerFreeze::Restore(CRestore& restore)
 	if (m_bUnFrozen)
 	{
 		SetThink(&CTriggerPlayerFreeze::PlayerFreezeDelay);
-		pev->nextthink = gpGlobals->time + 0.5;
+		SetNextThink(0.5);
 	}
 
 	return true;
@@ -3090,7 +3090,7 @@ void CTriggerSequence::Think()
 
 	if (m_nextCommand && pev)
 	{
-		pev->nextthink = timeNext;
+		AbsoluteNextThink(timeNext);
 	}
 	else
 	{
@@ -3140,7 +3140,7 @@ void CTriggerSequence::StopSequence()
 
 	//This method can be called before the entity has been initialized, so check this
 	if (pev)
-		pev->nextthink = 0;
+		DontThink();
 }
 
 void CTriggerSequence::ExecuteFireTargets(char* fireTargetNames)

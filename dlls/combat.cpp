@@ -360,7 +360,7 @@ void CBaseMonster :: GibMonster()
 		{
 			// don't remove players!
 			SetThink ( &CBaseMonster::SUB_Remove );
-			pev->nextthink = gpGlobals->time;
+			SetNextThink(0);
 		}
 		else
 		{
@@ -683,7 +683,7 @@ void CBaseEntity :: SUB_StartFadeOut ()
 	pev->solid = SOLID_NOT;
 	pev->avelocity = g_vecZero;
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	SetThink ( &CBaseEntity::SUB_FadeOut );
 }
 
@@ -692,12 +692,12 @@ void CBaseEntity :: SUB_FadeOut ()
 	if ( pev->renderamt > 7 )
 	{
 		pev->renderamt -= 7;
-		pev->nextthink = gpGlobals->time + 0.1;
+		SetNextThink(0.1);
 	}
 	else 
 	{
 		pev->renderamt = 0;
-		pev->nextthink = gpGlobals->time + 0.2;
+		SetNextThink(0.2);
 		SetThink ( &CBaseEntity::SUB_Remove );
 	}
 }
@@ -719,7 +719,7 @@ void CGib :: WaitTillLand ()
 	if ( pev->velocity == g_vecZero )
 	{
 		SetThink (&CGib::SUB_StartFadeOut);
-		pev->nextthink = gpGlobals->time + m_lifeTime;
+		SetNextThink(m_lifeTime);
 
 		// If you bleed, you stink!
 		if ( m_bloodColor != DONT_BLEED )
@@ -731,7 +731,7 @@ void CGib :: WaitTillLand ()
 	else
 	{
 		// wait and check again in another half second.
-		pev->nextthink = gpGlobals->time + 0.5;
+		SetNextThink(0.5);
 	}
 }
 
@@ -787,11 +787,11 @@ void CGib :: StickyGibTouch ( CBaseEntity *pOther )
 	TraceResult	tr;
 	
 	SetThink ( &CGib::SUB_Remove );
-	pev->nextthink = gpGlobals->time + 10;
+	SetNextThink(10);
 
 	if ( !FClassnameIs( pOther->pev, "worldspawn" ) )
 	{
-		pev->nextthink = gpGlobals->time;
+		SetNextThink(0);
 		return;
 	}
 
@@ -825,7 +825,7 @@ void CGib :: Spawn( const char *szGibModel )
 	SET_MODEL(ENT(pev), szGibModel);
 	UTIL_SetSize(pev, Vector( 0, 0, 0), Vector(0, 0, 0));
 
-	pev->nextthink = gpGlobals->time + 4;
+	SetNextThink(4);
 	m_lifeTime = 25;
 	SetThink ( &CGib::WaitTillLand );
 	SetTouch ( &CGib::BounceGibTouch );

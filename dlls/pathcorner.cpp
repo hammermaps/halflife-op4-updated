@@ -222,7 +222,7 @@ void CPathTrack :: Spawn()
 // DEBUGGING CODE
 #if PATH_SPARKLE_DEBUG
 	SetThink( Sparkle );
-	pev->nextthink = gpGlobals->time + 0.5;
+	SetNextThink(0.5);
 #endif
 }
 
@@ -418,7 +418,7 @@ CPathTrack *CPathTrack::Instance( edict_t *pent )
 void CPathTrack :: Sparkle()
 {
 
-	pev->nextthink = gpGlobals->time + 0.2;
+	SetNextThink(0.2);
 	if ( FBitSet( pev->spawnflags, SF_PATH_DISABLED ) )
 		UTIL_ParticleEffect(pev->origin, Vector(0,0,100), 210, 10);
 	else

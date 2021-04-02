@@ -559,7 +559,7 @@ void UTIL_SetMoveWithVelocity ( CBaseEntity *pEnt, const Vector vecSet, int loop
 //	else if (pEnt->pev->nextthink < 1)
 //	{
 //		UTIL_DesiredNextThink( pEnt, 1E6 );
-//		//pEnt->pev->nextthink = gpGlobals->time + 1E6;
+//		//pEnt->SetNextThink(1E6);
 //	}
 
 	if ( pEnt->m_pChildMoveWith )

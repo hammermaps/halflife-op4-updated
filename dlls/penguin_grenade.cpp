@@ -232,7 +232,7 @@ void CPenguinGrenade::Spawn()
 
 	SetTouch(&CPenguinGrenade::SuperBounceTouch);
 	SetThink(&CPenguinGrenade::HuntThink);
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 	m_flNextHunt = gpGlobals->time + 1E6;
 
 	pev->flags |= FL_MONSTER;
@@ -321,7 +321,7 @@ void CPenguinGrenade::HuntThink()
 	}
 
 	StudioFrameAdvance();
-	pev->nextthink = gpGlobals->time + 0.1;
+	SetNextThink(0.1);
 
 	// explode when ready
 	if (gpGlobals->time >= m_flDie)
