@@ -116,6 +116,8 @@ public:
 	float m_fTurnRate;		// actual turn rate
 	int m_iOrientation;		// 0 = floor, 1 = Ceiling
 	int	m_iOn;
+	virtual STATE getState() { if (m_iOn) { return STATE_ON; } else { return STATE_OFF; } }
+
 	int m_fBeserk;			// Sometimes this bitch will just freak out
 	int m_iAutoStart;		// true if the turret auto deploys when a target
 							// enters its range
@@ -250,7 +252,7 @@ void CBaseTurret::KeyValue( KeyValueData *pkvd )
 void CBaseTurret::Spawn()
 { 
 	Precache( );
-	pev->nextthink		= gpGlobals->time + 1;
+	SetNextThink( 1 );
 	pev->movetype		= MOVETYPE_FLY;
 	pev->sequence		= 0;
 	pev->frame			= 0;
@@ -306,8 +308,12 @@ void CBaseTurret::UpdateOnRemove()
 void CTurret::Spawn()
 { 
 	Precache( );
-	SET_MODEL(ENT(pev), "models/turret.mdl");
-	pev->health			= gSkillData.turretHealth;
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/turret.mdl");
+	if (!pev->health)
+		pev->health		= gSkillData.turretHealth;
 	m_HackedGunPos		= Vector( 0, 0, 12.75 );
 	m_flMaxSpin =		TURRET_MAXSPIN;
 	pev->view_ofs.z = 12.75;
@@ -332,14 +338,21 @@ void CTurret::Spawn()
 void CTurret::Precache()
 {
 	CBaseTurret::Precache( );
-	PRECACHE_MODEL ("models/turret.mdl");	
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL ("models/turret.mdl");	
 	PRECACHE_MODEL (TURRET_GLOW_SPRITE);
 }
 
 void CMiniTurret::Spawn()
 { 
 	Precache( );
-	SET_MODEL(ENT(pev), "models/miniturret.mdl");
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/miniturret.mdl");
+	if (!pev->health)
 	pev->health			= gSkillData.miniturretHealth;
 	m_HackedGunPos		= Vector( 0, 0, 12.75 );
 	m_flMaxSpin = 0;
@@ -359,7 +372,10 @@ void CMiniTurret::Spawn()
 void CMiniTurret::Precache()
 {
 	CBaseTurret::Precache( );
-	PRECACHE_MODEL ("models/miniturret.mdl");	
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL ("models/miniturret.mdl");	
 	PRECACHE_SOUND("weapons/hks1.wav");
 	PRECACHE_SOUND("weapons/hks2.wav");
 	PRECACHE_SOUND("weapons/hks3.wav");
@@ -1149,6 +1165,7 @@ int CBaseTurret::MoveTurret()
 //
 int	CBaseTurret::Classify ()
 {
+	if (m_iClass) return m_iClass;
 	if (m_iOn || m_iAutoStart)
 		return	CLASS_MACHINE;
 	return CLASS_NONE;
@@ -1178,14 +1195,21 @@ LINK_ENTITY_TO_CLASS( monster_sentry, CSentry );
 void CSentry::Precache()
 {
 	CBaseTurret::Precache( );
-	PRECACHE_MODEL ("models/sentry.mdl");	
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL ("models/sentry.mdl");	
 }
 
 void CSentry::Spawn()
 { 
 	Precache( );
-	SET_MODEL(ENT(pev), "models/sentry.mdl");
-	pev->health			= gSkillData.sentryHealth;
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/sentry.mdl");
+	if (!pev->health) //LRC
+		pev->health		= gSkillData.sentryHealth;
 	m_HackedGunPos		= Vector( 0, 0, 48 );
 	pev->view_ofs.z		= 48;
 	m_flMaxWait = 1E6;

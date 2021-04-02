@@ -77,7 +77,12 @@ int gmsgCustomIcon = 0;
 
 int gmsgParticles = 0;
 int gmsgGrassParticles = 0;
-int gmsgAddShine = 0;
+
+int gmsgSetFog = 0; //LRC
+int gmsgKeyedDLight = 0; //LRC
+int gmsgSetSky = 0; //LRC
+int gmsgAddShine = 0; // LRC
+int gmsgParticle = 0; // LRC
 
 void LinkUserMessages()
 {
@@ -121,7 +126,12 @@ void LinkUserMessages()
 	gmsgFade = REG_USER_MSG("ScreenFade", sizeof(ScreenFade));
 	gmsgAmmoX = REG_USER_MSG("AmmoX", 2);
 	gmsgTeamNames = REG_USER_MSG("TeamNames", -1);
+	
+	gmsgSetFog = REG_USER_MSG("SetFog", 9); //LRC
+	gmsgKeyedDLight = REG_USER_MSG("KeyedDLight", -1); //LRC
+	gmsgSetSky = REG_USER_MSG("SetSky", 7); //LRC
 	gmsgAddShine = REG_USER_MSG("AddShine", -1); //LRC
+	gmsgParticle = REG_USER_MSG("Particle", -1); //LRC
 
 	gmsgStatusText = REG_USER_MSG("StatusText", -1);
 	gmsgStatusValue = REG_USER_MSG("StatusValue", 3);

@@ -603,6 +603,9 @@
     <ClCompile Include="..\..\dlls\alias.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\locus.cpp">
+      <Filter>Source Files\dlls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\doors.h">
@@ -1002,6 +1005,9 @@
       <Filter>Source Files\dlls\effects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\movewith.h">
+      <Filter>Header Files\dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\locus.h">
       <Filter>Header Files\dlls</Filter>
     </ClInclude>
   </ItemGroup>

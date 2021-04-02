@@ -146,8 +146,8 @@ int CGraph :: AllocNodes ()
 //=========================================================
 entvars_t* CGraph :: LinkEntForLink ( CLink *pLink, CNode *pNode )
 {
-	edict_t	*pentSearch;
-	edict_t	*pentTrigger;
+	CBaseEntity	*pSearch;
+	CBaseEntity	*pTrigger;
 	entvars_t		*pevTrigger;
 	entvars_t		*pevLinkEnt;
 	TraceResult	tr;
@@ -156,7 +156,7 @@ entvars_t* CGraph :: LinkEntForLink ( CLink *pLink, CNode *pNode )
 	if ( !pevLinkEnt )
 		return NULL;
 
-	pentSearch = NULL;// start search at the top of the ent list.
+	pSearch = NULL;// start search at the top of the ent list.
 			
 	if ( FClassnameIs ( pevLinkEnt, "func_door" ) || FClassnameIs ( pevLinkEnt, "func_door_rotating" ) )
 	{
@@ -171,9 +171,9 @@ entvars_t* CGraph :: LinkEntForLink ( CLink *pLink, CNode *pNode )
 
 		while ( 1 )
 		{
-			pentTrigger = FIND_ENTITY_BY_TARGET ( pentSearch, STRING( pevLinkEnt->targetname ) );// find the button or trigger
+			pTrigger = UTIL_FindEntityByTarget ( pSearch, STRING( pevLinkEnt->targetname ) );// find the button or trigger
 
-			if ( FNullEnt( pentTrigger ) )
+			if ( !pTrigger )
 			{// no trigger found
 
 				// right now this is a problem among auto-open doors, or any door that opens through the use 
@@ -182,8 +182,8 @@ entvars_t* CGraph :: LinkEntForLink ( CLink *pLink, CNode *pNode )
 				return pevLinkEnt;
 			}
 			
-			pentSearch = pentTrigger;
-			pevTrigger = VARS( pentTrigger );
+			pSearch = pTrigger;
+			pevTrigger = pTrigger->pev;
 			
 			if ( FClassnameIs(pevTrigger, "func_button") || FClassnameIs(pevTrigger, "func_rot_button" ) )
 			{// only buttons are handled right now. 
@@ -460,7 +460,7 @@ int	CGraph::NodeType( const CBaseEntity *pEntity )
 {
 	if ( pEntity->pev->movetype == MOVETYPE_FLY)
 	{
-		if (pEntity->pev->waterlevel != 0)
+		if (pEntity->pev->waterlevel != 0 && pEntity->pev->watertype != CONTENT_FOG)
 		{
 			return bits_NODE_WATER;
 		}
@@ -521,13 +521,13 @@ int CGraph::NextNodeInRoute( int iCurrentNode, int iDest, int iHull, int iCap )
 {
 	int iNext = iCurrentNode;
 	int nCount = iDest+1;
-	char *pRoute = m_pRouteInfo + m_pNodes[ iCurrentNode ].m_pNextBestNode[iHull][iCap];
+	signed char* pRoute = m_pRouteInfo + m_pNodes[iCurrentNode].m_pNextBestNode[iHull][iCap];
 
 	// Until we decode the next best node
 	//
 	while (nCount > 0)
 	{
-		char ch = *pRoute++;
+		signed char ch = *pRoute++;
 		//ALERT(at_aiconsole, "C(%d)", ch);
 		if (ch < 0)
 		{
@@ -662,7 +662,7 @@ int CGraph :: FindShortestPath ( int *piPath, int iStart, int iDest, int iHull, 
 
 		// Mark all the nodes as unvisited.
 		//
-		int i;
+		int i = 0;
 		for ( i = 0; i < m_cNodes; i++)
 		{
 			m_pNodes[ i ].m_flClosestSoFar = -1.0;
@@ -1493,7 +1493,7 @@ void CTestHull::DropDelay ()
 
 	SetThink ( &CTestHull::CallBuildNodeGraph );
 
-	SetNextThink(1);
+	SetNextThink(1.0);
 }
 
 //=========================================================
@@ -2427,7 +2427,7 @@ int CGraph :: FLoadGraph ( char *szMapName )
 		// Malloc for the routing info.
 		//
 		m_fRoutingComplete = FALSE;
-		m_pRouteInfo = (char *)calloc( sizeof(char), m_nRouteInfo );
+		m_pRouteInfo = (signed char*)calloc(sizeof(signed char), m_nRouteInfo);
 		if ( !m_pRouteInfo )
 		{
 			ALERT ( at_aiconsole, "***ERROR**\nCounldn't malloc %d route bytes!\n", m_nRouteInfo );
@@ -2541,7 +2541,7 @@ int CGraph :: FSaveGraph ( char *szMapName )
 		//
 		if ( m_pRouteInfo && m_nRouteInfo )
 		{
-			fwrite ( m_pRouteInfo, sizeof( char ), m_nRouteInfo, file );
+			fwrite(m_pRouteInfo, sizeof(signed char), m_nRouteInfo, file);
 		}
 
 		if (m_pHashLinks && m_nHashLinks)
@@ -2563,7 +2563,7 @@ int CGraph :: FSaveGraph ( char *szMapName )
 int CGraph :: FSetGraphPointers ()
 {
 	int	i;
-	edict_t	*pentLinkEnt;
+	CBaseEntity	*pLinkEnt;
 
 	for ( i = 0 ; i < m_cLinks ; i++ )
 	{// go through all of the links
@@ -2578,9 +2578,9 @@ int CGraph :: FSetGraphPointers ()
 			// m_szLinkEntModelname is not necessarily NULL terminated (so we can store it in a more alignment-friendly 4 bytes)
 			memcpy( name, m_pLinkPool[ i ].m_szLinkEntModelname, 4 );
 			name[4] = 0;
-			pentLinkEnt =  FIND_ENTITY_BY_STRING( NULL, "model", name );
+			pLinkEnt =  UTIL_FindEntityByString( NULL, "model", name );
 
-			if ( FNullEnt ( pentLinkEnt ) )
+			if ( !pLinkEnt )
 			{
 			// the ent isn't around anymore? Either there is a major problem, or it was removed from the world
 			// ( like a func_breakable that's been destroyed or something ). Make sure that LinkEnt is null.
@@ -2589,7 +2589,7 @@ int CGraph :: FSetGraphPointers ()
 			}
 			else
 			{
-				m_pLinkPool[ i ].m_pLinkEnt = VARS( pentLinkEnt );
+				m_pLinkPool[ i ].m_pLinkEnt = pLinkEnt->pev;
 
 				if ( !FBitSet( m_pLinkPool[ i ].m_pLinkEnt->flags, FL_GRAPHED ) )
 				{
@@ -2740,7 +2740,7 @@ void CGraph::HashChoosePrimes(int TableSize)
     // We divide this interval into 16 equal sized zones. We want to find
     // one prime number that best represents that zone.
     //
-    int iPrime,iZone;
+	int iZone = 0, iPrime = 0;
     for (iZone = 1, iPrime = 0; iPrime < 16; iZone += Spacing)
     {
         // Search for a prime number that is less than the target zone
@@ -2798,7 +2798,7 @@ void CGraph::SortNodes()
 	// things and patchup the links.
 	//
 	int iNodeCnt = 0;
-	int i;
+	int i = 0;
 	m_pNodes[0].m_iPreviousNode = iNodeCnt++;
 
 	for (i = 1; i < m_cNodes; i++)
@@ -2866,7 +2866,7 @@ void CGraph::BuildLinkLookups()
 		ALERT(at_aiconsole, "Couldn't allocated Link Lookup Table.\n");
 		return;
 	}
-	int i;
+	int i = 0;
 	for (i = 0; i < m_nHashLinks; i++)
 	{
 		m_pHashLinks[i] = ENTRY_STATE_EMPTY;
@@ -2907,7 +2907,7 @@ void CGraph::BuildRegionTables()
 	// Calculate regions for all the nodes.
 	//
 	//
-	int i;
+	int i = 0;
 	for (i = 0; i < 3; i++)
 	{
 		m_RegionMin[i] =  999999999.0; // just a big number out there;
@@ -2938,7 +2938,7 @@ void CGraph::BuildRegionTables()
 
 	for (i = 0; i < 3; i++)
 	{
-		int j;
+		int j = 0;
 		for (j = 0; j < NUM_RANGES; j++)
 		{
 			m_RangeStart[i][j] = 255;
@@ -3048,7 +3048,7 @@ void CGraph :: ComputeStaticRoutingTables()
 
 	int *pMyPath = new int[m_cNodes];
 	unsigned short *BestNextNodes = new unsigned short[m_cNodes];
-	char *pRoute = new char[m_cNodes*2];
+	signed char* pRoute = new signed char[m_cNodes * 2];
 
 
 	if (Routes && pMyPath && BestNextNodes && pRoute)
@@ -3073,7 +3073,7 @@ void CGraph :: ComputeStaticRoutingTables()
 
 				// Initialize Routing table to uncalculated.
 				//
-				int iFrom;
+				int iFrom = 0;
 				for (iFrom = 0; iFrom < m_cNodes; iFrom++)
 				{
 					for (int iTo = 0; iTo < m_cNodes; iTo++)
@@ -3143,7 +3143,7 @@ void CGraph :: ComputeStaticRoutingTables()
 					int cSequence = 0;
 					int cRepeats = 0;
 					int CompressedSize = 0;
-					char *p = pRoute;
+					signed char* p = pRoute;
 					for (int i = 0; i < m_cNodes; i++)
 					{
 						BOOL CanRepeat = ((BestNextNodes[i] == iLastNode) && cRepeats < 127);
@@ -3290,7 +3290,7 @@ void CGraph :: ComputeStaticRoutingTables()
 					int nRoute = p - pRoute;
 					if (m_pRouteInfo)
 					{
-						int i;
+						int i = 0;
 						for (i = 0; i < m_nRouteInfo - nRoute; i++)
 						{
 							if (memcmp(m_pRouteInfo + i, pRoute, nRoute) == 0)
@@ -3304,7 +3304,7 @@ void CGraph :: ComputeStaticRoutingTables()
 						}
 						else
 						{
-							char *Tmp = (char *)calloc(sizeof(char), (m_nRouteInfo + nRoute));
+							signed char* Tmp = (signed char*)calloc(sizeof(signed char), (m_nRouteInfo + nRoute));
 							memcpy(Tmp, m_pRouteInfo, m_nRouteInfo);
 							free(m_pRouteInfo);
 							m_pRouteInfo = Tmp;
@@ -3317,7 +3317,7 @@ void CGraph :: ComputeStaticRoutingTables()
 					else
 					{
 						m_nRouteInfo = nRoute;
-						m_pRouteInfo = (char *)calloc(sizeof(char), nRoute);
+						m_pRouteInfo = (signed char*)calloc(sizeof(signed char), nRoute);
 						memcpy(m_pRouteInfo, pRoute, nRoute);
 						m_pNodes[ iFrom ].m_pNextBestNode[iHull][iCap] = 0;
 						nTotalCompressedSize += CompressedSize;
@@ -3383,8 +3383,8 @@ void CGraph :: TestRoutingTables()
 						//
 #if 1
 						float flDistance1 = 0.0;
-
-						for (int i = 0; i < cPathSize1-1; i++)
+						int i = 0;
+						for (i = 0; i < cPathSize1-1; i++)
 						{
 							// Find the link from pMyPath[i] to pMyPath[i+1]
 							//
@@ -3438,12 +3438,13 @@ void CGraph :: TestRoutingTables()
 #endif
 							ALERT(at_aiconsole, "Routing is inconsistent!!!\n");
 							ALERT(at_aiconsole, "(%d to %d |%d/%d)1:", iFrom, iTo, iHull, iCap);
-							for (int i = 0; i < cPathSize1; i++)
+							int i = 0;
+							for (i = 0; i < cPathSize1; i++)
 							{
 								ALERT(at_aiconsole, "%d ", pMyPath[i]);
 							}
 							ALERT(at_aiconsole, "\n(%d to %d |%d/%d)2:", iFrom, iTo, iHull, iCap);
-							for (int i = 0; i < cPathSize2; i++)
+							for (i = 0; i < cPathSize2; i++)
 							{
 								ALERT(at_aiconsole, "%d ", pMyPath2[i]);
 							}

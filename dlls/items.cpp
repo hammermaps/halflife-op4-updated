@@ -166,6 +166,7 @@ void CItem::Materialize()
 	}
 
 	SetTouch( &CItem::ItemTouch );
+	SetThink(NULL);
 }
 
 #define SF_SUIT_SHORTLOGON		0x0001
@@ -184,6 +185,11 @@ class CItemSuit : public CItem
 	}
 	BOOL MyTouch( CBasePlayer *pPlayer ) override
 	{
+		if ( pPlayer->pev->deadflag != DEAD_NO )
+		{
+			return FALSE;
+		}
+
 		if ( pPlayer->pev->weapons & (1<<WEAPON_SUIT) )
 			return FALSE;
 
@@ -209,13 +215,23 @@ class CItemBattery : public CItem
 	void Spawn() override
 	{ 
 		Precache( );
-		SET_MODEL(ENT(pev), "models/w_battery.mdl");
+		if (pev->model)
+			SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+		else
+			SET_MODEL(ENT(pev), "models/w_battery.mdl");
 		CItem::Spawn( );
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_battery.mdl");
-		PRECACHE_SOUND( "items/gunpickup2.wav" );
+		if (pev->model)
+			PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+		else
+			PRECACHE_MODEL ("models/w_battery.mdl");
+
+		if (pev->noise)
+			PRECACHE_SOUND( (char*)STRING(pev->noise) ); //LRC
+		else
+			PRECACHE_SOUND( "items/gunpickup2.wav" );
 	}
 	BOOL MyTouch( CBasePlayer *pPlayer ) override
 	{
@@ -230,10 +246,17 @@ class CItemBattery : public CItem
 			int pct;
 			char szcharge[64];
 
-			pPlayer->pev->armorvalue += gSkillData.batteryCapacity;
+			if (pev->armorvalue)
+				pPlayer->pev->armorvalue += pev->armorvalue;
+			else
+				pPlayer->pev->armorvalue += gSkillData.batteryCapacity;
+
 			pPlayer->pev->armorvalue = V_min(pPlayer->pev->armorvalue, MAX_NORMAL_BATTERY);
 
-			EMIT_SOUND( pPlayer->edict(), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM );
+			if (pev->noise)
+				EMIT_SOUND( pPlayer->edict(), CHAN_ITEM, STRING(pev->noise), 1, ATTN_NORM ); //LRC
+			else
+				EMIT_SOUND( pPlayer->edict(), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM );
 
 			MESSAGE_BEGIN( MSG_ONE, gmsgItemPickup, NULL, pPlayer->pev );
 				WRITE_STRING( STRING(pev->classname) );

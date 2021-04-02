@@ -72,6 +72,10 @@ extern int gmsgOldWeapon;
 extern int gmsgCustomIcon;
 extern int gmsgParticles;
 extern int gmsgGrassParticles;
-extern int gmsgAddShine;
+extern int gmsgSetFog; //LRC
+extern int gmsgKeyedDLight; //LRC
+extern int gmsgSetSky; //LRC
+extern int gmsgAddShine; // LRC
+extern int gmsgParticle; // LRC
 
 void LinkUserMessages();

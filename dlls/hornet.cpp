@@ -153,7 +153,7 @@ int CHornet::IRelationship ( CBaseEntity *pTarget )
 //=========================================================
 int CHornet::Classify ()
 {
-
+	if (m_iClass) return m_iClass;
 	if ( pev->owner && pev->owner->v.flags & FL_CLIENT)
 	{
 		return CLASS_PLAYER_BIOWEAPON;
@@ -397,7 +397,7 @@ void CHornet::DartTouch( CBaseEntity *pOther )
 
 void CHornet::DieTouch ( CBaseEntity *pOther )
 {
-	if ( pOther && pOther->pev->takedamage )
+	if (pOther && pOther->pev->takedamage && pev->owner)
 	{// do the damage
 
 		switch (RANDOM_LONG(0,2))

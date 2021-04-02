@@ -442,21 +442,23 @@ extern DLL_GLOBAL int			g_Language;
 #define SVC_ROOMTYPE		37
 #define	SVC_DIRECTOR		51
 
-
-
 // triggers
 #define	SF_TRIGGER_ALLOWMONSTERS	1// monsters allowed to fire this trigger
 #define	SF_TRIGGER_NOCLIENTS		2// players not allowed to fire this trigger
 #define SF_TRIGGER_PUSHABLES		4// only pushables can fire this trigger
+#define SF_TRIGGER_EVERYTHING		8// everything else can fire this trigger (e.g. gibs, rockets)
 
 // func breakable
 #define SF_BREAK_TRIGGER_ONLY	1// may only be broken by trigger
 #define	SF_BREAK_TOUCH			2// can be 'crashed through' by running player (plate glass)
 #define SF_BREAK_PRESSURE		4// can be broken by a player standing on it
+#define SF_BREAK_FADE_RESPAWN	8// LRC- fades in gradually when respawned
 #define SF_BREAK_CROWBAR		256// instant break if hit with crowbar
 
 // func_pushable (it's also func_breakable, so don't collide with those flags)
 #define SF_PUSH_BREAKABLE		128
+#define SF_PUSH_NOPULL			512//LRC
+#define SF_PUSH_USECUSTOMSIZE	0x800000 //LRC, not yet used
 
 #define SF_LIGHT_START_OFF		1
 
@@ -470,6 +472,7 @@ extern DLL_GLOBAL int			g_Language;
 #define TELE_SILENT			2
 
 #define SF_TRIG_PUSH_ONCE		1
+
 
 
 // Sound Utilities

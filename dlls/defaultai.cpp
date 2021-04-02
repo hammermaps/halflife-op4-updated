@@ -796,9 +796,30 @@ Schedule_t	slError[] =
 	},
 };
 
+//LRC
+Task_t tlScriptedTeleport[] = 
+{
+	{ TASK_PLANT_ON_SCRIPT,		(float)0		},
+	{ TASK_WAIT_FOR_SCRIPT,		(float)0		},
+	{ TASK_PLAY_SCRIPT,			(float)0		},
+	{ TASK_END_SCRIPT,			(float)0		},
+};
+
+//LRC
+Schedule_t slTeleportToScript[] =
+{
+	{ 
+		tlScriptedTeleport,
+		ARRAYSIZE ( tlScriptedTeleport ),
+		SCRIPT_BREAK_CONDITIONS,
+		0,
+		"TeleportToScript"
+	},
+};
+
 Task_t tlScriptedWalk[] = 
 {
-	{ TASK_WALK_TO_TARGET,		(float)TARGET_MOVE_SCRIPTED },
+	{ TASK_WALK_TO_SCRIPT,		(float)TARGET_MOVE_SCRIPTED },
 	{ TASK_WAIT_FOR_MOVEMENT,	(float)0		},
 	{ TASK_PLANT_ON_SCRIPT,		(float)0		},
 	{ TASK_FACE_SCRIPT,			(float)0		},
@@ -806,6 +827,7 @@ Task_t tlScriptedWalk[] =
 	{ TASK_ENABLE_SCRIPT,		(float)0		},
 	{ TASK_WAIT_FOR_SCRIPT,		(float)0		},
 	{ TASK_PLAY_SCRIPT,			(float)0		},
+	{ TASK_END_SCRIPT,			(float)0		},
 };
 
 Schedule_t slWalkToScript[] =
@@ -822,7 +844,7 @@ Schedule_t slWalkToScript[] =
 
 Task_t tlScriptedRun[] = 
 {
-	{ TASK_RUN_TO_TARGET,		(float)TARGET_MOVE_SCRIPTED },
+	{ TASK_RUN_TO_SCRIPT,		(float)TARGET_MOVE_SCRIPTED },
 	{ TASK_WAIT_FOR_MOVEMENT,	(float)0		},
 	{ TASK_PLANT_ON_SCRIPT,		(float)0		},
 	{ TASK_FACE_SCRIPT,			(float)0		},
@@ -830,6 +852,7 @@ Task_t tlScriptedRun[] =
 	{ TASK_ENABLE_SCRIPT,		(float)0		},
 	{ TASK_WAIT_FOR_SCRIPT,		(float)0		},
 	{ TASK_PLAY_SCRIPT,			(float)0		},
+	{ TASK_END_SCRIPT,			(float)0		},
 };
 
 Schedule_t slRunToScript[] =
@@ -846,8 +869,10 @@ Schedule_t slRunToScript[] =
 Task_t tlScriptedWait[] = 
 {
 	{ TASK_STOP_MOVING,			0				},
+//	{ TASK_ENABLE_SCRIPT,		(float)0		},
 	{ TASK_WAIT_FOR_SCRIPT,		(float)0		},
 	{ TASK_PLAY_SCRIPT,			(float)0		},
+	{ TASK_END_SCRIPT,			(float)0		},
 };
 
 Schedule_t slWaitScript[] =
@@ -868,6 +893,7 @@ Task_t tlScriptedFace[] =
 	{ TASK_FACE_IDEAL,			(float)0		},
 	{ TASK_WAIT_FOR_SCRIPT,		(float)0		},
 	{ TASK_PLAY_SCRIPT,			(float)0		},
+	{ TASK_END_SCRIPT,			(float)0		},
 };
 
 Schedule_t slFaceScript[] =
@@ -1017,7 +1043,8 @@ Schedule_t *CBaseMonster::m_scheduleList[] =
 	slTakeCoverFromOrigin,
 	slTakeCoverFromBestSound,
 	slTakeCoverFromEnemy,
-	slFail
+	slFail,
+	slTeleportToScript
 };
 
 Schedule_t *CBaseMonster::ScheduleFromName( const char *pName )

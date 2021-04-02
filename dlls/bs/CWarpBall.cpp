@@ -72,6 +72,8 @@ void CWarpBall::Precache()
 	PRECACHE_MODEL("sprites/XFlare1.spr");
 	PRECACHE_MODEL("sprites/lgtning.spr");
 	PRECACHE_SOUND("debris/alien_teleport.wav");
+	PRECACHE_SOUND("debris/beamstart2.wav");
+	PRECACHE_SOUND("debris/beamstart7.wav");
 }
 
 void CWarpBall::Spawn()
@@ -208,6 +210,8 @@ void CWarpBall::BallThink()
 			m_pSprite->TurnOff();
 
 		m_fPlaying = false;
+
+		EMIT_SOUND(edict(), CHAN_ITEM, "debris/beamstart7.wav", 1, ATTN_NORM);
 	}
 	else
 	{
@@ -228,6 +232,8 @@ void CWarpBall::BallThink()
 				m_pBeams->SetNextThink(0);
 			}
 		}
+
+		EMIT_SOUND(edict(), CHAN_BODY, "debris/beamstart2.wav", 1, ATTN_NORM);
 
 		SetNextThink(0.1);
 		m_flLastTime = gpGlobals->time;

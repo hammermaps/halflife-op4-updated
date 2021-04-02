@@ -22,7 +22,7 @@ struct skilldata_t
 	int iSkillLevel; // game skill level
 
 // Monster Health & Damage
-	float	agruntHealth;
+	float agruntHealth;
 	float agruntDmgPunch;
 
 	float apacheHealth;

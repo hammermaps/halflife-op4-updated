@@ -110,9 +110,10 @@ public:
 	void KeyValue( KeyValueData *pkvd ) override;
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value ) override;
 	int	ObjectCaps() override { return (CBaseToggle :: ObjectCaps() | FCAP_CONTINUOUS_USE) & ~FCAP_ACROSS_TRANSITION; }
-	int		Save( CSave &save ) override;
-	int		Restore( CRestore &restore ) override;
-
+	int	Save( CSave &save ) override;
+	int	Restore( CRestore &restore ) override;
+	STATE GetState() override;
+	
 	static	TYPEDESCRIPTION m_SaveData[];
 
 	float m_flNextCharge; 
@@ -167,7 +168,9 @@ void CWallHealth::Spawn()
 	SET_MODEL(ENT(pev), STRING(pev->model) );
 	m_iJuice = gSkillData.healthchargerCapacity;
 	pev->frame = 0;			
-
+	//LRC
+	if (m_iStyle >= 32) LIGHT_STYLE(m_iStyle, "a");
+	else if (m_iStyle <= -32) LIGHT_STYLE(-m_iStyle, "z");
 }
 
 void CWallHealth::Precache()
@@ -191,6 +194,9 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 	if (m_iJuice <= 0)
 	{
 		pev->frame = 1;			
+		//LRC
+		if (m_iStyle >= 32) LIGHT_STYLE(m_iStyle, "z");
+		else if (m_iStyle <= -32) LIGHT_STYLE(-m_iStyle, "a");
 		Off();
 	}
 
@@ -242,6 +248,9 @@ void CWallHealth::Recharge()
 		EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/medshot4.wav", 1.0, ATTN_NORM );
 	m_iJuice = gSkillData.healthchargerCapacity;
 	pev->frame = 0;			
+	//LRC
+	if (m_iStyle >= 32) LIGHT_STYLE(m_iStyle, "a");
+	else if (m_iStyle <= -32) LIGHT_STYLE(-m_iStyle, "z");
 	SetThink( &CWallHealth::SUB_DoNothing );
 }
 
@@ -260,4 +269,14 @@ void CWallHealth::Off()
 	}
 	else
 		SetThink( &CWallHealth::SUB_DoNothing );
+}
+
+STATE CWallHealth::GetState( void )
+{
+	if (m_iOn == 2)
+		return STATE_IN_USE;
+	else if (m_iJuice)
+		return STATE_ON;
+	else
+		return STATE_OFF;
 }

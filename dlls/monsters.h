@@ -175,11 +175,11 @@ public:
 	void EXPORT WaitTillLand();
 	void LimitVelocity();
 
-	int ObjectCaps() override { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_DONT_SAVE; }
-	static void SpawnHeadGib(entvars_t* pevVictim);
-	static void SpawnRandomGibs(entvars_t* pevVictim, int cGibs, const GibData& gibData);
-	static void SpawnRandomGibs(entvars_t* pevVictim, int cGibs, int human);
-	static void SpawnStickyGibs(entvars_t* pevVictim, Vector vecOrigin, int cGibs);
+	int	ObjectCaps() override { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_DONT_SAVE; }
+	static	void SpawnHeadGib(entvars_t* pevVictim);
+	static	void SpawnRandomGibs(entvars_t* pevVictim, int cGibs, const GibData& gibData);
+	static	void SpawnRandomGibs(entvars_t* pevVictim, int cGibs, int human);
+	static  void SpawnStickyGibs(entvars_t* pevVictim, Vector vecOrigin, int cGibs);
 
 	int m_bloodColor;
 	int m_cBloodDecals;

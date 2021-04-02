@@ -125,7 +125,7 @@ void CLegacyCineMonster :: CineSpawn( const char *szModel )
 	if ( FStringNull(pev->targetname) )	
 	{
 		SetThink( &CLegacyCineMonster::CineThink );
-		pev->nextthink += 1.0;
+		AbsoluteNextThink( m_fNextThink + 0.1 );
 	}
 }
 
@@ -137,7 +137,7 @@ void CLegacyCineMonster :: Use( CBaseEntity *pActivator, CBaseEntity *pCaller, U
 {
 	pev->animtime = 0;	// reset the sequence
 	SetThink( &CLegacyCineMonster::CineThink );
-	SetNextThink(0);
+	SetNextThink( 0 );
 }
 
 //

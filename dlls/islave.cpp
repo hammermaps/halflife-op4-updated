@@ -409,7 +409,7 @@ void CISlave :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				if ( !trace.fStartSolid )
 				{
 					CBaseEntity *pNew = Create( "monster_alien_slave", m_hDead->pev->origin, m_hDead->pev->angles );
-					pNew->pev->model = m_hDead->pev->model;
+					CBaseMonster *pNewMonster = pNew->MyMonsterPointer( );
 					pNew->pev->spawnflags |= 1;
 					
 					WackBeam( -1, pNew );

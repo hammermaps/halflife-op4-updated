@@ -804,6 +804,8 @@ static int g_serveractive = 0;
 void ServerDeactivate()
 {
 	// It's possible that the engine will call this function more times than is necessary
+	g_pWorld = NULL;
+	// It's possible that the engine will call this function more times than is necessary
 	//  Therefore, only run it one time for each call to ServerActivate 
 	if ( g_serveractive != 1 )
 	{
