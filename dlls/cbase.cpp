@@ -167,10 +167,19 @@ int DispatchSpawn( edict_t *pent )
 		{
 			if ( g_pGameRules && !g_pGameRules->IsAllowedToSpawn( pEntity ) )
 				return -1;	// return that this entity should be deleted
+			
 			if ( pEntity->pev->flags & FL_KILLME )
 				return -1;
-		}
 
+			if (g_iSkillLevel == SKILL_EASY && pEntity->m_iLFlags & LF_NOTEASY)
+				return -1; //LRC
+			
+			if (g_iSkillLevel == SKILL_MEDIUM && pEntity->m_iLFlags & LF_NOTMEDIUM)
+				return -1; //LRC
+			
+			if (g_iSkillLevel == SKILL_HARD && pEntity->m_iLFlags & LF_NOTHARD)
+				return -1; //LRC
+		}
 
 		// Handle global stuff here
 		if ( pEntity && pEntity->pev->globalname ) 
@@ -353,7 +362,6 @@ int DispatchRestore( edict_t *pent, SAVERESTOREDATA *pSaveData, int globalEntity
 			pSaveData->pCurrentData = pSaveData->pBaseData + pSaveData->size;
 			// -------------------
 
-
 			const globalentity_t *pGlobal = gGlobalState.EntityFromTable( tmpVars.globalname );
 			
 			// Don't overlay any instance of the global that isn't the latest
@@ -501,6 +509,12 @@ void CBaseEntity::InitMoveWith()
 		ALERT(at_console, "Missing movewith entity %s\n", STRING(m_MoveWith));
 		return;
 	}
+
+	//	if (pev->targetname)
+//		ALERT(at_console,"Init: %s %s moves with %s\n", STRING(pev->classname), STRING(pev->targetname), STRING(m_MoveWith));
+//	else
+//		ALERT(at_console,"Init: %s moves with %s\n", STRING(pev->classname), STRING(m_MoveWith));
+
 
 	CBaseEntity* pSibling = m_pMoveWith->m_pChildMoveWith;
 	while (pSibling) // check that this entity isn't already in the list of children
@@ -734,6 +748,21 @@ TYPEDESCRIPTION	CBaseEntity::m_SaveData[] =
 {
 	DEFINE_FIELD( CBaseEntity, m_pGoalEnt, FIELD_CLASSPTR ),
 
+	DEFINE_FIELD(CBaseEntity, m_MoveWith, FIELD_STRING), //LRC
+	DEFINE_FIELD(CBaseEntity, m_pMoveWith, FIELD_CLASSPTR), //LRC
+	DEFINE_FIELD(CBaseEntity, m_pChildMoveWith, FIELD_CLASSPTR), //LRC
+	DEFINE_FIELD(CBaseEntity, m_pSiblingMoveWith, FIELD_CLASSPTR), //LRC
+
+	DEFINE_FIELD(CBaseEntity, m_iLFlags, FIELD_INTEGER), //LRC
+	DEFINE_FIELD(CBaseEntity, m_iStyle, FIELD_INTEGER), //LRC
+	DEFINE_FIELD(CBaseEntity, m_vecMoveWithOffset, FIELD_VECTOR), //LRC
+	DEFINE_FIELD(CBaseEntity, m_vecRotWithOffset, FIELD_VECTOR), //LRC
+	DEFINE_FIELD(CBaseEntity, m_activated, FIELD_BOOLEAN), //LRC
+	DEFINE_FIELD(CBaseEntity, m_fNextThink, FIELD_TIME), //LRC
+	DEFINE_FIELD(CBaseEntity, m_fPevNextThink, FIELD_TIME), //LRC
+	DEFINE_FIELD(CBaseEntity, m_vecPostAssistVel, FIELD_VECTOR), //LRC
+	DEFINE_FIELD(CBaseEntity, m_vecPostAssistAVel, FIELD_VECTOR), //LRC
+	
 	DEFINE_FIELD( CBaseEntity, m_pfnThink, FIELD_FUNCTION ),		// UNDONE: Build table of these!!!
 	DEFINE_FIELD( CBaseEntity, m_pfnTouch, FIELD_FUNCTION ),
 	DEFINE_FIELD( CBaseEntity, m_pfnUse, FIELD_FUNCTION ),
@@ -743,17 +772,22 @@ TYPEDESCRIPTION	CBaseEntity::m_SaveData[] =
 
 int CBaseEntity::Save( CSave &save )
 {
-	if ( save.WriteEntVars( "ENTVARS", pev ) )
-		return save.WriteFields( "BASE", this, m_SaveData, ARRAYSIZE(m_SaveData) );
+	ThinkCorrection(); //LRC
+
+	if (save.WriteEntVars("ENTVARS", pev))
+	{
+		if (pev->targetname)
+			return save.WriteFields("BASE", this, m_SaveData, ARRAYSIZE(m_SaveData));
+		else
+			return save.WriteFields("BASE", this, m_SaveData, ARRAYSIZE(m_SaveData));
+	}
 
 	return 0;
 }
 
 int CBaseEntity::Restore( CRestore &restore )
 {
-	int status;
-
-	status = restore.ReadEntVars( "ENTVARS", pev );
+	int status = restore.ReadEntVars("ENTVARS", pev);
 	if ( status )
 		status = restore.ReadFields( "BASE", this, m_SaveData, ARRAYSIZE(m_SaveData) );
 
@@ -919,16 +953,14 @@ int	CBaseEntity :: DamageDecal( int bitsDamageType )
 // will keep a pointer to it after this call.
 CBaseEntity * CBaseEntity::Create( const char *szName, const Vector &vecOrigin, const Vector &vecAngles, edict_t *pentOwner )
 {
-	edict_t	*pent;
-	CBaseEntity *pEntity;
-
-	pent = CREATE_NAMED_ENTITY( MAKE_STRING( szName ));
+	edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING(szName));
 	if ( FNullEnt( pent ) )
 	{
 		ALERT ( at_console, "NULL Ent in Create!\n" );
 		return NULL;
 	}
-	pEntity = Instance( pent );
+	
+	CBaseEntity* pEntity = Instance(pent);
 	pEntity->pev->owner = pentOwner;
 	pEntity->pev->origin = vecOrigin;
 	pEntity->pev->angles = vecAngles;
