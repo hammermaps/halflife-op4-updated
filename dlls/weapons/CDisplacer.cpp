@@ -140,13 +140,14 @@ void CDisplacer::WeaponIdle()
 	}
 }
 
+
 void CDisplacer::PrimaryAttack()
 {
 	if( m_pPlayer->m_rgAmmo[ m_iPrimaryAmmoType ] >= 20 )
 	{
 		SetThink( &CDisplacer::SpinupThink );
 
-		SetNextThink(0);
+		AbsoluteNextThink(gpGlobals->time);
 
 		m_Mode = DisplacerMode::STARTED;
 
@@ -168,7 +169,7 @@ void CDisplacer::SecondaryAttack()
 	{
 		SetThink( &CDisplacer::AltSpinupThink );
 
-		SetNextThink(0);
+		AbsoluteNextThink(gpGlobals->time);
 
 		m_Mode = DisplacerMode::STARTED;
 
@@ -231,7 +232,7 @@ void CDisplacer::SpinupThink()
 
 	m_iSoundState = 128;
 
-	SetNextThink(0.1);
+	pev->nextthink = gpGlobals->time + 0.1;
 }
 
 void CDisplacer::AltSpinupThink()
@@ -265,7 +266,7 @@ void CDisplacer::AltSpinupThink()
 
 			SetThink( &CDisplacer::AltFireThink );
 
-			SetNextThink(0.1);
+			pev->nextthink = gpGlobals->time + 0.1;
 		}
 
 		m_iImplodeCounter = static_cast<int>( ( gpGlobals->time - m_flStartTime ) * 100.0 + 50.0 );

@@ -57,8 +57,15 @@ CBaseEntity * CBaseEntity::Create( const char *szName, const Vector &vecOrigin, 
 void CBaseEntity::SUB_Remove() { }
 void CBaseEntity::Activate(void) { } //LRC
 void CBaseEntity::InitMoveWith(void) { } //LRC
-void CBaseEntity::SetNextThink(float delay, BOOL correctSpeed) { }//LRC
-void CBaseEntity::AbsoluteNextThink(float time, BOOL correctSpeed) { }//LRC
+void CBaseEntity::SetNextThink(float delay, BOOL correctSpeed)
+{
+	m_fNextThink = gpGlobals->time + delay;
+	pev->nextthink = m_fNextThink;
+}//LRC
+void CBaseEntity::AbsoluteNextThink(float time, BOOL correctSpeed)
+{
+	pev->nextthink = time;
+}//LRC
 void CBaseEntity::ThinkCorrection() { }//LRC
 void CBaseEntity::UpdateOnRemove() { }
 
@@ -359,4 +366,5 @@ int CBasePlayerWeapon::ExtractAmmo( CBasePlayerWeapon *pWeapon ) { return 0; }
 int CBasePlayerWeapon::ExtractClipAmmo( CBasePlayerWeapon *pWeapon ) { return 0; }	
 void CBasePlayerWeapon::RetireWeapon() { }
 void CSoundEnt::InsertSound ( int iType, const Vector &vecOrigin, int iVolume, float flDuration ) {}
+void CBasePlayerWeapon::SetNextThink(float delay) { pev->nextthink = UTIL_WeaponTimeBase() + delay; }//LRC
 void RadiusDamage( Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType ){}

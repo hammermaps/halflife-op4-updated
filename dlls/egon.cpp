@@ -49,7 +49,6 @@ void CEgon::Precache()
 	PRECACHE_MODEL("models/v_egon.mdl");
 	PRECACHE_MODEL("models/p_egon.mdl");
 
-	PRECACHE_MODEL("models/w_9mmclip.mdl");
 	PRECACHE_SOUND("items/9mmclip1.wav");
 
 	PRECACHE_SOUND( EGON_SOUND_OFF );

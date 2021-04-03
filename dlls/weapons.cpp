@@ -393,6 +393,8 @@ void W_Precache()
 	PRECACHE_SOUND("bulletimpact/wood1.wav");
 	PRECACHE_SOUND("bulletimpact/wood2.wav");
 	PRECACHE_SOUND("bulletimpact/wood3.wav");
+
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
 }
 
 TYPEDESCRIPTION	CBasePlayerItem::m_SaveData[] = 
