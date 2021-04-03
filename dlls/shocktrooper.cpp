@@ -748,7 +748,7 @@ void CShockTrooper :: CheckAmmo ()
 //=========================================================
 int	CShockTrooper :: Classify ()
 {
-	return	CLASS_ALIEN_RACE_X;
+	return	m_iClass ? m_iClass : CLASS_ALIEN_RACE_X;
 }
 
 //=========================================================
@@ -940,15 +940,22 @@ void CShockTrooper :: HandleAnimEvent( MonsterEvent_t *pEvent )
 void CShockTrooper :: Spawn()
 {
 	Precache( );
-
-	SET_MODEL(ENT(pev), "models/strooper.mdl");
+	
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/strooper.mdl");
+	
 	UTIL_SetSize(pev, Vector( -24, -24, 0 ), Vector( 24, 24, 72 ) );
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	pev->effects		= 0;
-	pev->health			= gSkillData.shocktrooperHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.shocktrooperHealth;
+	
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 	m_flNextGrenadeCheck = gpGlobals->time + 1;
@@ -985,7 +992,11 @@ void CShockTrooper :: Spawn()
 //=========================================================
 void CShockTrooper :: Precache()
 {
-	PRECACHE_MODEL("models/strooper.mdl");
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/strooper.mdl");
+	
 	PRECACHE_MODEL( "models/strooper_gibs.mdl" );
 
 	PRECACHE_SOUND( "weapons/shock_fire.wav" );

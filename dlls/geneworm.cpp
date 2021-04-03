@@ -558,7 +558,7 @@ public:
 	int Restore( CRestore &restore ) override;
 	static TYPEDESCRIPTION m_SaveData[];
 
-	int Classify() override { return CLASS_ALIEN_MONSTER; }
+	int Classify() override { return m_iClass ? m_iClass : CLASS_ALIEN_MONSTER; }
 
 	int BloodColor() override { return BLOOD_COLOR_GREEN; }
 
@@ -707,7 +707,11 @@ const char* COFGeneWorm::pSpawnSounds[] =
 
 void COFGeneWorm::Precache()
 {
-	PRECACHE_MODEL( "models/geneworm.mdl" );
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL( "models/geneworm.mdl" );
+	
 	PRECACHE_MODEL( "sprites/lgtning.spr" );
 	PRECACHE_MODEL( "sprites/tele1.spr" );
 	PRECACHE_MODEL( "sprites/bigspit.spr" );
@@ -756,7 +760,10 @@ void COFGeneWorm::Spawn()
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_NOT;
 
-	SET_MODEL( edict(), "models/geneworm.mdl" );
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/geneworm.mdl" );
 
 	UTIL_SetSize( pev, { -436.67, -720.49, -331.74 }, { 425.29, 164.85, 355.68 } );
 
@@ -767,7 +774,10 @@ void COFGeneWorm::Spawn()
 
 	pev->effects = 0;
 
-	pev->max_health = pev->health = gSkillData.geneWormHealth;
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.geneWormHealth;
+
+	pev->max_health = pev->health;
 
 	pev->view_ofs = { 0, 0, 300 };
 

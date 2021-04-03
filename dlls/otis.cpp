@@ -300,7 +300,7 @@ int COtis :: ISoundMask ()
 //=========================================================
 int	COtis :: Classify ()
 {
-	return	CLASS_PLAYER_ALLY;
+	return	m_iClass ? m_iClass : CLASS_PLAYER_ALLY;
 }
 
 //=========================================================
@@ -468,13 +468,20 @@ void COtis :: Spawn()
 {
 	Precache( );
 
-	SET_MODEL(ENT(pev), "models/otis.mdl");
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/otis.mdl");
+	
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_RED;
-	pev->health			= gSkillData.otisHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.otisHealth;
+	
 	pev->view_ofs		= Vector ( 0, 0, 50 );// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= VIEW_FIELD_WIDE; // NOTE: we need a wide field of view so npc will notice player and say hello
 	m_MonsterState		= MONSTERSTATE_NONE;
@@ -506,7 +513,10 @@ void COtis :: Spawn()
 //=========================================================
 void COtis :: Precache()
 {
-	PRECACHE_MODEL("models/otis.mdl");
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/otis.mdl");
 
 	PRECACHE_SOUND("barney/ba_attack1.wav" );
 	PRECACHE_SOUND("barney/ba_attack2.wav" );

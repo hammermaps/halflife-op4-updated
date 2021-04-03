@@ -169,7 +169,7 @@ const char *COFShockRoach::pBiteSounds[] =
 //=========================================================
 int	COFShockRoach :: Classify ()
 {
-	return	CLASS_ALIEN_PREY;
+	return	m_iClass ? m_iClass : CLASS_ALIEN_PREY;
 }
 
 //=========================================================
@@ -285,15 +285,21 @@ void COFShockRoach :: HandleAnimEvent( MonsterEvent_t *pEvent )
 void COFShockRoach :: Spawn()
 {
 	Precache( );
-
-	SET_MODEL(ENT(pev), "models/w_shock_rifle.mdl");
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/w_shock_rifle.mdl");
+	
 	UTIL_SetSize(pev, Vector(-12, -12, 0), Vector(12, 12, 4));
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_FLY;
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	pev->effects		= 0;
-	pev->health			= gSkillData.shockroachHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.shockroachHealth;
+	
 	pev->view_ofs		= Vector ( 0, 0, 20 );// position of the eyes relative to monster's origin.
 	pev->yaw_speed		= 5;//!!! should we put this in the monster's changeanim function since turn rates may vary with state/anim?
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
@@ -310,6 +316,11 @@ void COFShockRoach :: Spawn()
 //=========================================================
 void COFShockRoach :: Precache()
 {
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/w_shock_rifle.mdl");
+	
 	PRECACHE_SOUND_ARRAY(pIdleSounds);
 	PRECACHE_SOUND_ARRAY(pAlertSounds);
 	PRECACHE_SOUND_ARRAY(pPainSounds);
@@ -318,8 +329,6 @@ void COFShockRoach :: Precache()
 	PRECACHE_SOUND_ARRAY(pBiteSounds);
 
 	PRECACHE_SOUND( "shockroach/shock_walk.wav" );
-
-	PRECACHE_MODEL("models/w_shock_rifle.mdl");
 }	
 
 

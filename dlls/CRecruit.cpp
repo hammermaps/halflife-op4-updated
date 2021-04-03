@@ -240,7 +240,7 @@ int CRecruit::ISoundMask()
 
 int CRecruit::Classify()
 {
-	return CLASS_HUMAN_MILITARY_FRIENDLY;
+	return m_iClass ? m_iClass : CLASS_HUMAN_MILITARY_FRIENDLY;
 }
 
 void CRecruit::SetYawSpeed()
@@ -391,13 +391,20 @@ void CRecruit::Spawn()
 {
 	Precache();
 
-	SET_MODEL( ENT( pev ), "models/recruit.mdl" );
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL( ENT( pev ), "models/recruit.mdl" );
+	
 	UTIL_SetSize( pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_STEP;
 	m_bloodColor = BLOOD_COLOR_RED;
-	pev->health = gSkillData.barneyHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.barneyHealth;
+
 	pev->view_ofs = Vector( 0, 0, 50 );// position of the eyes relative to monster's origin.
 	m_flFieldOfView = VIEW_FIELD_WIDE; // NOTE: we need a wide field of view so npc will notice player and say hello
 	m_MonsterState = MONSTERSTATE_NONE;
@@ -570,7 +577,10 @@ int CRecruit::TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float
 
 void CRecruit::Precache()
 {
-	PRECACHE_MODEL( "models/recruit.mdl" );
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL( "models/recruit.mdl" );
 
 	PRECACHE_SOUND( "barney/ba_attack1.wav" );
 	PRECACHE_SOUND( "barney/ba_attack2.wav" );

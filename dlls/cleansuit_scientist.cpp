@@ -588,7 +588,7 @@ void CCleansuitScientist :: RunTask( Task_t *pTask )
 //=========================================================
 int	CCleansuitScientist :: Classify ()
 {
-	return	CLASS_HUMAN_PASSIVE;
+	return	m_iClass ? m_iClass : CLASS_HUMAN_PASSIVE;
 }
 
 
@@ -658,13 +658,20 @@ void CCleansuitScientist :: Spawn()
 {
 	Precache( );
 
-	SET_MODEL(ENT(pev), "models/cleansuit_scientist.mdl");
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/cleansuit_scientist.mdl");
+	
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_RED;
-	pev->health			= gSkillData.scientistHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.scientistHealth;
+	
 	pev->view_ofs		= Vector ( 0, 0, 50 );// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= VIEW_FIELD_WIDE; // NOTE: we need a wide field of view so scientists will notice player and say hello
 	m_MonsterState		= MONSTERSTATE_NONE;
@@ -694,7 +701,11 @@ void CCleansuitScientist :: Spawn()
 //=========================================================
 void CCleansuitScientist :: Precache()
 {
-	PRECACHE_MODEL("models/cleansuit_scientist.mdl");
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/cleansuit_scientist.mdl");
+	
 	PRECACHE_SOUND("scientist/sci_pain1.wav");
 	PRECACHE_SOUND("scientist/sci_pain2.wav");
 	PRECACHE_SOUND("scientist/sci_pain3.wav");

@@ -82,14 +82,18 @@ LINK_ENTITY_TO_CLASS(monster_penguin, CPenguinGrenade);
 
 void CPenguinGrenade::Precache()
 {
-	g_engfuncs.pfnPrecacheModel("models/w_penguin.mdl");
-	g_engfuncs.pfnPrecacheSound("squeek/sqk_blast1.wav");
-	g_engfuncs.pfnPrecacheSound("common/bodysplat.wav");
-	g_engfuncs.pfnPrecacheSound("squeek/sqk_die1.wav");
-	g_engfuncs.pfnPrecacheSound("squeek/sqk_hunt1.wav");
-	g_engfuncs.pfnPrecacheSound("squeek/sqk_hunt2.wav");
-	g_engfuncs.pfnPrecacheSound("squeek/sqk_hunt3.wav");
-	g_engfuncs.pfnPrecacheSound("squeek/sqk_deploy1.wav");
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/w_penguin.mdl");
+	
+	PRECACHE_SOUND("squeek/sqk_blast1.wav");
+	PRECACHE_SOUND("common/bodysplat.wav");
+	PRECACHE_SOUND("squeek/sqk_die1.wav");
+	PRECACHE_SOUND("squeek/sqk_hunt1.wav");
+	PRECACHE_SOUND("squeek/sqk_hunt2.wav");
+	PRECACHE_SOUND("squeek/sqk_hunt3.wav");
+	PRECACHE_SOUND("squeek/sqk_deploy1.wav");
 }
 
 void CPenguinGrenade::GibMonster()
@@ -226,7 +230,11 @@ void CPenguinGrenade::Spawn()
 	pev->movetype = MOVETYPE_BOUNCE;
 	pev->solid = SOLID_BBOX;
 
-	SET_MODEL(ENT(pev), "models/w_penguin.mdl");
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/w_penguin.mdl");
+	
 	UTIL_SetSize(pev, Vector(-4, -4, 0), Vector(4, 4, 8));
 	UTIL_SetOrigin(this, pev->origin);
 
@@ -237,7 +245,10 @@ void CPenguinGrenade::Spawn()
 
 	pev->flags |= FL_MONSTER;
 	pev->takedamage = DAMAGE_AIM;
-	pev->health = gSkillData.snarkHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.snarkHealth;
+	
 	pev->gravity = 0.5;
 	pev->friction = 0.5;
 
@@ -276,7 +287,7 @@ int CPenguinGrenade::Classify()
 		m_iMyClass = 0;
 	}
 
-	return CLASS_ALIEN_BIOWEAPON;
+	return m_iClass ? m_iClass : CLASS_ALIEN_BIOWEAPON;
 }
 
 int CPenguinGrenade::IRelationship(CBaseEntity* pTarget)

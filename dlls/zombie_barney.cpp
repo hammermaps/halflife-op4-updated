@@ -112,7 +112,7 @@ const char *CZombieBarney::pPainSounds[] =
 //=========================================================
 int	CZombieBarney :: Classify ()
 {
-	return	CLASS_ALIEN_MONSTER;
+	return	m_iClass ? m_iClass : CLASS_ALIEN_MONSTER;
 }
 
 //=========================================================
@@ -272,14 +272,21 @@ void CZombieBarney :: HandleAnimEvent( MonsterEvent_t *pEvent )
 void CZombieBarney :: Spawn()
 {
 	Precache( );
-
-	SET_MODEL(ENT(pev), "models/zombie_barney.mdl");
+	
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/zombie_barney.mdl");
+	
 	UTIL_SetSize( pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_GREEN;
-	pev->health			= gSkillData.zombieBarneyHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.zombieBarneyHealth;
+	
 	pev->view_ofs		= VEC_VIEW;// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
@@ -294,8 +301,11 @@ void CZombieBarney :: Spawn()
 void CZombieBarney :: Precache()
 {
 	int i;
-
-	PRECACHE_MODEL("models/zombie_barney.mdl");
+	
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/zombie_barney.mdl");
 
 	for ( i = 0; i < ARRAYSIZE( pAttackHitSounds ); i++ )
 		PRECACHE_SOUND((char *)pAttackHitSounds[i]);

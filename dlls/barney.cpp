@@ -254,15 +254,6 @@ int CBarney :: ISoundMask ()
 }
 
 //=========================================================
-// Classify - indicates this monster's place in the 
-// relationship table.
-//=========================================================
-int	CBarney :: Classify ()
-{
-	return	m_iClass?m_iClass:CLASS_PLAYER_ALLY;
-}
-
-//=========================================================
 // ALertSound - barney says "Freeze!"
 //=========================================================
 void CBarney :: AlertSound()
@@ -432,6 +423,16 @@ void CBarney :: HandleAnimEvent( MonsterEvent_t *pEvent )
 	}
 }
 
+
+//=========================================================
+// Classify - indicates this monster's place in the 
+// relationship table.
+//=========================================================
+int	CBarney::Classify()
+{
+	return m_iClass ? m_iClass : CLASS_PLAYER_ALLY;
+}
+
 //=========================================================
 // Spawn
 //=========================================================
@@ -443,13 +444,16 @@ void CBarney :: Spawn()
 		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
 	else
 		SET_MODEL(ENT(pev), "models/barney.mdl");
+	
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_RED;
+	
 	if (pev->health == 0) //LRC
-		pev->health			= gSkillData.barneyHealth;
+		pev->health	= gSkillData.barneyHealth;
+	
 	pev->view_ofs		= Vector ( 0, 0, 50 );// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= VIEW_FIELD_WIDE; // NOTE: we need a wide field of view so npc will notice player and say hello
 	m_MonsterState		= MONSTERSTATE_NONE;

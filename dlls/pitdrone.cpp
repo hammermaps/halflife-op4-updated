@@ -408,7 +408,7 @@ int CPitdrone :: ISoundMask ()
 //=========================================================
 int	CPitdrone :: Classify ()
 {
-	return	CLASS_ALIEN_PREDATOR;
+	return	m_iClass ? m_iClass : CLASS_ALIEN_PREDATOR;
 }
 
 //=========================================================
@@ -659,14 +659,21 @@ void CPitdrone :: Spawn()
 {
 	Precache( );
 
-	SET_MODEL(ENT(pev), "models/pit_drone.mdl");
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/pit_drone.mdl");
+	
 	UTIL_SetSize( pev, Vector( -16, -16, 0 ), Vector( 16, 16, 48 ) );
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	pev->effects		= 0;
-	pev->health			= gSkillData.pitdroneHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.pitdroneHealth;
+	
 	m_flFieldOfView		= VIEW_FIELD_WIDE;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
@@ -702,7 +709,11 @@ void CPitdrone :: Spawn()
 //=========================================================
 void CPitdrone :: Precache()
 {
-	PRECACHE_MODEL("models/pit_drone.mdl");
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/pit_drone.mdl");
+	
 	PRECACHE_MODEL( "models/pit_drone_gibs.mdl" );
 
 	UTIL_PrecacheOther( "pitdronespike" );

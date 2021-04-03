@@ -328,7 +328,7 @@ void COFBabyVoltigore :: PainSound ()
 //=========================================================
 int	COFBabyVoltigore :: Classify ()
 {
-	return	CLASS_ALIEN_MILITARY;
+	return m_iClass ? m_iClass : CLASS_ALIEN_MILITARY;
 }
 
 //=========================================================
@@ -462,15 +462,22 @@ void COFBabyVoltigore :: HandleAnimEvent( MonsterEvent_t *pEvent )
 void COFBabyVoltigore :: Spawn()
 {
 	Precache( );
-
-	SET_MODEL(ENT(pev), "models/baby_voltigore.mdl");
+	
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL(ENT(pev), "models/baby_voltigore.mdl");
+	
 	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 32));
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	pev->effects		= 0;
-	pev->health			= gSkillData.babyvoltigoreHealth;
+
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.babyvoltigoreHealth;
+	
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 	m_afCapability		= 0;
@@ -493,8 +500,11 @@ void COFBabyVoltigore :: Spawn()
 void COFBabyVoltigore :: Precache()
 {
 	int i;
-
-	PRECACHE_MODEL("models/baby_voltigore.mdl");
+	
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL("models/baby_voltigore.mdl");
 
 	for ( i = 0; i < ARRAYSIZE( pAttackHitSounds ); i++ )
 		PRECACHE_SOUND((char *)pAttackHitSounds[i]);

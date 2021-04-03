@@ -77,7 +77,7 @@ public:
 
 	int BloodColor() override { return BLOOD_COLOR_GREEN; }
 
-	int Classify() override { return CLASS_ALIEN_MILITARY; }
+	int Classify() override { return m_iClass ? m_iClass : CLASS_ALIEN_MILITARY; }
 
 	int ObjectCaps() override { return 0; }
 
@@ -293,7 +293,11 @@ const char* COFPitWormUp::pIdleSounds[] =
 
 void COFPitWormUp::Precache()
 {
-	PRECACHE_MODEL( "models/pit_worm_up.mdl" );
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC
+	else
+		PRECACHE_MODEL( "models/pit_worm_up.mdl" );
+	
 	PRECACHE_MODEL( "sprites/tele1.spr" );
 
 	PRECACHE_SOUND_ARRAY( pAttackSounds );
@@ -335,7 +339,10 @@ void COFPitWormUp::Spawn()
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	SET_MODEL( edict(), "models/pit_worm_up.mdl" );
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC
+	else
+		SET_MODEL( edict(), "models/pit_worm_up.mdl" );
 
 	UTIL_SetSize( pev, { -32, -32, 0 }, { 32, 32, 64 } );
 
@@ -344,7 +351,10 @@ void COFPitWormUp::Spawn()
 	pev->flags |= FL_MONSTER;
 	pev->takedamage = DAMAGE_AIM;
 
-	pev->max_health = pev->health = gSkillData.pitWormHealth;
+	if (pev->health == 0) //LRC
+		pev->health = gSkillData.pitWormHealth;
+
+	pev->max_health = pev->health;
 
 	pev->view_ofs = { 0, 0, PITWORM_UP_EYE_HEIGHT };
 
