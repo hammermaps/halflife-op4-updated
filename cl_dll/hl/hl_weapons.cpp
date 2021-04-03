@@ -56,6 +56,7 @@ static globalvars_t	Globals;
 
 static CBasePlayerWeapon *g_pWpns[MAX_WEAPONS];
 
+int g_iWaterLevel; //LRC - for DMC fog
 float g_flApplyVel = 0.0;
 int   g_irunninggausspred = 0;
 
@@ -106,6 +107,7 @@ bool bIsMultiplayer ()
 {
 	return gEngfuncs.GetMaxClients() == 1 ? 0 : 1;
 }
+
 //Just loads a v_ model.
 void LoadVModel ( const char *szViewModel, CBasePlayer *m_pPlayer )
 {
@@ -201,7 +203,6 @@ void CBaseEntity :: Killed( entvars_t *pevAttacker, int iGib )
 /*
 =====================
 CBasePlayerWeapon :: DefaultDeploy
-
 =====================
 */
 BOOL CBasePlayerWeapon :: DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt, int skiplocal, int	body )
@@ -222,7 +223,6 @@ BOOL CBasePlayerWeapon :: DefaultDeploy(const char *szViewModel, const char *szW
 /*
 =====================
 CBasePlayerWeapon :: PlayEmptySound
-
 =====================
 */
 BOOL CBasePlayerWeapon :: PlayEmptySound()

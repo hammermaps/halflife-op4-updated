@@ -49,6 +49,7 @@ typedef struct cvar_s cvar_t;
 
 extern int giR, giG, giB;
 
+#define FOG_LIMIT 30000
 
 #define HUD_ACTIVE	1
 #define HUD_INTERMISSION 2
@@ -162,9 +163,34 @@ private:
 
 #include "health.h"
 
+//LRC - for the moment, skymode has only two settings
+#define SKY_OFF 0
+#define SKY_ON  1
 
 #define FADE_TIME 100
 
+//LRC
+//methods actually defined in tri.cpp
+
+class CShinySurface
+{
+	float m_fMinX, m_fMinY, m_fMaxX, m_fMaxY, m_fZ;
+	char m_fScale;
+	float m_fAlpha; // texture scale and brighness
+	HSPRITE m_hsprSprite;
+	char m_szSprite[128];
+
+public:
+	CShinySurface* m_pNext;
+
+	CShinySurface(float fScale, float fAlpha, float fMinX, float fMaxX, float fMinY, float fMaxY, float fZ, char* szSprite);
+	~CShinySurface();
+
+	// draw the surface as seen from the given position
+	void Draw(const Vector& org);
+
+	void DrawAll(const Vector& org);
+};
 
 //
 //-----------------------------------------------------
@@ -369,6 +395,19 @@ private:
 	int	  m_fOn;
 	float m_fFade;
 	int	  m_iWidth;		// width of the battery innards
+};
+
+//
+//-----------------------------------------------------
+//
+// (LRC) -- 30/08/02 November235: Particles to Order
+class CHudParticle : public CHudBase
+{
+public:
+	int Init(void);
+	int VidInit(void);
+	int Draw(float flTime);
+	int MsgFunc_Particle(const char* pszName, int iSize, void* pbuf);
 };
 
 //
@@ -695,6 +734,9 @@ public:
 	int		m_iRes;
 	cvar_t  *m_pCvarStealMouse;
 	cvar_t	*m_pCvarDraw;
+	CShinySurface* m_pShinySurface; //LRC
+	Vector	m_vecSkyPos; //LRC
+	int		m_iSkyMode;  //LRC
 
 	int m_iFontHeight;
 	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b );
@@ -745,6 +787,7 @@ public:
 	CHudTextMessage m_TextMessage;
 	CHudStatusIcons m_StatusIcons;
 	CHudBenchmark	m_Benchmark;
+	CHudParticle	m_Particle;
 
 	CHudFlagIcons m_FlagIcons;
 	CHudPlayerBrowse m_PlayerBrowse;
@@ -755,7 +798,7 @@ public:
 	int Redraw( float flTime, int intermission );
 	int UpdateClientData( client_data_t *cdata, float time );
 
-	CHud() : m_iSpriteCount(0), m_pHudList(NULL) {}  
+	CHud() : m_iSpriteCount(0), m_pHudList(NULL), m_pShinySurface(NULL) {}
 	~CHud();			// destructor, frees allocated memory
 
 	// user messages
@@ -767,7 +810,11 @@ public:
 	void _cdecl MsgFunc_ViewMode( const char *pszName, int iSize, void *pbuf );
 	int _cdecl MsgFunc_SetFOV(const char *pszName,  int iSize, void *pbuf);
 	int  _cdecl MsgFunc_Concuss( const char *pszName, int iSize, void *pbuf );
-
+	void _cdecl MsgFunc_SetFog(const char* pszName, int iSize, void* pbuf);		//LRC
+	void _cdecl MsgFunc_KeyedDLight(const char* pszName, int iSize, void* pbuf);	//LRC
+	void _cdecl MsgFunc_SetSky(const char* pszName, int iSize, void* pbuf);		//LRC
+	void _cdecl MsgFunc_AddShine(const char* pszName, int iSize, void* pbuf);     //LRC
+	
 	// Screen information
 	SCREENINFO	m_scrinfo;
 

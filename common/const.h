@@ -599,9 +599,13 @@
 */
 #define	CONTENTS_LADDER				-16
 
+//LRC- New (long overdue) content types for Spirit
 #define	CONTENT_FLYFIELD			-17
 #define	CONTENT_GRAVITY_FLYFIELD	-18
 #define	CONTENT_FOG					-19
+#define CONTENT_SPECIAL1			-20 //LRC - used by the particle systems
+#define CONTENT_SPECIAL2			-21
+#define CONTENT_SPECIAL3			-22
 
 #define CONTENT_EMPTY	-1
 #define CONTENT_SOLID	-2

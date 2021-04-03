@@ -111,6 +111,34 @@ int __MsgFunc_OldWeapon(const char* pszName, int iSize, void* pbuf)
 	return 1;
 }
 
+//LRC
+int __MsgFunc_SetFog(const char* pszName, int iSize, void* pbuf)
+{
+	gHUD.MsgFunc_SetFog(pszName, iSize, pbuf);
+	return 1;
+}
+
+//LRC
+int __MsgFunc_KeyedDLight(const char* pszName, int iSize, void* pbuf)
+{
+	gHUD.MsgFunc_KeyedDLight(pszName, iSize, pbuf);
+	return 1;
+}
+
+//LRC
+int __MsgFunc_AddShine(const char* pszName, int iSize, void* pbuf)
+{
+	gHUD.MsgFunc_AddShine(pszName, iSize, pbuf);
+	return 1;
+}
+
+//LRC
+int __MsgFunc_SetSky(const char* pszName, int iSize, void* pbuf)
+{
+	gHUD.MsgFunc_SetSky(pszName, iSize, pbuf);
+	return 1;
+}
+
 //DECLARE_MESSAGE(m_Logo, Logo)
 int __MsgFunc_Logo(const char *pszName, int iSize, void *pbuf)
 {
@@ -248,29 +276,6 @@ int __MsgFunc_ServerName(const char *pszName, int iSize, void *pbuf)
 	return 0;
 }
 
-/*
-int __MsgFunc_ScoreInfo(const char *pszName, int iSize, void *pbuf)
-{
-	if (gViewPort)
-		return gViewPort->MsgFunc_ScoreInfo( pszName, iSize, pbuf );
-	return 0;
-}
-
-int __MsgFunc_TeamScore(const char *pszName, int iSize, void *pbuf)
-{
-	if (gViewPort)
-		return gViewPort->MsgFunc_TeamScore( pszName, iSize, pbuf );
-	return 0;
-}
-
-int __MsgFunc_TeamInfo(const char *pszName, int iSize, void *pbuf)
-{
-	if (gViewPort)
-		return gViewPort->MsgFunc_TeamInfo( pszName, iSize, pbuf );
-	return 0;
-}
-*/
-
 int __MsgFunc_Spectator(const char *pszName, int iSize, void *pbuf)
 {
 	if (gViewPort)
@@ -341,29 +346,41 @@ int __MsgFunc_Grass(const char* pszName, int iSize, void* pbuf)
 	return 0;
 }
 
+void __CmdFunc_ModVersion()
+{
+	gEngfuncs.Con_Printf("-----------------------------------\n");
+	gEngfuncs.Con_Printf("- Build date: %s\n", __DATE__);
+	gEngfuncs.Con_Printf("- Mod name: %s\n", "Half-Life: Generations");
+	gEngfuncs.Con_Printf("-----------------------------------\n");
+}
+
 // This is called every time the DLL is loaded
 void CHud :: Init()
 {
 	//BP ParticleEmitter
 	HOOK_MESSAGE(Particles);
 	HOOK_MESSAGE(Grass);
-	
-	HOOK_MESSAGE( Logo );
-	HOOK_MESSAGE( ResetHUD );
-	HOOK_MESSAGE( GameMode );
-	HOOK_MESSAGE( InitHUD );
-	HOOK_MESSAGE( ViewMode );
-	HOOK_MESSAGE( SetFOV );
-	HOOK_MESSAGE( Concuss );
+	HOOK_MESSAGE(Logo);
+	HOOK_MESSAGE(ResetHUD);
+	HOOK_MESSAGE(GameMode);
+	HOOK_MESSAGE(InitHUD);
+	HOOK_MESSAGE(ViewMode);
+	HOOK_MESSAGE(SetFOV);
+	HOOK_MESSAGE(Concuss);
 	HOOK_MESSAGE(HudColor);
 	HOOK_MESSAGE(OldWeapon);
+	HOOK_MESSAGE(SetFog); //LRC
+	HOOK_MESSAGE(KeyedDLight); //LRC
+	HOOK_MESSAGE(AddShine); //LRC
+	HOOK_MESSAGE(SetSky); //LRC
 
 	// TFFree CommandMenu
 	HOOK_COMMAND( "+commandmenu", OpenCommandMenu );
 	HOOK_COMMAND( "-commandmenu", CloseCommandMenu );
 	HOOK_COMMAND( "ForceCloseCommandMenu", ForceCloseCommandMenu );
 	HOOK_COMMAND( "special", InputPlayerSpecial );
-
+	HOOK_COMMAND("version_mod", ModVersion);
+	
 	HOOK_MESSAGE( ValClass );
 	HOOK_MESSAGE( TeamNames );
 	HOOK_MESSAGE( Feign );
@@ -394,7 +411,6 @@ void CHud :: Init()
 	CVAR_CREATE( "hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );		// controls whether or not to suicide immediately on TF class switch
 	CVAR_CREATE( "hud_takesshots", "0", FCVAR_ARCHIVE );		// controls whether or not to automatically take screenshots at the end of a round
 
-
 	m_iLogo = 0;
 	m_iFOV = 0;
 	setNightVisionState(false);
@@ -417,7 +433,8 @@ void CHud :: Init()
 	CVAR_CREATE("cl_grassamount", "100", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
 
 	m_pSpriteList = NULL;
-
+	m_pShinySurface = NULL; //LRC
+	//
 	// Clear any old HUD list
 	if ( m_pHudList )
 	{
@@ -451,8 +468,9 @@ void CHud :: Init()
 	m_StatusIcons.Init();
 	m_FlagIcons.Init();
 	m_PlayerBrowse.Init();
+	m_Particle.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
-
+	
 	m_Menu.Init();
 	
 	MsgFunc_ResetHUD(0, 0, NULL );
@@ -601,10 +619,14 @@ void CHud :: VidInit()
 	m_StatusIcons.VidInit();
 	m_FlagIcons.VidInit();
 	m_PlayerBrowse.VidInit();
+	m_Particle.VidInit();
 	GetClientVoiceMgr()->VidInit();
-
-	if (pParticleManager)
+	
+	if(pParticleManager)
+	{
 		delete pParticleManager;
+		pParticleManager = nullptr;
+	}
 	
 	pParticleManager = new CParticleSystemManager;
 	pParticleManager->PrecacheTextures();

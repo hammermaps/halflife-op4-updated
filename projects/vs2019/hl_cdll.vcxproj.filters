@@ -393,6 +393,15 @@
     <ClCompile Include="..\..\cl_dll\particles\tga_loader.cpp">
       <Filter>Source Files\cl_dll\particles</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cl_dll\particlemgr.cpp">
+      <Filter>Source Files\cl_dll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\particlemsg.cpp">
+      <Filter>Source Files\cl_dll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\particlesys.cpp">
+      <Filter>Source Files\cl_dll</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\kbutton.h">
@@ -706,6 +715,12 @@
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\particles\system_manager.h">
       <Filter>Source Files\cl_dll\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\particlemgr.h">
+      <Filter>Header Files\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\particlesys.h">
+      <Filter>Header Files\cl_dll</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -142,6 +142,9 @@
     <ClCompile Include="..\..\cl_dll\in_camera.cpp" />
     <ClCompile Include="..\..\cl_dll\menu.cpp" />
     <ClCompile Include="..\..\cl_dll\message.cpp" />
+    <ClCompile Include="..\..\cl_dll\particlemgr.cpp" />
+    <ClCompile Include="..\..\cl_dll\particlemsg.cpp" />
+    <ClCompile Include="..\..\cl_dll\particlesys.cpp" />
     <ClCompile Include="..\..\cl_dll\particles\grass_particle.cpp" />
     <ClCompile Include="..\..\cl_dll\particles\grass_particles.cpp" />
     <ClCompile Include="..\..\cl_dll\particles\mapped_particle.cpp" />
@@ -231,6 +234,8 @@
     <ClInclude Include="..\..\cl_dll\interpolation.h" />
     <ClInclude Include="..\..\cl_dll\in_defs.h" />
     <ClInclude Include="..\..\cl_dll\kbutton.h" />
+    <ClInclude Include="..\..\cl_dll\particlemgr.h" />
+    <ClInclude Include="..\..\cl_dll\particlesys.h" />
     <ClInclude Include="..\..\cl_dll\particles\particle.h" />
     <ClInclude Include="..\..\cl_dll\particles\particle_header.h" />
     <ClInclude Include="..\..\cl_dll\particles\particle_systems.h" />

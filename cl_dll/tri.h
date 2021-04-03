@@ -5,9 +5,4 @@
 
 extern IParticleMan *g_pParticleMan;
 
-
-
-
-
-
 #endif //TRI_H
