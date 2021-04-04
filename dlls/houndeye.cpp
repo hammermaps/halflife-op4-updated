@@ -637,6 +637,9 @@ void CHoundeye::SonicAttack()
 
 				flAdjustedDamage -= (flDist / HOUNDEYE_MAX_ATTACK_RADIUS) * flAdjustedDamage;
 
+				//Houndeyes are strong enough to rupture organs, destroy objects, and gibulate people.
+				pEntity->pev->velocity.z += pEntity->pev->velocity.z + 200;
+				
 				if (!FVisible(pEntity))
 				{
 					if (pEntity->IsPlayer())

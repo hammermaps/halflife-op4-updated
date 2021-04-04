@@ -215,7 +215,21 @@ IMPLEMENT_CUSTOM_SCHEDULES( CBarney, CTalkMonster );
 
 void CBarney :: StartTask( Task_t *pTask )
 {
-	CTalkMonster::StartTask( pTask );	
+	m_iTaskStatus = TASKSTATUS_RUNNING;
+
+	switch (pTask->iTask)
+	{
+	case TASK_WALK_PATH:
+	case TASK_RUN_PATH:
+		// Barney no longer assumes he is covered if he moves
+		Forget(bits_MEMORY_INCOVER);
+		CTalkMonster::StartTask(pTask);
+		break;
+
+	default:
+		CTalkMonster::StartTask(pTask);
+		break;
+	}
 }
 
 void CBarney :: RunTask( Task_t *pTask )
@@ -551,6 +565,8 @@ int CBarney :: TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 	int ret = CTalkMonster::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 	if ( !IsAlive() || pev->deadflag == DEAD_DYING )
 		return ret;
+
+	Forget(bits_MEMORY_INCOVER); // If we're damaged, we aren't safe anymore.
 
 	// LRC - if my reaction to the player has been overridden, don't do this stuff
 	if (m_iPlayerReact) return ret;
