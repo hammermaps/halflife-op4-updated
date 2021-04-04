@@ -791,9 +791,7 @@ Vector CHGrunt :: GetGunPosition( )
 void CHGrunt :: Shoot ()
 {
 	if (m_hEnemy == NULL && m_pCine == NULL) //LRC - scripts may fire when you have no enemy
-	{
 		return;
-	}
 
 	Vector vecShootOrigin = GetGunPosition();
 	Vector vecShootDir = ShootAtEnemy( vecShootOrigin );
@@ -830,10 +828,8 @@ void CHGrunt :: Shoot ()
 //=========================================================
 void CHGrunt :: Shotgun ()
 {
-	if (m_hEnemy == NULL)
-	{
+	if (m_hEnemy == NULL && m_pCine == NULL)
 		return;
-	}
 
 	Vector vecShootOrigin = GetGunPosition();
 	Vector vecShootDir = ShootAtEnemy( vecShootOrigin );
@@ -871,9 +867,6 @@ void CHGrunt :: Shotgun ()
 //=========================================================
 void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 {
-	Vector	vecShootDir;
-	Vector	vecShootOrigin;
-
 	switch( pEvent->event )
 	{
 		case HGRUNT_AE_DROP_GUN:
@@ -959,6 +952,7 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				CGrenade::ShootContact( pev, GetGunPosition(), m_vecTossVelocity );
 		
 			m_fThrowGrenade = FALSE;
+				
 			if (g_iSkillLevel == SKILL_HARD)
 				m_flNextGrenadeCheck = gpGlobals->time + RANDOM_FLOAT( 2, 5 );// wait a random amount of time before shooting again
 			else

@@ -65,8 +65,6 @@ int iAgruntMuzzleFlash;
 #define		AGRUNT_AE_LEFT_PUNCH ( 12 )
 #define		AGRUNT_AE_RIGHT_PUNCH ( 13 )
 
-
-
 #define		AGRUNT_MELEE_DIST	100
 
 //LRC - body definitions for the Agrunt model
@@ -488,6 +486,7 @@ void CAGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			//LRC - hornets have the same allegiance as their creators
 			pHornetMonster->m_iPlayerReact = m_iPlayerReact;
 			pHornetMonster->m_iClass = m_iClass;
+			
 			if (m_afMemory & bits_MEMORY_PROVOKED) // if I'm mad at the player, so are my hornets
 				pHornetMonster->Remember(bits_MEMORY_PROVOKED);
 

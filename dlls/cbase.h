@@ -17,15 +17,22 @@
 Class Hierachy
 
 CBaseEntity
+	CPointEntity
+	CBasePlayerAmmo
 	CBaseDelay
+		CBaseAnimating
+			CBasePlayerItem
+				CBasePlayerWeapon
 		CBaseToggle
-			CBaseItem
+				CBaseButton
+				CBaseDoor
+				CBaseTrigger
+				CBasePlatTrain
 			CBaseMonster
-				CBaseCycler
-				CBasePlayer
-				CBaseGroup
+					CCycler
+					CBasePlayer
+					CCineMonster
 */
-
 #define		MAX_PATH_SIZE	10 // max number of nodes available for a path.
 
 // These are caps bits to indicate what an object's capabilities (currently used for save/restore and level transitions)
@@ -254,7 +261,7 @@ public:
 	virtual int Save(CSave& save);
 	virtual int Restore(CRestore& restore);
 	//LRC - if I MoveWith something, then only cross transitions if the MoveWith entity does too.
-	virtual int ObjectCaps(void)
+	virtual int ObjectCaps()
 	{
 		return m_pMoveWith ? m_pMoveWith->ObjectCaps() & FCAP_ACROSS_TRANSITION : FCAP_ACROSS_TRANSITION;
 	}
@@ -278,7 +285,7 @@ public:
 
 	// LRC- this supports a global concept of "entities with states", so that state_watchers and
 	// mastership (mastery? masterhood?) can work universally.
-	virtual STATE GetState(void) { return STATE_OFF; };
+	virtual STATE GetState() { return STATE_OFF; };
 
 	// For team-specific doors in multiplayer, etc: a master's state depends on who wants to know.
 	virtual STATE GetState(CBaseEntity* pEnt) { return GetState(); };
@@ -574,7 +581,7 @@ public:
 	using BaseClass = CBaseEntity;
 
 	void Spawn() override;
-	int ObjectCaps() override { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+	virtual int ObjectCaps() { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 };
 
 
@@ -638,11 +645,12 @@ public:
 	int m_iszKillTarget;
 	EHANDLE m_hActivator; //LRC - moved here from CBaseToggle
 
-	void KeyValue(KeyValueData* pkvd) override;
-	int Save(CSave& save) override;
-	int Restore(CRestore& restore) override;
+	virtual void KeyValue(KeyValueData* pkvd);
+	virtual int Save(CSave& save);
+	virtual int Restore(CRestore& restore);
 
 	static TYPEDESCRIPTION m_SaveData[];
+	
 	// common member functions
 	void SUB_UseTargets(CBaseEntity* pActivator, USE_TYPE useType, float value);
 	void EXPORT DelayThink();
@@ -654,8 +662,8 @@ class CBaseAnimating : public CBaseDelay
 public:
 	using BaseClass = CBaseDelay;
 
-	int Save(CSave& save) override;
-	int Restore(CRestore& restore) override;
+	virtual int Save(CSave& save);
+	virtual int Restore(CRestore& restore);
 
 	static TYPEDESCRIPTION m_SaveData[];
 
@@ -668,10 +676,7 @@ public:
 	void ResetSequenceInfo();
 	void DispatchAnimEvents(float flFutureInterval = 0.1);
 	// Handle events that have happend since last time called up until X seconds into the future
-	virtual void HandleAnimEvent(MonsterEvent_t* pEvent)
-	{
-	}
-
+	virtual void HandleAnimEvent(MonsterEvent_t* pEvent){}
 	float SetBoneController(int iController, float flValue);
 	void InitBoneControllers();
 	float SetBlending(int iBlender, float flValue);
@@ -681,12 +686,13 @@ public:
 	void GetAttachment(int iAttachment, Vector& origin, Vector& angles);
 	void SetBodygroup(int iGroup, int iValue);
 	int GetBodygroup(int iGroup);
-	int ExtractBbox(int sequence, float* mins, float* maxs);
-	void SetSequenceBox();
 
 	//LRC
-	int GetBoneCount(void);
+	int GetBoneCount();
 	void SetBones(float (*data)[3], int datasize);
+
+	int ExtractBbox(int sequence, float* mins, float* maxs);
+	void SetSequenceBox();
 
 	// animation needs
 	float m_flFrameRate; // computed FPS for current sequence
@@ -731,12 +737,12 @@ public:
 
 	int m_bitsDamageInflict; // DMG_ damage type that the door or tigger does
 
-	int Save(CSave& save) override;
-	int Restore(CRestore& restore) override;
+	virtual int Save(CSave& save);
+	virtual int Restore(CRestore& restore);
 
 	static TYPEDESCRIPTION m_SaveData[];
 
-	int GetToggleState() override { return m_toggle_state; }
+	virtual int GetToggleState() { return m_toggle_state; }
 
 	// LRC- overridden because toggling entities have general rules governing their states.
 	virtual STATE GetState();
@@ -819,9 +825,9 @@ public:
 	using BaseClass = CBaseToggle;
 
 	void Spawn() override;
-	void PostSpawn() override; //LRC
-	void Precache() override;
-	void KeyValue(KeyValueData* pkvd) override;
+	virtual void PostSpawn(); //LRC
+	virtual void Precache();
+	virtual void KeyValue(KeyValueData* pkvd);
 
 	void ButtonActivate();
 
@@ -833,12 +839,11 @@ public:
 	void EXPORT ButtonUse_IgnorePlayer(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 	void EXPORT ButtonUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 
-	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-	int Save(CSave& save) override;
-	int Restore(CRestore& restore) override;
+	virtual int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
+	virtual int Save(CSave& save);
+	virtual int Restore(CRestore& restore);
 
 	enum BUTTON_CODE { BUTTON_NOTHING, BUTTON_ACTIVATE, BUTTON_RETURN };
-
 	BUTTON_CODE ButtonResponseToTouch();
 
 	static TYPEDESCRIPTION m_SaveData[];

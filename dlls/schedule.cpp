@@ -575,8 +575,7 @@ void CBaseMonster :: RunTask ( Task_t *pTask )
 //=========================================================
 void CBaseMonster :: SetTurnActivity ()
 {
-	float flYD;
-	flYD = FlYawDiff();
+	float flYD = FlYawDiff();
 
 	if ( flYD <= -45 && LookupActivity ( ACT_TURN_RIGHT ) != ACTIVITY_NOT_AVAILABLE )
 	{// big right turn
