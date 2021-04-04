@@ -912,63 +912,62 @@ void CBaseMonster :: StartTask ( Task_t *pTask )
 			}
 			break;
 		}
-
 	case TASK_JUMP_TO_TARGET:
+	{
+		if ((m_hTargetEnt->pev->origin - pev->origin).Length() >= 1.0)
 		{
-			if( ( m_hTargetEnt->pev->origin - pev->origin ).Length() >= 1.0 )
+			if (!m_hTargetEnt || !JumpToTarget(ACT_LEAP, 2.0))
 			{
-				if( !m_hTargetEnt || !JumpToTarget( ACT_LEAP, 2.0 ) )
-				{
-					TaskFail();
-					ALERT( at_aiconsole, "%s Failed to reach target!!!\n", STRING( pev->classname ) );
-					RouteClear();
-				}
+				m_afConditions |= 0x40000000u;
+				TaskFail();
+				ALERT(at_aiconsole, "%s Failed to reach target!!!\n", STRING(pev->classname));
+				RouteClear();
 			}
-
-			TaskComplete();
-			break;
 		}
+
+		TaskComplete();
+		break;
+	}
 
 	case TASK_WAIT_FOR_JUMP:
+	{
+		if (pev->flags & FL_ONGROUND)
 		{
-			if( pev->flags & FL_ONGROUND )
-			{
-				if( !HasConditions( bits_COND_TASK_FAILED ) )
-					TaskIsComplete();
-			}
-
-			break;
+			if (!HasConditions(bits_COND_TASK_FAILED))
+				TaskIsComplete();
 		}
 
-	case TASK_RUN_TO_TARGET:
-	case TASK_WALK_TO_TARGET:
-		{
-			Activity newActivity;
+		break;
+	}
+	case TASK_RUN_TO_SCRIPT:
+	case TASK_WALK_TO_SCRIPT:
+	{
+		Activity newActivity;
 
-			if ( (m_hTargetEnt->pev->origin - pev->origin).Length() < 1 )
+		if ((m_hTargetEnt->pev->origin - pev->origin).Length() < 1)
+			TaskComplete();
+		else
+		{
+			if (pTask->iTask == TASK_WALK_TO_SCRIPT)
+				newActivity = ACT_WALK;
+			else
+				newActivity = ACT_RUN;
+			// This monster can't do this!
+			if (LookupActivity(newActivity) == ACTIVITY_NOT_AVAILABLE)
 				TaskComplete();
 			else
 			{
-				if ( pTask->iTask == TASK_WALK_TO_TARGET )
-					newActivity = ACT_WALK;
-				else
-					newActivity = ACT_RUN;
-				// This monster can't do this!
-				if ( LookupActivity( newActivity ) == ACTIVITY_NOT_AVAILABLE )
-					TaskComplete();
-				else 
+				if (m_hTargetEnt == NULL || !MoveToTarget(newActivity, 2))
 				{
-					if ( m_hTargetEnt == NULL || !MoveToTarget( newActivity, 2 ) )
-					{
-						TaskFail();
-						ALERT( at_aiconsole, "%s Failed to reach target!!!\n", STRING(pev->classname) );
-						RouteClear();
-					}
+					TaskFail();
+					ALERT(at_aiconsole, "%s Failed to reach target!!!\n", STRING(pev->classname));
+					RouteClear();
 				}
 			}
-			TaskComplete();
-			break;
 		}
+		TaskComplete();
+		break;
+	}
 	case TASK_CLEAR_MOVE_WAIT:
 		{
 			m_flMoveWaitFinished = gpGlobals->time;
