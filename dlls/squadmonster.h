@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   This source code contains proprietary and confidential information of
@@ -27,8 +27,8 @@
 #define bits_SLOT_HGRUNT_ENGAGE2	( 1 << 1 )
 #define bits_SLOTS_HGRUNT_ENGAGE	( bits_SLOT_HGRUNT_ENGAGE1 | bits_SLOT_HGRUNT_ENGAGE2 )
 
-#define bits_SLOT_HGRUNT_GRENADE1	( 1 << 2 ) 
-#define bits_SLOT_HGRUNT_GRENADE2	( 1 << 3 ) 
+#define bits_SLOT_HGRUNT_GRENADE1	( 1 << 2 )
+#define bits_SLOT_HGRUNT_GRENADE2	( 1 << 3 )
 #define bits_SLOTS_HGRUNT_GRENADE	( bits_SLOT_HGRUNT_GRENADE1 | bits_SLOT_HGRUNT_GRENADE2 )
 
 // ALIEN GRUNT SLOTS
@@ -53,72 +53,69 @@
 //=========================================================
 // CSquadMonster - for any monster that forms squads.
 //=========================================================
-class CSquadMonster : public CBaseMonster 
+class CSquadMonster : public CBaseMonster
 {
 public:
 	using BaseClass = CBaseMonster;
-	
+
 	// squad leader info
-	EHANDLE	m_hSquadLeader;		// who is my leader
-	EHANDLE	m_hSquadMember[MAX_SQUAD_MEMBERS-1];	// valid only for leader
-	int		m_afSquadSlots;
-	float	m_flLastEnemySightTime; // last time anyone in the squad saw the enemy
-	BOOL	m_fEnemyEluded;
+	EHANDLE m_hSquadLeader; // who is my leader
+	EHANDLE m_hSquadMember[MAX_SQUAD_MEMBERS - 1]; // valid only for leader
+	int m_afSquadSlots;
+	float m_flLastEnemySightTime; // last time anyone in the squad saw the enemy
+	BOOL m_fEnemyEluded;
 
 	// squad member info
-	int		m_iMySlot;// this is the behaviour slot that the monster currently holds in the squad. 
+	int m_iMySlot; // this is the behaviour slot that the monster currently holds in the squad. 
 
-	int  CheckEnemy ( CBaseEntity *pEnemy ) override;
-	void StartMonster () override;
+	int CheckEnemy(CBaseEntity* pEnemy) override;
+	void StartMonster() override;
 	void VacateSlot();
 	void ScheduleChange() override;
-	void Killed( entvars_t *pevAttacker, int iGib ) override;
-	BOOL OccupySlot( int iDesiredSlot );
-	BOOL NoFriendlyFire();
+	void Killed(entvars_t* pevAttacker, int iGib) override;
+	BOOL OccupySlot(int iDesiredSlot);
+	BOOL NoFriendlyFire() override;
+	BOOL NoFriendlyFire(BOOL playerAlly);
 
 	// squad functions still left in base class
-	CSquadMonster *MySquadLeader( ) 
-	{ 
-		CSquadMonster *pSquadLeader = (CSquadMonster *)((CBaseEntity *)m_hSquadLeader); 
-		if (pSquadLeader != NULL)
+	CSquadMonster* MySquadLeader()
+	{
+		CSquadMonster* pSquadLeader = static_cast<CSquadMonster*>(static_cast<CBaseEntity*>(m_hSquadLeader));
+		if (pSquadLeader != nullptr)
 			return pSquadLeader;
 		return this;
 	}
-	CSquadMonster *MySquadMember( int i ) 
-	{ 
-		if (i >= MAX_SQUAD_MEMBERS-1)
-			return this;
-		else
-			return (CSquadMonster *)((CBaseEntity *)m_hSquadMember[i]); 
-	}
-	int	InSquad () { return m_hSquadLeader != NULL; }
-	int IsLeader () { return m_hSquadLeader == this; }
-	int SquadJoin ( int searchRadius );
-	int SquadRecruit ( int searchRadius, int maxMembers );
-	int	SquadCount();
-	void SquadRemove( CSquadMonster *pRemove );
-	void SquadUnlink();
-	BOOL SquadAdd( CSquadMonster *pAdd );
-	void SquadDisband();
-	void SquadAddConditions ( int iConditions );
-	void SquadMakeEnemy ( CBaseEntity *pEnemy );
-	void SquadPasteEnemyInfo ();
-	void SquadCopyEnemyInfo ();
-	BOOL SquadEnemySplit ();
-	BOOL SquadMemberInRange( const Vector &vecLocation, float flDist );
 
-	CSquadMonster *MySquadMonsterPointer() override { return this; }
+	CSquadMonster* MySquadMember(int i)
+	{
+		if (i >= MAX_SQUAD_MEMBERS - 1)
+			return this;
+		return static_cast<CSquadMonster*>(static_cast<CBaseEntity*>(m_hSquadMember[i]));
+	}
+
+	int InSquad() { return m_hSquadLeader != nullptr; }
+	int IsLeader() { return m_hSquadLeader == this; }
+	int SquadRecruit(int searchRadius, int maxMembers);
+	int SquadCount();
+	void SquadRemove(CSquadMonster* pRemove);
+	BOOL SquadAdd(CSquadMonster* pAdd);
+	void SquadMakeEnemy(CBaseEntity* pEnemy);
+	void SquadPasteEnemyInfo();
+	void SquadCopyEnemyInfo();
+	BOOL SquadEnemySplit();
+	BOOL SquadMemberInRange(const Vector& vecLocation, float flDist);
+
+	CSquadMonster* MySquadMonsterPointer() override { return this; }
 
 	static TYPEDESCRIPTION m_SaveData[];
 
-	int	Save( CSave &save ) override;
-	int Restore( CRestore &restore ) override;
+	virtual int Save(CSave& save);
+	virtual int Restore(CRestore& restore);
 
-	BOOL FValidateCover ( const Vector &vecCoverLocation ) override;
+	BOOL FValidateCover(const Vector& vecCoverLocation) override;
 
-	MONSTERSTATE GetIdealState () override;
-	Schedule_t	*GetScheduleOfType ( int iType ) override;
+	MONSTERSTATE GetIdealState() override;
+	Schedule_t* GetScheduleOfType(int iType) override;
 
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 };
-

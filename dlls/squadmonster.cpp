@@ -51,14 +51,8 @@ IMPLEMENT_SAVERESTORE( CSquadMonster, CBaseMonster );
 //=========================================================
 BOOL CSquadMonster :: OccupySlot( int iDesiredSlots )
 {
-	int i;
-	int iMask;
-	int iSquadSlots;
-
 	if ( !InSquad() )
-	{
 		return TRUE;
-	}
 
 	if ( SquadEnemySplit() )
 	{
@@ -77,11 +71,11 @@ BOOL CSquadMonster :: OccupySlot( int iDesiredSlots )
 		return FALSE;
 	}
 
-	iSquadSlots = pSquadLeader->m_afSquadSlots;
+	int iSquadSlots = pSquadLeader->m_afSquadSlots;
 
-	for ( i = 0; i < NUM_SLOTS; i++ )
+	for ( int i = 0; i < NUM_SLOTS; i++ )
 	{
-		iMask = 1<<i;
+		int iMask = 1 << i;
 		if ( iDesiredSlots & iMask ) // am I looking for this bit?
 		{
 			if ( !(iSquadSlots & iMask) )	// Is it already taken?
@@ -307,9 +301,7 @@ int CSquadMonster :: SquadCount()
 //=========================================================
 int CSquadMonster :: SquadRecruit( int searchRadius, int maxMembers )
 {
-	int squadCount;
 	int iMyClass = Classify();// cache this monster's class
-
 
 	// Don't recruit if I'm already in a group
 	if ( InSquad() )
@@ -320,7 +312,7 @@ int CSquadMonster :: SquadRecruit( int searchRadius, int maxMembers )
 
 	// I am my own leader
 	m_hSquadLeader = this;
-	squadCount = 1;
+	int squadCount = 1;
 
 	CBaseEntity *pEntity = NULL;
 
@@ -387,9 +379,7 @@ int CSquadMonster :: SquadRecruit( int searchRadius, int maxMembers )
 //=========================================================
 int CSquadMonster :: CheckEnemy ( CBaseEntity *pEnemy )
 {
-	int iUpdatedLKP;
-
-	iUpdatedLKP = CBaseMonster :: CheckEnemy ( m_hEnemy );
+	int iUpdatedLKP = CBaseMonster::CheckEnemy(m_hEnemy);
 	
 	// communicate with squad members about the enemy IF this individual has the same enemy as the squad leader.
 	if ( InSquad() && (CBaseEntity *)m_hEnemy == MySquadLeader()->m_hEnemy )
@@ -444,26 +434,25 @@ void CSquadMonster :: StartMonster()
 	}
 }
 
+BOOL CSquadMonster::NoFriendlyFire()
+{
+	return NoFriendlyFire(FALSE); //default: don't like the player
+}
+
 //=========================================================
 // NoFriendlyFire - checks for possibility of friendly fire
 //
 // Builds a large box in front of the grunt and checks to see 
 // if any squad members are in that box. 
 //=========================================================
-BOOL CSquadMonster :: NoFriendlyFire()
+BOOL CSquadMonster::NoFriendlyFire(BOOL playerAlly)
 {
-	if ( !InSquad() )
-	{
+	if (!playerAlly && !InSquad())
 		return TRUE;
-	}
 
 	CPlane	backPlane;
 	CPlane  leftPlane;
 	CPlane	rightPlane;
-
-	Vector	vecLeftSide;
-	Vector	vecRightSide;
-	Vector	v_left;
 
 	//!!!BUGBUG - to fix this, the planes must be aligned to where the monster will be firing its gun, not the direction it is facing!!!
 
@@ -479,9 +468,9 @@ BOOL CSquadMonster :: NoFriendlyFire()
 
 	//UTIL_MakeVectors ( pev->angles );
 	
-	vecLeftSide = pev->origin - ( gpGlobals->v_right * ( pev->size.x * 1.5 ) );
-	vecRightSide = pev->origin + ( gpGlobals->v_right * ( pev->size.x * 1.5 ) );
-	v_left = gpGlobals->v_right * -1;
+	Vector vecLeftSide = pev->origin - (gpGlobals->v_right * (pev->size.x * 1.5));
+	Vector vecRightSide = pev->origin + (gpGlobals->v_right * (pev->size.x * 1.5));
+	Vector v_left = gpGlobals->v_right * -1;
 
 	leftPlane.InitializePlane ( gpGlobals->v_right, vecLeftSide );
 	rightPlane.InitializePlane ( v_left, vecRightSide );
@@ -493,20 +482,33 @@ BOOL CSquadMonster :: NoFriendlyFire()
 	ALERT ( at_console, "BackPlane: %f %f %f : %f\n", backPlane.m_vecNormal.x, backPlane.m_vecNormal.y, backPlane.m_vecNormal.z, backPlane.m_flDist );
 */
 
-	CSquadMonster *pSquadLeader = MySquadLeader();
+	CSquadMonster* pSquadLeader = MySquadLeader();
 	for (int i = 0; i < MAX_SQUAD_MEMBERS; i++)
 	{
-		CSquadMonster *pMember = pSquadLeader->MySquadMember(i);
+		CSquadMonster* pMember = pSquadLeader->MySquadMember(i);
 		if (pMember && pMember != this)
 		{
 
-			if ( backPlane.PointInFront  ( pMember->pev->origin ) &&
-				 leftPlane.PointInFront  ( pMember->pev->origin ) && 
-				 rightPlane.PointInFront ( pMember->pev->origin) )
+			if (backPlane.PointInFront(pMember->pev->origin) &&
+				leftPlane.PointInFront(pMember->pev->origin) &&
+				rightPlane.PointInFront(pMember->pev->origin))
 			{
 				// this guy is in the check volume! Don't shoot!
 				return FALSE;
 			}
+		}
+	}
+
+	if (playerAlly)
+	{
+		edict_t* pentPlayer = FIND_CLIENT_IN_PVS(edict());
+		if (!FNullEnt(pentPlayer) &&
+			backPlane.PointInFront(pentPlayer->v.origin) &&
+			leftPlane.PointInFront(pentPlayer->v.origin) &&
+			rightPlane.PointInFront(pentPlayer->v.origin))
+		{
+			// the player is in the check volume! Don't shoot!
+			return FALSE;
 		}
 	}
 
@@ -519,10 +521,6 @@ BOOL CSquadMonster :: NoFriendlyFire()
 //=========================================================
 MONSTERSTATE CSquadMonster :: GetIdealState ()
 {
-	int	iConditions;
-
-	iConditions = IScheduleFlags();
-	
 	// If no schedule conditions, the new ideal state is probably the reason we're in here.
 	switch ( m_MonsterState )
 	{

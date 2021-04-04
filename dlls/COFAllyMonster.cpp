@@ -12,17 +12,16 @@
 *   use or distribution of this code by or to any unlicensed person is illegal.
 *
 ****/
-#include	"extdll.h"
-#include	"util.h"
-#include	"cbase.h"
-#include	"monsters.h"
-#include	"schedule.h"
-#include	"talkmonster.h"
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "monsters.h"
+#include "schedule.h"
+#include "talkmonster.h"
 #include "COFAllyMonster.h"
-#include	"defaultai.h"
-#include	"scripted.h"
-#include	"soundent.h"
-#include	"animation.h"
+#include "defaultai.h"
+#include "scripted.h"
+#include "soundent.h"
 
 //=========================================================
 // Talking monster base class
@@ -36,10 +35,6 @@ TYPEDESCRIPTION	COFAllyMonster::m_SaveData[] =
 {
 	DEFINE_FIELD(COFAllyMonster, m_bitsSaid, FIELD_INTEGER),
 	DEFINE_FIELD(COFAllyMonster, m_nSpeak, FIELD_INTEGER),
-
-	// Recalc'ed in Precache()
-	//	DEFINE_FIELD( COFAllyMonster, m_voicePitch, FIELD_INTEGER ),
-	//	DEFINE_FIELD( COFAllyMonster, m_szGrp, FIELD_??? ),
 	DEFINE_FIELD(COFAllyMonster, m_useTime, FIELD_TIME),
 	DEFINE_FIELD(COFAllyMonster, m_iszUse, FIELD_STRING),
 	DEFINE_FIELD(COFAllyMonster, m_iszUnUse, FIELD_STRING),
@@ -57,7 +52,6 @@ char* COFAllyMonster::m_szFriends[TLK_CFRIENDS] =
 	"monster_human_medic_ally",
 	"monster_human_torch_ally",
 };
-
 
 //=========================================================
 // AI Schedules Specific to talking monsters
@@ -207,7 +201,6 @@ Schedule_t	slOFAllyMoveAway[] =
 	},
 };
 
-
 Task_t	tlOFAllyMoveAwayFail[] =
 {
 	{ TASK_STOP_MOVING,				(float)0		},
@@ -224,8 +217,6 @@ Schedule_t	slOFAllyMoveAwayFail[] =
 		"MoveAwayFail"
 	},
 };
-
-
 
 Task_t	tlOFAllyMoveAwayFollow[] =
 {
@@ -315,7 +306,6 @@ Schedule_t	slOFAllyTlkIdleWatchClient[] =
 	},
 };
 
-
 Task_t	tlOFAllyTlkIdleEyecontact[] =
 {
 	{ TASK_TLK_IDEALYAW,	(float)0		},// look at who I'm talking to
@@ -336,7 +326,6 @@ Schedule_t	slOFAllyTlkIdleEyecontact[] =
 		"TlkIdleEyecontact"
 	},
 };
-
 
 DEFINE_CUSTOM_SCHEDULES(COFAllyMonster)
 {
@@ -462,7 +451,6 @@ void COFAllyMonster::StartTask(Task_t* pTask)
 		}
 	}
 	break;
-
 	case TASK_PLAY_SCRIPT:
 		m_hTalkTarget = NULL;
 		CBaseMonster::StartTask(pTask);
@@ -472,7 +460,6 @@ void COFAllyMonster::StartTask(Task_t* pTask)
 		CBaseMonster::StartTask(pTask);
 	}
 }
-
 
 void COFAllyMonster::RunTask(Task_t* pTask)
 {
@@ -547,7 +534,6 @@ void COFAllyMonster::RunTask(Task_t* pTask)
 		}
 	}
 	break;
-
 	case TASK_TLK_EYECONTACT:
 		if (!IsMoving() && IsTalking() && m_hTalkTarget != NULL)
 		{
@@ -559,12 +545,9 @@ void COFAllyMonster::RunTask(Task_t* pTask)
 			TaskComplete();
 		}
 		break;
-
 	case TASK_WALK_PATH_FOR_UNITS:
 	{
-		float distance;
-
-		distance = (m_vecLastPosition - pev->origin).Length2D();
+		float distance = (m_vecLastPosition - pev->origin).Length2D();
 
 		// Walk path until far enough away
 		if (distance > pTask->flData || MovementIsComplete())
@@ -609,14 +592,13 @@ void COFAllyMonster::RunTask(Task_t* pTask)
 	}
 }
 
-
 void COFAllyMonster::Killed(entvars_t* pevAttacker, int iGib)
 {
 	// If a client killed me (unless I was already Barnacle'd), make everyone else mad/afraid of him
 	if ((pevAttacker->flags & FL_CLIENT) && m_MonsterState != MONSTERSTATE_PRONE)
 	{
 		AlertFriends();
-		LimitFollowers(CBaseEntity::Instance(pevAttacker), 0);
+		LimitFollowers(Instance(pevAttacker), 0);
 	}
 
 	m_hTargetEnt = NULL;
@@ -625,8 +607,6 @@ void COFAllyMonster::Killed(entvars_t* pevAttacker, int iGib)
 	SetUse(NULL);
 	CBaseMonster::Killed(pevAttacker, iGib);
 }
-
-
 
 CBaseEntity* COFAllyMonster::EnumFriends(CBaseEntity* pPrevious, int listNumber, BOOL bTrace)
 {

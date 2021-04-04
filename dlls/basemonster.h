@@ -306,7 +306,7 @@ public:
 	BOOL FacingIdeal();
 
 	BOOL FCheckAITrigger(); // checks and, if necessary, fires the monster's trigger target. 
-	BOOL NoFriendlyFire();
+	virtual BOOL NoFriendlyFire() { return 0; };
 	BOOL BBoxFlat();
 
 	// PrescheduleThink 
