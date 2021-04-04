@@ -1588,20 +1588,17 @@ BOOL COFGeneWorm::FVisible( const Vector& vecOrigin )
 
 void FireHurtTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	edict_t *pentTarget = NULL;
 	if( !targetName )
 		return;
 
-	ALERT( at_aiconsole, "Firing: (%s)\n", targetName );
-
+	CBaseEntity* pTarget = NULL;
 	for( ;;)
 	{
-		pentTarget = FIND_ENTITY_BY_TARGETNAME( pentTarget, targetName );
-		if( FNullEnt( pentTarget ) )
-			break;
+		pTarget = UTIL_FindEntityByTargetname(pTarget, targetName, pActivator);
 
-		CBaseEntity *pTarget = CBaseEntity::Instance( pentTarget );
-
+		if (pTarget)
+			ALERT(at_aiconsole, "Firing: (%s)\n", targetName);
+		
 		//Fire only those targets that were toggled by the last hurt event
 		if( pTarget
 			&& !( useType == USE_OFF && pTarget->pev->solid == SOLID_NOT )

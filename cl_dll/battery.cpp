@@ -93,7 +93,7 @@ int CHudBattery::Draw(float flTime)
 		b = giB;
 	}
 
-	if (!(gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)) ))
+	if (!(gHUD.m_iWeaponBits & (1<<(ITEM_SUIT)) ))
 		return 1;
 
 	// Has health changed? Flash the health #

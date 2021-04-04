@@ -566,6 +566,7 @@ CBaseEntity* UTIL_FollowReference(CBaseEntity* pStartEntity, const char* szName)
 
 CBaseEntity* UTIL_FindEntityForward(CBaseEntity* pMe);
 
+char UTIL_TextureHit(TraceResult* ptr, Vector vecSrc, Vector vecEnd);
 bool UTIL_IsMultiplayer();
 bool UTIL_IsCTF();
 

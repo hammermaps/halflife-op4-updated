@@ -63,167 +63,167 @@ public:
 	BOOL m_fRegisteredSound;// whether or not this grenade has issued its DANGER sound to the world sound list yet.
 };
 
-// constant items
-#define ITEM_HEALTHKIT		1
-#define ITEM_ANTIDOTE		2
-#define ITEM_SECURITY		3
-#define ITEM_BATTERY		4
+enum WeaponIds
+{
+	WEAPON_NONE = 0,
+	WEAPON_CROWBAR,
+	WEAPON_GLOCK,
+	WEAPON_PYTHON,
+	WEAPON_MP5,
+	WEAPON_CHAINGUN,
+	WEAPON_CROSSBOW,
+	WEAPON_SHOTGUN,
+	WEAPON_RPG,
+	WEAPON_GAUSS,
+	WEAPON_EGON,
+	WEAPON_HORNETGUN,
+	WEAPON_HANDGRENADE,
+	WEAPON_TRIPMINE,
+	WEAPON_SATCHEL,
+	WEAPON_SNARK,
+	WEAPON_GRAPPLE,
+	WEAPON_EAGLE,
+	WEAPON_PIPEWRENCH,
+	WEAPON_M249,
+	WEAPON_DISPLACER,
+	WEAPON_SHOCKRIFLE,
+	WEAPON_SPORELAUNCHER,
+	WEAPON_SNIPERRIFLE,
+	WEAPON_KNIFE,
+	WEAPON_PENGUIN,
+};
 
-#define WEAPON_NONE				0
-#define WEAPON_CROWBAR			1
-#define	WEAPON_GLOCK			2
-#define WEAPON_PYTHON			3
-#define WEAPON_MP5				4
-#define WEAPON_CHAINGUN			5
-#define WEAPON_CROSSBOW			6
-#define WEAPON_SHOTGUN			7
-#define WEAPON_RPG				8
-#define WEAPON_GAUSS			9
-#define WEAPON_EGON				10
-#define WEAPON_HORNETGUN		11
-#define WEAPON_HANDGRENADE		12
-#define WEAPON_TRIPMINE			13
-#define	WEAPON_SATCHEL			14
-#define	WEAPON_SNARK			15
-#define WEAPON_GRAPPLE			16
-#define WEAPON_EAGLE			17
-#define WEAPON_PIPEWRENCH		18
-#define WEAPON_M249				19
-#define WEAPON_DISPLACER		20
-#define WEAPON_SHOCKRIFLE		22
-#define WEAPON_SPORELAUNCHER	23
-#define WEAPON_SNIPERRIFLE		24
-#define WEAPON_KNIFE			25
-#define WEAPON_PENGUIN			26
-
-#define WEAPON_ALLWEAPONS		(~(1<<WEAPON_SUIT))
-
-#define WEAPON_SUIT				31	// ?????
+#define WEAPON_ALLWEAPONS		(~(1<<ITEM_SUIT))
 
 #define MAX_WEAPONS			32
 
-
 #define MAX_NORMAL_BATTERY	100
 
-
 // weapon weight factors (for auto-switching)   (-1 = noswitch)
-#define CROWBAR_WEIGHT		0
-#define GLOCK_WEIGHT		10
-#define PYTHON_WEIGHT		15
-#define MP5_WEIGHT			15
-#define SHOTGUN_WEIGHT		15
-#define CROSSBOW_WEIGHT		10
-#define RPG_WEIGHT			20
-#define GAUSS_WEIGHT		20
-#define EGON_WEIGHT			20
-#define HORNETGUN_WEIGHT	10
-#define HANDGRENADE_WEIGHT	5
-#define SNARK_WEIGHT		5
-#define SATCHEL_WEIGHT		-10
-#define TRIPMINE_WEIGHT		-10
-#define EAGLE_WEIGHT		15
-#define SHOCKRIFLE_WEIGHT	15
-#define PIPEWRENCH_WEIGHT	2
-#define M249_WEIGHT			20
-#define DISPLACER_WEIGHT	10
-#define SPORELAUNCHER_WEIGHT	20
-#define SNIPERRIFLE_WEIGHT	10
-#define PENGUIN_WEIGHT 5
-
+enum WeightWeapon
+{
+	CROWBAR_WEIGHT = 0,
+	GLOCK_WEIGHT = 10,
+	PYTHON_WEIGHT = 15,
+	MP5_WEIGHT = 15,
+	SHOTGUN_WEIGHT = 15,
+	CROSSBOW_WEIGHT = 10,
+	RPG_WEIGHT = 20,
+	GAUSS_WEIGHT = 20,
+	EGON_WEIGHT = 20,
+	HORNETGUN_WEIGHT = 10,
+	HANDGRENADE_WEIGHT = 5,
+	SNARK_WEIGHT = 5,
+	SATCHEL_WEIGHT = -10,
+	TRIPMINE_WEIGHT = -10,
+	EAGLE_WEIGHT = 15,
+	SHOCKRIFLE_WEIGHT = 15,
+	PIPEWRENCH_WEIGHT = 2,
+	M249_WEIGHT = 20,
+	DISPLACER_WEIGHT = 10,
+	SPORELAUNCHER_WEIGHT = 20,
+	SNIPERRIFLE_WEIGHT = 10,
+	PENGUIN_WEIGHT = 5,
+};
 
 // weapon clip/carry ammo capacities
-#define URANIUM_MAX_CARRY		100
-#define	_9MM_MAX_CARRY			250
-#define _357_MAX_CARRY			36
-#define BUCKSHOT_MAX_CARRY		125
-#define BOLT_MAX_CARRY			50
-#define ROCKET_MAX_CARRY		5
-#define HANDGRENADE_MAX_CARRY	10
-#define SATCHEL_MAX_CARRY		5
-#define TRIPMINE_MAX_CARRY		5
-#define SNARK_MAX_CARRY			15
-#define HORNET_MAX_CARRY		8
-#define M203_GRENADE_MAX_CARRY	10
-#define M249_MAX_CARRY			200
-#define SPORELAUNCHER_MAX_CARRY	20
-#define SNIPERRIFLE_MAX_CARRY	15
-#define PENGUIN_MAX_CARRY 9
+enum ClipMaxCarry
+{
+	URANIUM_MAX_CARRY = 100,
+	_9MM_MAX_CARRY = 250,
+	_357_MAX_CARRY = 36,
+	BUCKSHOT_MAX_CARRY = 125,
+	BOLT_MAX_CARRY = 50,
+	ROCKET_MAX_CARRY = 5,
+	HANDGRENADE_MAX_CARRY = 10,
+	SATCHEL_MAX_CARRY = 5,
+	TRIPMINE_MAX_CARRY = 5,
+	SNARK_MAX_CARRY = 15,
+	HORNET_MAX_CARRY = 8,
+	M203_GRENADE_MAX_CARRY = 10,
+	M249_MAX_CARRY = 200,
+	SPORELAUNCHER_MAX_CARRY = 20,
+	SNIPERRIFLE_MAX_CARRY = 15,
+	PENGUIN_MAX_CARRY = 9,
+};
 
-// the maximum amount of ammo each weapon's clip can hold
-#define WEAPON_NOCLIP			-1
-
-//#define CROWBAR_MAX_CLIP		WEAPON_NOCLIP
-#define GLOCK_MAX_CLIP			17
-#define PYTHON_MAX_CLIP			6
-#define MP5_MAX_CLIP			50
-#define MP5_DEFAULT_AMMO		25
-#define SHOTGUN_MAX_CLIP		8
-#define CROSSBOW_MAX_CLIP		5
-#define RPG_MAX_CLIP			1
-#define GAUSS_MAX_CLIP			WEAPON_NOCLIP
-#define EGON_MAX_CLIP			WEAPON_NOCLIP
-#define HORNETGUN_MAX_CLIP		WEAPON_NOCLIP
-#define HANDGRENADE_MAX_CLIP	WEAPON_NOCLIP
-#define SATCHEL_MAX_CLIP		WEAPON_NOCLIP
-#define TRIPMINE_MAX_CLIP		WEAPON_NOCLIP
-#define SNARK_MAX_CLIP			WEAPON_NOCLIP
-#define EAGLE_MAX_CLIP			7
-#define M249_MAX_CLIP			50
-#define SPORELAUNCHER_MAX_CLIP	5
-#define SHOCKRIFLE_MAX_CLIP		10
-#define SNIPERRIFLE_MAX_CLIP	5
-#define PENGUIN_MAX_CLIP		3
-
+enum ClipMaxSize
+{
+	WEAPON_NOCLIP = -1,
+	GLOCK_MAX_CLIP = 17,
+	PYTHON_MAX_CLIP = 6,
+	MP5_MAX_CLIP = 50,
+	MP5_DEFAULT_AMMO = 25,
+	SHOTGUN_MAX_CLIP = 8,
+	CROSSBOW_MAX_CLIP = 5,
+	RPG_MAX_CLIP = 1,
+	GAUSS_MAX_CLIP = WEAPON_NOCLIP,
+	EGON_MAX_CLIP = WEAPON_NOCLIP,
+	HORNETGUN_MAX_CLIP = WEAPON_NOCLIP,
+	HANDGRENADE_MAX_CLIP = WEAPON_NOCLIP,
+	SATCHEL_MAX_CLIP = WEAPON_NOCLIP,
+	TRIPMINE_MAX_CLIP = WEAPON_NOCLIP,
+	SNARK_MAX_CLIP = WEAPON_NOCLIP,
+	EAGLE_MAX_CLIP = 7,
+	M249_MAX_CLIP = 50,
+	SPORELAUNCHER_MAX_CLIP = 5,
+	SHOCKRIFLE_MAX_CLIP = 10,
+	SNIPERRIFLE_MAX_CLIP = 5,
+	PENGUIN_MAX_CLIP = 3,
+};
 
 // the default amount of ammo that comes with each gun when it spawns
-#define GLOCK_DEFAULT_GIVE			17
-#define PYTHON_DEFAULT_GIVE			6
-#define DEAGLE_DEFAULT_GIVE			7
-#define MP5_DEFAULT_GIVE			50 //Full magazine for Op4
-#define MP5_DEFAULT_AMMO			25
-#define MP5_M203_DEFAULT_GIVE		0
-#define SHOTGUN_DEFAULT_GIVE		12
-#define CROSSBOW_DEFAULT_GIVE		5
-#define RPG_DEFAULT_GIVE			1
-#define GAUSS_DEFAULT_GIVE			20
-#define EGON_DEFAULT_GIVE			20
-#define HANDGRENADE_DEFAULT_GIVE	5
-#define SATCHEL_DEFAULT_GIVE		1
-#define TRIPMINE_DEFAULT_GIVE		1
-#define SNARK_DEFAULT_GIVE			5
-#define HIVEHAND_DEFAULT_GIVE		8
-#define M249_DEFAULT_GIVE			50
-#define DISPLACER_DEFAULT_GIVE		40
-#define SPORELAUNCHER_DEFAULT_GIVE	5
-#define SHOCKRIFLE_DEFAULT_GIVE		10
-#define SNIPERRIFLE_DEFAULT_GIVE	5
+enum ClipGiveDefault
+{
+	GLOCK_DEFAULT_GIVE = 17,
+	PYTHON_DEFAULT_GIVE = 6,
+	DEAGLE_DEFAULT_GIVE = 7,
+	MP5_DEFAULT_GIVE = 50,
+	MP5_M203_DEFAULT_GIVE = 0,
+	SHOTGUN_DEFAULT_GIVE = 12,
+	CROSSBOW_DEFAULT_GIVE = 5,
+	RPG_DEFAULT_GIVE = 1,
+	GAUSS_DEFAULT_GIVE = 20,
+	EGON_DEFAULT_GIVE = 20,
+	HANDGRENADE_DEFAULT_GIVE = 5,
+	SATCHEL_DEFAULT_GIVE = 1,
+	TRIPMINE_DEFAULT_GIVE = 1,
+	SNARK_DEFAULT_GIVE = 5,
+	HIVEHAND_DEFAULT_GIVE = 8,
+	M249_DEFAULT_GIVE = 50,
+	DISPLACER_DEFAULT_GIVE = 40,
+	SPORELAUNCHER_DEFAULT_GIVE = 5,
+	SHOCKRIFLE_DEFAULT_GIVE = 10,
+	SNIPERRIFLE_DEFAULT_GIVE = 5,
+};
 
 // The amount of ammo given to a player by an ammo item.
-#define AMMO_URANIUMBOX_GIVE	20
-#define AMMO_GLOCKCLIP_GIVE		GLOCK_MAX_CLIP
-#define AMMO_357BOX_GIVE		PYTHON_MAX_CLIP
-#define AMMO_MP5CLIP_GIVE		MP5_MAX_CLIP
-#define AMMO_CHAINBOX_GIVE		200
-#define AMMO_M203BOX_GIVE		2
-#define AMMO_BUCKSHOTBOX_GIVE	12
-#define AMMO_CROSSBOWCLIP_GIVE	CROSSBOW_MAX_CLIP
-#define AMMO_RPGCLIP_GIVE		RPG_MAX_CLIP
-#define AMMO_URANIUMBOX_GIVE	20
-#define AMMO_SNARKBOX_GIVE		5
-#define AMMO_M249_GIVE			50
-#define AMMO_EAGLE_GIVE			7
-#define AMMO_SPORE_GIVE			1
-#define AMMO_SNIPERRIFLE_GIVE	5
+enum AmmoGive
+{
+	AMMO_URANIUMBOX_GIVE = 20,
+	AMMO_GLOCKCLIP_GIVE = GLOCK_MAX_CLIP,
+	AMMO_357BOX_GIVE = PYTHON_MAX_CLIP,
+	AMMO_MP5CLIP_GIVE = MP5_MAX_CLIP,
+	AMMO_CHAINBOX_GIVE = 200,
+	AMMO_M203BOX_GIVE = 2,
+	AMMO_BUCKSHOTBOX_GIVE = 12,
+	AMMO_CROSSBOWCLIP_GIVE = CROSSBOW_MAX_CLIP,
+	AMMO_RPGCLIP_GIVE = RPG_MAX_CLIP,
+	AMMO_SNARKBOX_GIVE = 5,
+	AMMO_M249_GIVE = 50,
+	AMMO_EAGLE_GIVE = 7,
+	AMMO_SPORE_GIVE = 1,
+	AMMO_SNIPERRIFLE_GIVE = 5,
+};
 
-// bullet types
-typedef	enum
+enum Bullet
 {
 	BULLET_NONE = 0,
-	BULLET_PLAYER_9MM, // glock
-	BULLET_PLAYER_MP5, // mp5
-	BULLET_PLAYER_357, // python
-	BULLET_PLAYER_BUCKSHOT, // shotgun
-	BULLET_PLAYER_CROWBAR, // crowbar swipe
+	BULLET_PLAYER_9MM,
+	BULLET_PLAYER_MP5,
+	BULLET_PLAYER_357,
+	BULLET_PLAYER_BUCKSHOT,
+	BULLET_PLAYER_CROWBAR,
 
 	BULLET_MONSTER_9MM,
 	BULLET_MONSTER_MP5,
@@ -232,14 +232,17 @@ typedef	enum
 	BULLET_PLAYER_556,
 	BULLET_PLAYER_762,
 	BULLET_PLAYER_EAGLE,
-} Bullet;
+};
 
-
-#define ITEM_FLAG_SELECTONEMPTY		1
-#define ITEM_FLAG_NOAUTORELOAD		2
-#define ITEM_FLAG_NOAUTOSWITCHEMPTY	4
-#define ITEM_FLAG_LIMITINWORLD		8
-#define ITEM_FLAG_EXHAUSTIBLE		16 // A player can totally exhaust their ammo supply and lose this weapon
+enum ItemFlags
+{
+	ITEM_FLAG_SELECTONEMPTY = 1,
+	ITEM_FLAG_NOAUTORELOAD = 2,
+	ITEM_FLAG_NOAUTOSWITCHEMPTY = 4,
+	ITEM_FLAG_LIMITINWORLD = 8,
+	// A player can totally exhaust their ammo supply and lose this weapon
+	ITEM_FLAG_EXHAUSTIBLE = 16,
+};
 
 #define WEAPON_IS_ONTARGET 0x40
 
@@ -349,17 +352,18 @@ class CBasePlayerWeapon : public CBasePlayerItem
 {
 public:
 	using BaseClass = CBasePlayerItem;
-	
-    int		Save( CSave &save ) override;
-    int		Restore( CRestore &restore ) override;
+
+	virtual void Spawn() {};
+	virtual int	Save( CSave &save );
+	virtual int	Restore( CRestore &restore );
 	
 	static	TYPEDESCRIPTION m_SaveData[];
 
 	virtual void SetNextThink(float delay); //LRC
 
 	// generic weapon versions of CBasePlayerItem calls
-	int AddToPlayer( CBasePlayer *pPlayer ) override;
-	int AddDuplicate( CBasePlayerItem *pItem ) override;
+	virtual int AddToPlayer( CBasePlayer *pPlayer );
+	virtual int AddDuplicate( CBasePlayerItem *pItem );
 
 	virtual int ExtractAmmo( CBasePlayerWeapon *pWeapon ); //{ return TRUE; }			// Return TRUE if you can add ammo to yourself when picked up
 	virtual int ExtractClipAmmo( CBasePlayerWeapon *pWeapon );// { return TRUE; }			// Return TRUE if you can add ammo to yourself when picked up
@@ -374,9 +378,6 @@ public:
 
 	void UpdateItemInfo() override {}	// updates HUD state
 
-	int m_iPlayEmptySound;
-	int m_fFireOnEmpty;		// True when the gun is empty and the player is still holding down the
-							// attack key(s)
 	virtual BOOL PlayEmptySound();
 	virtual void ResetEmptySound();
 
@@ -407,7 +408,7 @@ public:
 	CBasePlayerItem *GetWeaponPtr() override { return (CBasePlayerItem *)this; }
 	float GetNextAttackDelay( float delay );
 
-	float m_flPumpTime;
+	float	m_flPumpTime;
 	int		m_fInSpecialReload;									// Are we in the middle of a reload for the shotguns
 	float	m_flNextPrimaryAttack;								// soonest time ItemPostFrame will call PrimaryAttack
 	float	m_flNextSecondaryAttack;							// soonest time ItemPostFrame will call SecondaryAttack
@@ -418,13 +419,17 @@ public:
 	int		m_iClientClip;										// the last version of m_iClip sent to hud dll
 	int		m_iClientWeaponState;								// the last version of the weapon state sent to hud dll (is current weapon, is on target)
 	int		m_fInReload;										// Are we in the middle of a reload;
-
+	float	m_flAccuracy;
+	float	m_flLastFire;
 	int		m_iDefaultAmmo;// how much ammo you get when you pick up this weapon as placed by a level designer.
 	
 	// hle time creep vars
 	float	m_flPrevPrimaryAttack;
-	float	m_flLastFireTime;			
+	float	m_flLastFireTime;
 
+	int m_iPlayEmptySound;
+	int m_fFireOnEmpty;		// True when the gun is empty and the player is still holding down the
+							// attack key(s)
 };
 
 
@@ -641,7 +646,7 @@ public:
 
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
-	void GlockFire( float flSpread, float flCycleTime, BOOL fUseAutoAim );
+	void GlockFire( float flSpread, float flCycleTime, bool fUseAutoAim );
 	BOOL Deploy() override;
 	void Reload() override;
 	void WeaponIdle() override;
@@ -657,7 +662,6 @@ public:
 
 private:
 	int m_iShell;
-	
 
 	unsigned short m_usFireGlock1;
 	unsigned short m_usFireGlock2;

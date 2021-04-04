@@ -16,6 +16,7 @@
 #include "entity_state.h"
 #include "cl_entity.h"
 #include "triangleapi.h"
+#include "r_studioint.h"
 #include "Exports.h"
 #include "particlemgr.h"
 
@@ -26,11 +27,12 @@
 
 class CException;
 extern IParticleMan *g_pParticleMan;
-extern float g_fFogColor[4];
+
 extern float g_fStartDist;
 extern float g_fEndDist;
-extern int g_iWaterLevel;
 extern Vector v_origin;
+extern Vector FogColor;
+extern int g_iWaterLevel;
 
 int UseTexture(HSPRITE& hsprSpr, char* str)
 {
@@ -114,25 +116,42 @@ void CShinySurface::Draw(const Vector& org)
 	gEngfuncs.pTriAPI->End();
 }
 
+extern engine_studio_api_t IEngineStudio;
+
 void BlackFog()
 {
-	//Not in water and we want fog.
 	static float fColorBlack[3] = { 0,0,0 };
-	bool bFog = g_iWaterLevel < 2 && g_fStartDist > 0 && g_fEndDist > 0;
+	bool bFog = g_fStartDist > 0 && g_fEndDist > 0;
 	if (bFog)
 		gEngfuncs.pTriAPI->Fog(fColorBlack, g_fStartDist, g_fEndDist, bFog);
 	else
+	{
+		float g_fFogColor[3] = { FogColor.x, FogColor.y, FogColor.z };
 		gEngfuncs.pTriAPI->Fog(g_fFogColor, g_fStartDist, g_fEndDist, bFog);
+	}
 }
 
 void RenderFog()
 {
-	//Not in water and we want fog.
+	float g_fFogColor[4] = { FogColor.x, FogColor.y, FogColor.z, 1.0 };
 	bool bFog = g_iWaterLevel < 2 && g_fStartDist > 0 && g_fEndDist > 0;
 	if (bFog)
-		gEngfuncs.pTriAPI->Fog(g_fFogColor, g_fStartDist, g_fEndDist, bFog);
-	//	else
-	//		gEngfuncs.pTriAPI->Fog ( g_fFogColor, 10000, 10001, 0 );
+	{
+		if (IEngineStudio.IsHardware() == 2)
+		{
+			gEngfuncs.pTriAPI->Fog(g_fFogColor, g_fStartDist, g_fEndDist, bFog);
+		}
+		else if (IEngineStudio.IsHardware() == 1)
+		{
+			glEnable(GL_FOG);
+			glFogi(GL_FOG_MODE, GL_LINEAR);
+			glFogfv(GL_FOG_COLOR, g_fFogColor);
+			glFogf(GL_FOG_DENSITY, 1.0f);
+			glHint(GL_FOG_HINT, GL_DONT_CARE);
+			glFogf(GL_FOG_START, g_fStartDist);
+			glFogf(GL_FOG_END, g_fEndDist);
+		}
+	}
 }
 
 /*
@@ -147,6 +166,8 @@ void DLLEXPORT HUD_DrawNormalTriangles()
 //	RecClDrawNormalTriangles();
 
 	gHUD.m_Spectator.DrawOverview();
+
+	RenderFog();
 }
 
 /*
@@ -158,8 +179,6 @@ Render any triangles with transparent rendermode needs here
 */
 void DLLEXPORT HUD_DrawTransparentTriangles()
 {
-	BlackFog();
-
 	try {
 		pParticleManager->UpdateSystems();
 	}
@@ -184,4 +203,6 @@ void DLLEXPORT HUD_DrawTransparentTriangles()
 
 	if ( g_pParticleMan )
 		 g_pParticleMan->Update();
+
+	BlackFog();
 }

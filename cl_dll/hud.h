@@ -810,7 +810,7 @@ public:
 	void _cdecl MsgFunc_ViewMode( const char *pszName, int iSize, void *pbuf );
 	int _cdecl MsgFunc_SetFOV(const char *pszName,  int iSize, void *pbuf);
 	int  _cdecl MsgFunc_Concuss( const char *pszName, int iSize, void *pbuf );
-	void _cdecl MsgFunc_SetFog(const char* pszName, int iSize, void* pbuf);		//LRC
+	int _cdecl MsgFunc_SetFog(const char* pszName, int iSize, void* pbuf);		//LRC
 	void _cdecl MsgFunc_KeyedDLight(const char* pszName, int iSize, void* pbuf);	//LRC
 	void _cdecl MsgFunc_SetSky(const char* pszName, int iSize, void* pbuf);		//LRC
 	void _cdecl MsgFunc_AddShine(const char* pszName, int iSize, void* pbuf);     //LRC

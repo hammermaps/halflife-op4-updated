@@ -263,7 +263,7 @@ void CBasePlayer::DeathSound()
 
 	// play one of the suit death alarms
 	//LRC- if no suit, then no flatline sound. (unless it's a deathmatch.)
-	if (!(pev->weapons & (1 << WEAPON_SUIT)) && !g_pGameRules->IsDeathmatch())
+	if (!(pev->weapons & (1 << ITEM_SUIT)) && !g_pGameRules->IsDeathmatch())
 		return;
 
 	// play one of the suit death alarms
@@ -899,13 +899,13 @@ void CBasePlayer::RemoveItems(int iWeaponMask, int i9mm, int i357, int iBuck, in
 		}
 	}
 
-	int suit = pev->weapons & 1 << WEAPON_SUIT;
-	pev->weapons &= ~(1 << WEAPON_SUIT);
+	int suit = pev->weapons & 1 << ITEM_SUIT;
+	pev->weapons &= ~(1 << ITEM_SUIT);
 	//	ALERT(at_console, "weapons was %d; ", pev->weapons);
 	pev->weapons &= iWeaponMask;
 	//	ALERT(at_console, "now %d\n(Mask is %d)", pev->weapons, iWeaponMask);
 	if (suit && !(iWeaponMask & 1))
-		pev->weapons |= 1 << WEAPON_SUIT;
+		pev->weapons |= 1 << ITEM_SUIT;
 
 	// are we dropping the active item?
 	if (m_pActiveItem && !(1 << m_pActiveItem->m_iId & iWeaponMask))
@@ -2550,7 +2550,7 @@ void CBasePlayer::CheckSuitUpdate()
 	int isearch = m_iSuitPlayNext;
 
 	// Ignore suit updates if no suit
-	if (!(pev->weapons & (1 << WEAPON_SUIT)))
+	if (!(pev->weapons & (1 << ITEM_SUIT)))
 		return;
 
 	// if in range of radiation source, ping geiger counter
@@ -2613,7 +2613,7 @@ void CBasePlayer::SetSuitUpdate(const char* name, int fgroup, int iNoRepeatTime)
 
 
 	// Ignore suit updates if no suit
-	if (!(pev->weapons & (1 << WEAPON_SUIT)))
+	if (!(pev->weapons & (1 << ITEM_SUIT)))
 		return;
 
 	if (g_pGameRules->IsMultiplayer())
@@ -3706,7 +3706,7 @@ void CBasePlayer::FlashlightTurnOn()
 		return;
 	}
 
-	if ((pev->weapons & (1 << WEAPON_SUIT)))
+	if ((pev->weapons & (1 << ITEM_SUIT)))
 	{
 		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, SOUND_FLASHLIGHT_ON, 1.0, ATTN_NORM, 0, PITCH_NORM);
 		SetBits(pev->effects, EF_BRIGHTLIGHT);
@@ -4353,7 +4353,7 @@ void CBasePlayer::UpdateClientData()
 		//Update the client's night vision state on restore/level transition
 		if (g_pGameRules->FAllowFlashlight())
 		{
-			if (pev->weapons & WEAPON_SUIT)
+			if (pev->weapons & ITEM_SUIT)
 			{
 				if (FlashlightIsOn())
 				{

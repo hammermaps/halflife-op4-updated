@@ -877,7 +877,7 @@ BOOL CBasePlayerWeapon :: DefaultDeploy( const char *szViewModel, const char *sz
 
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0;
-	m_flLastFireTime = 0.0;
+	m_flLastFireTime = 0.0f;
 
 	return TRUE;
 }
@@ -1057,6 +1057,7 @@ float CBasePlayerWeapon::GetNextAttackDelay( float delay )
 		m_flLastFireTime = gpGlobals->time;
 		m_flPrevPrimaryAttack = delay;
 	}
+	
 	// calculate the time between this shot and the previous
 	float flTimeBetweenFires = gpGlobals->time - m_flLastFireTime;
 	float flCreep = 0.0f;

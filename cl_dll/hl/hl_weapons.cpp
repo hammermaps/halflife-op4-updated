@@ -216,6 +216,7 @@ BOOL CBasePlayerWeapon :: DefaultDeploy(const char *szViewModel, const char *szW
 
 	g_irunninggausspred = false;
 	m_pPlayer->m_flNextAttack = 0.5;
+	m_flLastFireTime = 0.0f;
 	m_flTimeWeaponIdle = 1.0;
 	return TRUE;
 }
@@ -271,7 +272,7 @@ CBaseEntity::FireBulletsPlayer
 Only produces random numbers to match the server ones.
 =====================
 */
-Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq, int iDamage, entvars_t *pevAttacker, int shared_rand )
+Vector CBaseEntity::FireBulletsPlayer(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iPenetration, int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, int shared_rand)
 {
 	float x, y, z;
 

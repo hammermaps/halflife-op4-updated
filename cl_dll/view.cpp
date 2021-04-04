@@ -431,14 +431,8 @@ V_CalcIntermissionRefdef
 */
 void V_CalcIntermissionRefdef ( struct ref_params_s *pparams )
 {
-	cl_entity_t	*ent, *view;
-	float		old;
-
-	// ent is the player model ( visible when out of body )
-	ent = gEngfuncs.GetLocalPlayer();
-	
 	// view is the weapon model (only visible from inside body )
-	view = gEngfuncs.GetViewModel();
+	cl_entity_t* view = gEngfuncs.GetViewModel();
 
 	VectorCopy ( pparams->simorg, pparams->vieworg );
 	VectorCopy ( pparams->cl_viewangles, pparams->viewangles );
@@ -446,7 +440,7 @@ void V_CalcIntermissionRefdef ( struct ref_params_s *pparams )
 	view->model = NULL;
 
 	// allways idle in intermission
-	old = v_idlescale;
+	float old = v_idlescale;
 	v_idlescale = 1;
 
 	V_AddIdle ( pparams );
@@ -486,8 +480,6 @@ V_CalcRefdef
 
 ==================
 */
-extern void RenderFog( void ); //LRC
-
 void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 {
 	cl_entity_t		*ent, *view;
@@ -749,20 +741,18 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	}
 #endif
 
+	static float lastorg[3];
+	Vector delta;
+
+	VectorSubtract(pparams->simorg, lastorg, delta);
+
+	if (Length(delta) != 0.0)
 	{
-		static float lastorg[3];
-		Vector delta;
+		VectorCopy(pparams->simorg, ViewInterp.Origins[ViewInterp.CurrentOrigin & ORIGIN_MASK]);
+		ViewInterp.OriginTime[ViewInterp.CurrentOrigin & ORIGIN_MASK] = pparams->time;
+		ViewInterp.CurrentOrigin++;
 
-		VectorSubtract( pparams->simorg, lastorg, delta );
-
-		if ( Length( delta ) != 0.0 )
-		{
-			VectorCopy( pparams->simorg, ViewInterp.Origins[ ViewInterp.CurrentOrigin & ORIGIN_MASK ] );
-			ViewInterp.OriginTime[ ViewInterp.CurrentOrigin & ORIGIN_MASK ] = pparams->time;
-			ViewInterp.CurrentOrigin++;
-
-			VectorCopy( pparams->simorg, lastorg );
-		}
+		VectorCopy(pparams->simorg, lastorg);
 	}
 
 	// Smooth out whole view in multiplayer when on trains, lifts
@@ -821,7 +811,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	v_angles = pparams->viewangles;
 	v_client_aimangles = pparams->cl_viewangles;
 	v_lastAngles = pparams->viewangles;
-//	v_cl_angles = pparams->cl_viewangles;	// keep old user mouse angles !
+
 	if ( CL_IsThirdPerson() )
 	{
 		VectorCopy( camAngles, pparams->viewangles);
@@ -865,9 +855,6 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	lasttime = pparams->time;
 
 	v_origin = pparams->vieworg;
-
-	//LRC
-	RenderFog();
 
 	// LRC - override the view position if we're drawing a sky, rather than the player's view
 	if (gHUD.m_iSkyMode == SKY_ON && pparams->nextView == 0)

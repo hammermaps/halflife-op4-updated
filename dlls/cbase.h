@@ -404,9 +404,10 @@ public:
 	int ShouldToggle(USE_TYPE useType); //LRC this version uses GetState()
 	void FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance,
 	                 int iBulletType, int iTracerFreq = 4, int iDamage = 0, entvars_t* pevAttacker = nullptr);
-	Vector FireBulletsPlayer(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance,
-	                         int iBulletType, int iTracerFreq = 4, int iDamage = 0, entvars_t* pevAttacker = nullptr,
-	                         int shared_rand = 0);
+	
+	Vector CBaseEntity::FireBulletsPlayer(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, 
+		float flDistance, int iPenetration, int iBulletType, int iDamage, float flRangeModifier, 
+		entvars_t* pevAttacker, int shared_rand);
 
 	virtual CBaseEntity* Respawn() { return nullptr; }
 

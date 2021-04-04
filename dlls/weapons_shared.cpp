@@ -88,7 +88,7 @@ BOOL CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, float fDelay, in
 
 	int j = V_min(iClipSize - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
 
-	if (j == 0)
+	if (j <= 0)
 		return FALSE;
 
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + fDelay;
@@ -143,6 +143,11 @@ void CBasePlayerWeapon::ItemPostFrame()
 	}
 #endif
 
+	if (!(m_pPlayer->pev->button & IN_ATTACK))
+	{
+		m_flLastFireTime = 0;
+	}
+	
 	if ((m_fInReload) && (m_pPlayer->m_flNextAttack <= UTIL_WeaponTimeBase()))
 	{
 		// complete the reload. 

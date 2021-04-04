@@ -2563,7 +2563,7 @@ void CTriggerHevCharge::ChargeTouch(CBaseEntity* pOther)
 		return;
 
 	// check that it's a player with an HEV suit
-	if (!pOther->IsPlayer() || !FBitSet(pOther->pev->weapons, 1 << WEAPON_SUIT))
+	if (!pOther->IsPlayer() || !FBitSet(pOther->pev->weapons, 1 << ITEM_SUIT))
 		return;
 
 	//FIXME: add in the multiplayer fix, from trigger_hurt?
@@ -3228,9 +3228,8 @@ void CTriggerCounter::CounterUse(CBaseEntity* pActivator, CBaseEntity* pCaller, 
 	if (m_cTriggersLeft < 0)
 		return;
 
-	BOOL fTellActivator =
-	(FClassnameIs(m_hActivator->pev, "player") &&
-		!FBitSet(pev->spawnflags, SPAWNFLAG_NOMESSAGE));
+	BOOL fTellActivator = m_hActivator->IsPlayer() && !FBitSet(pev->spawnflags, SPAWNFLAG_NOMESSAGE);
+	
 	if (m_cTriggersLeft != 0)
 	{
 		if (fTellActivator)
@@ -3526,7 +3525,7 @@ void CChangeLevel::ChangeLevelNow(CBaseEntity* pActivator)
 //
 void CChangeLevel::TouchChangeLevel(CBaseEntity* pOther)
 {
-	if (!FClassnameIs(pOther->pev, "player"))
+	if(!pOther->IsPlayer())
 		return;
 
 	ChangeLevelNow(pOther);

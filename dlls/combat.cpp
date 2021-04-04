@@ -29,6 +29,7 @@
 #include "animation.h"
 #include "weapons.h"
 #include "func_break.h"
+#include "pm_materials.h"
 #include "../engine/studio.h" //LRC
 
 extern DLL_GLOBAL Vector		g_vecAttackDir;
@@ -1581,133 +1582,211 @@ Go to the trouble of combining multiple pellets into a single damage call.
 This version is used by Players, uses the random seed generator to sync client and server side shots.
 ================
 */
-Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq, int iDamage, entvars_t *pevAttacker, int shared_rand )
+Vector CBaseEntity::FireBulletsPlayer(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iPenetration, int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, int shared_rand)
 {
-	static int tracerCount;
+	int iPenetrationPower, flPenetrationDistance;
 	TraceResult tr;
 	Vector vecRight = gpGlobals->v_right;
 	Vector vecUp = gpGlobals->v_up;
+	int iCurrentDamage = iDamage;
+	float flCurrentDistance;
 	float x, y, z;
+	
+	switch (iBulletType)
+	{
+		case BULLET_PLAYER_9MM:
+			iPenetrationPower = 21;
+			flPenetrationDistance = 800;
+			break;
+		case BULLET_PLAYER_MP5:
+			iPenetrationPower = 15;
+			flPenetrationDistance = 500;
+			break;
+		case BULLET_PLAYER_BUCKSHOT:
+			iPenetrationPower = 30;
+			flPenetrationDistance = 1000;
+			break;
+		case BULLET_PLAYER_762:
+			iPenetrationPower = 39;
+			flPenetrationDistance = 5000;
+			break;
+		case BULLET_PLAYER_556:
+			iPenetrationPower = 30;
+			flPenetrationDistance = 2000;
+			break;
+		case BULLET_PLAYER_EAGLE:
+		case BULLET_PLAYER_357:
+			iPenetrationPower = 25;
+			flPenetrationDistance = 800;
+			break;
+		default:
+			iPenetrationPower = 0;
+			flPenetrationDistance = 0;
+			break;
+	}
 
-	if ( pevAttacker == NULL )
+	if (!pevAttacker)
 		pevAttacker = pev;  // the default attacker is ourselves
 
-	ClearMultiDamage();
 	gMultiDamage.type = DMG_BULLET | DMG_NEVERGIB;
 
-	for ( ULONG iShot = 1; iShot <= cShots; iShot++ )
+	if (IsPlayer())
 	{
-		//Use player's random seed.
+		// Use player's random seed.
 		// get circular gaussian spread
-		x = UTIL_SharedRandomFloat( shared_rand + iShot, -0.5, 0.5 ) + UTIL_SharedRandomFloat( shared_rand + ( 1 + iShot ) , -0.5, 0.5 );
-		y = UTIL_SharedRandomFloat( shared_rand + ( 2 + iShot ), -0.5, 0.5 ) + UTIL_SharedRandomFloat( shared_rand + ( 3 + iShot ), -0.5, 0.5 );
-		z = x * x + y * y;
-
-		Vector vecDir = vecDirShooting +
-						x * vecSpread.x * vecRight +
-						y * vecSpread.y * vecUp;
-		Vector vecEnd;
-
-		vecEnd = vecSrc + vecDir * flDistance;
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr);
-		
-		// do damage, paint decals
-		if (tr.flFraction != 1.0)
+		x = UTIL_SharedRandomFloat(shared_rand, -0.5, 0.5) + UTIL_SharedRandomFloat(shared_rand + 1, -0.5, 0.5);
+		y = UTIL_SharedRandomFloat(shared_rand + 2, -0.5, 0.5) + UTIL_SharedRandomFloat(shared_rand + 3, -0.5, 0.5);
+	}
+	else
+	{
+		do
 		{
-			CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
+			x = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
+			y = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
+			z = x * x + y * y;
+		} while (z > 1);
+	}
 
-			if ( iDamage )
+	Vector vecDir = vecDirShooting +
+		x * vecSpread.x * vecRight +
+		y * vecSpread.y * vecUp;
+
+	Vector vecEnd = vecSrc + vecDir * flDistance;
+	
+	float flDamageModifier = 0.5;
+
+	while (iPenetration != 0)
+	{
+		ClearMultiDamage();
+		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+
+		switch (UTIL_TextureHit(&tr, vecSrc, vecEnd))
+		{
+			case CHAR_TEX_METAL:
+				iPenetrationPower *= 0.15;
+				flDamageModifier = 0.2;
+			break;
+			case CHAR_TEX_CONCRETE:
+				iPenetrationPower *= 0.25;
+			break;
+			case CHAR_TEX_GRATE:
+				iPenetrationPower *= 0.5;
+				flDamageModifier = 0.4;
+			break;
+			case CHAR_TEX_VENT:
+				iPenetrationPower *= 0.5;
+				flDamageModifier = 0.45;
+			break;
+			case CHAR_TEX_TILE:
+				iPenetrationPower *= 0.65;
+				flDamageModifier = 0.3;
+			break;
+			case CHAR_TEX_COMPUTER:
+				iPenetrationPower *= 0.4;
+				flDamageModifier = 0.45;
+			break;
+			case CHAR_TEX_WOOD:
+				flDamageModifier = 0.6;
+			break;
+		}
+
+		if (tr.flFraction != 1.0f)
+		{
+			CBaseEntity* pEntity = Instance(tr.pHit);
+			iPenetration--;
+
+			flCurrentDistance = tr.flFraction * flDistance;
+			iCurrentDamage *= pow(flRangeModifier, flCurrentDistance / 500);
+
+			if (flCurrentDistance > flPenetrationDistance)
+				iPenetration = 0;
+
+			float flDistanceModifier;
+			if (VARS(tr.pHit)->solid != SOLID_BSP || !iPenetration)
 			{
-				pEntity->TraceAttack(pevAttacker, iDamage, vecDir, &tr, DMG_BULLET | ((iDamage > 16) ? DMG_ALWAYSGIB : DMG_NEVERGIB) );
-				
-				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
-				DecalGunshot( &tr, iBulletType );
-			} 
-			else switch(iBulletType)
+				iPenetrationPower = 42;
+				flDamageModifier = 0.75;
+				flDistanceModifier = 0.75;
+			}
+			else
+				flDistanceModifier = 0.5;
+
+			TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
+			DecalGunshot(&tr, iBulletType);
+
+			vecSrc = tr.vecEndPos + (vecDir * iPenetrationPower);
+			flDistance = (flDistance - flCurrentDistance) * flDistanceModifier;
+			vecEnd = vecSrc + (vecDir * flDistance);
+
+			switch (iBulletType)
 			{
 			default:
-			case BULLET_PLAYER_9MM:		
-				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg9MM, vecDir, &tr, DMG_BULLET); 
+			case BULLET_PLAYER_9MM:
+				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg9MM, vecDir, &tr, DMG_BULLET);
 				break;
-
-			case BULLET_PLAYER_MP5:		
-				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET); 
+			case BULLET_PLAYER_MP5:
+				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET);
 				break;
-
-			case BULLET_PLAYER_BUCKSHOT:	
-				 // make distance based!
-				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgBuckshot, vecDir, &tr, DMG_BULLET); 
+			case BULLET_PLAYER_BUCKSHOT:
+				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgBuckshot, vecDir, &tr, DMG_BULLET);
 				break;
-			
-			case BULLET_PLAYER_357:		
-				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg357, vecDir, &tr, DMG_BULLET); 
+			case BULLET_PLAYER_357:
+				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg357, vecDir, &tr, DMG_BULLET);
 				break;
-
 			case BULLET_PLAYER_556:
-				pEntity->TraceAttack( pevAttacker, gSkillData.plrDmg556, vecDir, &tr, DMG_BULLET );
+				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg556, vecDir, &tr, DMG_BULLET);
 				break;
-
 			case BULLET_PLAYER_762:
-				pEntity->TraceAttack( pevAttacker, gSkillData.plrDmg762, vecDir, &tr, DMG_BULLET );
-				
-				if( tr.pHit && tr.pHit->v.takedamage != DAMAGE_NO )
+				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg762, vecDir, &tr, DMG_BULLET);
+
+				if (tr.pHit && tr.pHit->v.takedamage != DAMAGE_NO)
 				{
-					EMIT_SOUND_DYN( tr.pHit, CHAN_BODY, "weapons/xbow_hitbod2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM );
-				
-					auto pHitEntity = Instance( tr.pHit );
+					EMIT_SOUND_DYN(tr.pHit, CHAN_BODY, "weapons/xbow_hitbod2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-					if( pHitEntity->BloodColor() != DONT_BLEED )
+					auto pHitEntity = Instance(tr.pHit);
+					if (pHitEntity->BloodColor() != DONT_BLEED)
 					{
-						MESSAGE_BEGIN( MSG_PVS, SVC_TEMPENTITY, EyePosition() );
-						WRITE_BYTE( TE_BLOODSTREAM );
-
-						WRITE_COORD( tr.vecEndPos.x );
-						WRITE_COORD( tr.vecEndPos.y );
-						WRITE_COORD( tr.vecEndPos.z );
-
 						const auto direction = vecSrc - tr.vecEndPos;
-
-						WRITE_COORD( direction.x );
-						WRITE_COORD( direction.y );
-						WRITE_COORD( direction.z );
-
-						if( pHitEntity->BloodColor() == BLOOD_COLOR_RED )
-						{
-							WRITE_BYTE( 70 );
-						}
+						MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, EyePosition());
+							WRITE_BYTE(TE_BLOODSTREAM);
+							WRITE_COORD(tr.vecEndPos.x);
+							WRITE_COORD(tr.vecEndPos.y);
+							WRITE_COORD(tr.vecEndPos.z);
+							WRITE_COORD(direction.x);
+							WRITE_COORD(direction.y);
+							WRITE_COORD(direction.z);
+						if (pHitEntity->BloodColor() == BLOOD_COLOR_RED)
+							WRITE_BYTE(70);
 						else
-						{
-							WRITE_BYTE( pHitEntity->BloodColor() );
-						}
-						
-						WRITE_BYTE( 150 );
+							WRITE_BYTE(pHitEntity->BloodColor());
+							WRITE_BYTE(150);
 						MESSAGE_END();
 					}
 				}
 				break;
-
 			case BULLET_PLAYER_EAGLE:
-				pEntity->TraceAttack( pevAttacker, gSkillData.plrDmgEagle, vecDir, &tr, DMG_BULLET );
+				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgEagle, vecDir, &tr, DMG_BULLET);
 				break;
-				
 			case BULLET_NONE: // FIX 
 				pEntity->TraceAttack(pevAttacker, 50, vecDir, &tr, DMG_CLUB);
 				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 				// only decal glass
-				if ( !FNullEnt(tr.pHit) && VARS(tr.pHit)->rendermode != 0)
-				{
-					UTIL_DecalTrace( &tr, DECAL_GLASSBREAK1 + RANDOM_LONG(0,2) );
-				}
-
+				if (!FNullEnt(tr.pHit) && VARS(tr.pHit)->rendermode != 0)
+					UTIL_DecalTrace(&tr, DECAL_GLASSBREAK1 + RANDOM_LONG(0, 2));
 				break;
 			}
+			
+			iCurrentDamage *= flDamageModifier;
 		}
-		// make bullet trails
-		UTIL_BubbleTrail( vecSrc, tr.vecEndPos, (flDistance * tr.flFraction) / 64.0 );
-	}
-	ApplyMultiDamage(pev, pevAttacker);
+		else
+			iPenetration = 0;
 
-	return Vector( x * vecSpread.x, y * vecSpread.y, 0.0 );
+		UTIL_BubbleTrail(vecSrc, tr.vecEndPos, (flDistance* tr.flFraction) / 64.0);
+
+		ApplyMultiDamage(pev, pevAttacker);
+	}
+
+	return Vector(x * vecSpread.x, y * vecSpread.y, 0.0);
 }
 
 void CBaseEntity :: TraceBleed( float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType )

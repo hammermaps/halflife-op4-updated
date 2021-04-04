@@ -794,6 +794,10 @@ void CHoundeye::RunTask(Task_t* pTask)
 		{
 			pev->skin++;
 		}
+		else
+		{
+			TaskComplete();
+		}
 		break;
 	}
 	case TASK_HOUND_HOP_BACK:
@@ -959,6 +963,7 @@ Task_t	tlHoundSleep[] =
 	{ TASK_HOUND_FALL_ASLEEP,	(float)0				},
 	{ TASK_WAIT_RANDOM,			(float)25				},
 	{ TASK_HOUND_CLOSE_EYE,		(float)0				},
+	{ TASK_WAIT_INDEFINITE,		(float)0				},
 	//{ TASK_WAIT,				(float)10				},
 	//{ TASK_WAIT_RANDOM,			(float)10				},
 };

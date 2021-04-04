@@ -113,6 +113,15 @@
 #define EF_SNIPERLASER			512 // sniper laser effect
 #define EF_FIBERCAMERA			1024// fiber camera
 
+// constant items
+enum ItemIds
+{
+	ITEM_HEALTHKIT,
+	ITEM_ANTIDOTE,
+	ITEM_SECURITY,
+	ITEM_BATTERY,
+	ITEM_SUIT = 31,
+};
 
 // entity flags
 #define EFLAG_SLERP				1	// do studio interpolation of this entity

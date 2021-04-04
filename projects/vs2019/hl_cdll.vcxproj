@@ -193,6 +193,7 @@
     <ClCompile Include="..\..\dlls\tripmine.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CDisplacer.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CEagle.cpp" />
+    <ClCompile Include="..\..\dlls\weapons\CGlock.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CGrapple.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CGrappleTip.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CKnife.cpp" />
@@ -203,7 +204,6 @@
     <ClCompile Include="..\..\dlls\weapons\CSniperRifle.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CSporeLauncher.cpp" />
     <ClCompile Include="..\..\dlls\weapons_shared.cpp" />
-    <ClCompile Include="..\..\dlls\wpn_shared\hl_wpn_glock.cpp" />
     <ClCompile Include="..\..\game_shared\vgui_checkbutton2.cpp" />
     <ClCompile Include="..\..\game_shared\vgui_grid.cpp" />
     <ClCompile Include="..\..\game_shared\vgui_helpers.cpp" />

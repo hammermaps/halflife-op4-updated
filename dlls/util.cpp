@@ -2946,3 +2946,45 @@ bool UTIL_IsCTF()
 {
 	return g_pGameRules->IsCTF();
 }
+
+char UTIL_TextureHit(TraceResult* ptr, Vector vecSrc, Vector vecEnd)
+{
+	char chTextureType;
+	float rgfl1[3];
+	float rgfl2[3];
+	const char* pTextureName;
+	char szbuffer[64];
+	CBaseEntity* pEntity = CBaseEntity::Instance(ptr->pHit);
+
+#ifdef REGAMEDLL_FIXES
+	if (pEntity && pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE && pEntity->Classify() != CLASS_VEHICLE)
+#else
+	if (pEntity && pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
+#endif
+		return CHAR_TEX_FLESH;
+
+	vecSrc.CopyToArray(rgfl1);
+	vecEnd.CopyToArray(rgfl2);
+
+	if (pEntity)
+		pTextureName = TRACE_TEXTURE(ENT(pEntity->pev), rgfl1, rgfl2);
+	else
+		pTextureName = TRACE_TEXTURE(ENT(0), rgfl1, rgfl2);
+
+	if (pTextureName)
+	{
+		if (*pTextureName == '-' || *pTextureName == '+')
+			pTextureName += 2;
+
+		if (*pTextureName == '{' || *pTextureName == '!' || *pTextureName == '~' || *pTextureName == ' ')
+			pTextureName++;
+
+		strcpy(szbuffer, pTextureName);
+		szbuffer[16] = '\0';
+		chTextureType = TEXTURETYPE_Find(szbuffer);
+	}
+	else
+		chTextureType = '\0';
+
+	return chTextureType;
+}

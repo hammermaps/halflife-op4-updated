@@ -50,7 +50,7 @@ bool CItemPortableHEVCTF::MyTouch(CBasePlayer* pPlayer)
 
 		if (static_cast<int>(team_no) <= 0 || team_no == pPlayer->m_iTeamNum)
 		{
-			if (pPlayer->pev->weapons & (1 << WEAPON_SUIT))
+			if (pPlayer->pev->weapons & (1 << ITEM_SUIT))
 			{
 				pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::PortableHEV);
 				pPlayer->m_fPlayingAChargeSound = false;

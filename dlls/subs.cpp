@@ -265,6 +265,7 @@ void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* p
 
 	if (!targetName)
 		return;
+	
 	if (useType == USE_NOT)
 		return;
 
@@ -280,9 +281,11 @@ void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* p
 		useType = USE_OFF;
 	}
 
-	ALERT(at_aiconsole, "Firing: (%s)\n", targetName);
-
 	pTarget = UTIL_FindEntityByTargetname(pTarget, targetName, pActivator);
+
+	if (pTarget)
+		ALERT(at_aiconsole, "Firing: (%s)\n", targetName);
+	
 	if (!pTarget)
 	{
 		// it's not an entity name; check for a locus specifier, e.g: "fadein(mywall)"

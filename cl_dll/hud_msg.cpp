@@ -28,10 +28,9 @@
 extern IParticleMan *g_pParticleMan;
 
 //LRC - the fogging fog
-float g_fFogColor[3];
+Vector FogColor;
 float g_fStartDist;
 float g_fEndDist;
-//int g_iFinalStartDist; //for fading
 int g_iFinalEndDist;   //for fading
 float g_fFadeDuration; //negative = fading out
 
@@ -114,36 +113,33 @@ void CHud :: MsgFunc_InitHUD( const char *pszName, int iSize, void *pbuf )
 }
 
 //LRC
-void CHud::MsgFunc_SetFog(const char* pszName, int iSize, void* pbuf)
+int CHud::MsgFunc_SetFog(const char* pszName, int iSize, void* pbuf)
 {
-	//	CONPRINT("MSG:SetFog");
+	//CONPRINT("MSG:SetFog");
 	BEGIN_READ(pbuf, iSize);
+	FogColor.x = TransformColor(READ_BYTE());
+	FogColor.y = TransformColor(READ_BYTE());
+	FogColor.z = TransformColor(READ_BYTE());
 
-	for (int i = 0; i < 3; i++)
-		g_fFogColor[i] = READ_BYTE();
-
+	//CONPRINT("fog color %f, %f, %f\n", FogColor.x, FogColor.y, FogColor.z );
 	g_fFadeDuration = READ_SHORT();
 	g_fStartDist = READ_SHORT();
 
 	if (g_fFadeDuration > 0)
 	{
-		//		// fading in
-		//		g_fStartDist = READ_SHORT();
 		g_iFinalEndDist = READ_SHORT();
-		//		g_fStartDist = FOG_LIMIT;
 		g_fEndDist = FOG_LIMIT;
 	}
 	else if (g_fFadeDuration < 0)
 	{
-		//		// fading out
-		//		g_iFinalStartDist = 
 		g_iFinalEndDist = g_fEndDist = READ_SHORT();
 	}
 	else
 	{
-		//		g_fStartDist = READ_SHORT();
 		g_fEndDist = READ_SHORT();
 	}
+
+	return 1;
 }
 
 //LRC
