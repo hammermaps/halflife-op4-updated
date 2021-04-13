@@ -343,7 +343,7 @@ void CTurret::Precache()
 	else
 		PrecacheModel("models/turret.mdl");
 	
-	PRECACHE_MODEL (TURRET_GLOW_SPRITE);
+	PrecacheModel(TURRET_GLOW_SPRITE);
 }
 
 void CMiniTurret::Spawn()

@@ -85,7 +85,7 @@ void COFGonomeGuts::Spawn()
 	pev->rendermode = kRenderTransAlpha;
 	pev->renderamt = 255;
 
-	SET_MODEL(edict(), "sprites/bigspit.spr");
+	SetModel("sprites/bigspit.spr");
 	pev->rendercolor.x = 128;
 	pev->rendercolor.x = 32;
 	pev->rendercolor.x = 128;
@@ -909,7 +909,7 @@ LINK_ENTITY_TO_CLASS( monster_gonome_dead, CDeadGonome );
 void CDeadGonome::Spawn()
 {
 	PrecacheModel( "models/gonome.mdl" );
-	SET_MODEL( ENT( pev ), "models/gonome.mdl" );
+	SetModel( "models/gonome.mdl" );
 
 	pev->effects = 0;
 	pev->sequence = 0;

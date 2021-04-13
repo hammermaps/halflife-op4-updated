@@ -1048,7 +1048,7 @@ void CMOFAssassin :: Precache()
 	else
 		m_voicePitch = 100;
 
-	m_iBrassShell = PRECACHE_MODEL ("models/shell.mdl");// brass shell
+	m_iBrassShell = PrecacheModel("models/shell.mdl");// brass shell
 }	
 
 //=========================================================

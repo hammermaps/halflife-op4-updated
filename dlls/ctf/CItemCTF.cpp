@@ -69,7 +69,7 @@ void CItemCTF::Spawn()
 
 	if( !FStringNull( pev->model ) )
 	{
-		SET_MODEL( edict(), STRING( pev->model ) );
+		SetModel();
 
 		pev->sequence = LookupSequence( "idle" );
 

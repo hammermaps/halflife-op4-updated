@@ -121,10 +121,7 @@ void COFBlackOpsApache :: Spawn()
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel( "models/blkop_apache.mdl");
+	SetModel( "models/blkop_apache.mdl");
 	
 	UTIL_SetSize( pev, Vector( -32, -32, -64 ), Vector( 32, 32, 0 ) );
 	UTIL_SetOrigin( this, pev->origin );
@@ -368,7 +365,7 @@ void COFBlackOpsApache :: DyingThink()
 		if (/*!(pev->spawnflags & SF_NOWRECKAGE) && */(pev->flags & FL_ONGROUND))
 		{
 			CBaseEntity *pWreckage = Create( "cycler_wreckage", pev->origin, pev->angles );
-			// SET_MODEL( ENT(pWreckage->pev), STRING(pev->model) );
+			// pWreckage->SetModel();
 			UTIL_SetSize( pWreckage->pev, Vector( -200, -200, -128 ), Vector( 200, 200, -32 ) );
 			pWreckage->pev->frame = pev->frame;
 			pWreckage->pev->sequence = pev->sequence;

@@ -52,7 +52,7 @@ LINK_ENTITY_TO_CLASS( monster_skeleton_dead, COFSkeleton );
 void COFSkeleton::Spawn()
 {
 	PrecacheModel( "models/skeleton.mdl" );
-	SET_MODEL( ENT( pev ), "models/skeleton.mdl" );
+	SetModel( "models/skeleton.mdl" );
 
 	pev->effects = 0;
 	pev->yaw_speed = 8;

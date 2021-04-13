@@ -676,10 +676,7 @@ void CBigMomma :: Spawn()
 {
 	Precache( );
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel("models/big_mom.mdl");
+	SetModel("models/big_mom.mdl");
 	
 	UTIL_SetSize( pev, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
 

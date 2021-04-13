@@ -74,7 +74,7 @@ void CGrapple::Spawn()
 
 	m_iId = WEAPON_GRAPPLE;
 
-	SET_MODEL( edict(), "models/w_bgrap.mdl" );
+	SetModel( "models/w_bgrap.mdl" );
 
 	m_iClip = WEAPON_NOCLIP;
 

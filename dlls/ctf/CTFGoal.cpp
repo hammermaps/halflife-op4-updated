@@ -60,8 +60,9 @@ void CTFGoal::Spawn()
         if (*modelName == '*')
             pev->effects |= EF_NODRAW;
 
-        g_engfuncs.pfnPrecacheModel((char*)modelName);
-        g_engfuncs.pfnSetModel(edict(), STRING(pev->model));
+        PrecacheModel(modelName);
+    	
+        PrecacheModel(pev->model);
     }
 
     pev->solid = SOLID_TRIGGER;

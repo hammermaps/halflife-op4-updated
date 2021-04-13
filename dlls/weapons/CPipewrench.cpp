@@ -44,7 +44,7 @@ void CPipewrench::Spawn()
 	pev->classname = MAKE_STRING( "weapon_pipewrench" );
 	Precache();
 	m_iId = WEAPON_PIPEWRENCH;
-	SET_MODEL( edict(), "models/w_pipe_wrench.mdl");
+	SetModel( "models/w_pipe_wrench.mdl");
 	m_iClip = WEAPON_NOCLIP;
 	m_iSwingMode = SWING_NONE;
 

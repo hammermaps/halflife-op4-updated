@@ -53,7 +53,7 @@ void CShower::Spawn()
 	pev->gravity = 0.5;
 	SetNextThink(0.1);
 	pev->solid = SOLID_NOT;
-	SET_MODEL( edict(), "models/grenade.mdl");	// Need a model, just use the grenade, we don't draw it anyway
+	SetModel( "models/grenade.mdl");	// Need a model, just use the grenade, we don't draw it anyway
 	UTIL_SetSize(pev, g_vecZero, g_vecZero );
 	pev->effects |= EF_NODRAW;
 	pev->speed = RANDOM_FLOAT( 0.5, 1.5 );

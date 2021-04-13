@@ -59,7 +59,7 @@ void CSporeLauncher::Spawn()
 
 	m_iId = WEAPON_SPORELAUNCHER;
 
-	SET_MODEL( edict(), "models/w_spore_launcher.mdl" );
+	SetModel( "models/w_spore_launcher.mdl" );
 
 	m_iDefaultAmmo = SPORELAUNCHER_DEFAULT_GIVE;
 
@@ -384,7 +384,11 @@ public:
 
 	void Precache() override
 	{
-		PrecacheModel( "models/spore_ammo.mdl" );
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel( "models/spore_ammo.mdl" );
+		
 		PrecacheSound( "weapons/spore_ammo.wav" );
 	}
 
@@ -392,7 +396,7 @@ public:
 	{
 		Precache();
 
-		SET_MODEL( edict(), "models/spore_ammo.mdl" );
+		SetModel( "models/spore_ammo.mdl" );
 
 		pev->movetype = MOVETYPE_FLY;
 

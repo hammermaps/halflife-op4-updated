@@ -334,7 +334,7 @@ void CBaseDoor::Spawn( )
 	}
 
 	pev->movetype	= MOVETYPE_PUSH;
-	SET_MODEL( ENT(pev), STRING(pev->model) );
+	SetModel();
 	UTIL_SetOrigin(this, pev->origin);
 	
 	if (pev->speed == 0)

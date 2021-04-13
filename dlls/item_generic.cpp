@@ -72,8 +72,7 @@ void CGenericItem::Spawn()
 	pev->frame = 0;
 
 	Precache();
-
-	SET_MODEL( edict(), STRING( pev->model ) );
+	SetModel();
 
 	if( m_iSequence )
 	{

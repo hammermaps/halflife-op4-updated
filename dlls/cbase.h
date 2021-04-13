@@ -354,18 +354,41 @@ public:
 	virtual const char* TeamID() { return ""; }
 
 	/**
+	*	Sets the model.
+	*	@param pszModelName Name of the model.
+	*/
+	void SetModel(edict_t* pev, const char* const pszModelName);
+
+	/**
 *	Sets the model.
 *	@param pszModelName Name of the model.
 */
-	void SetModel(const char* const pszModelName);
-
+	void SetModel(const char* const pszModelName)
+	{
+		if (pev->model)
+			SetModel(edict(), STRING(pev->model)); //LRC
+		else
+			SetModel(edict(), pszModelName);
+	}
+	
 	/**
 	*	Sets the model.
 	*	@param iszModelName Name of the model.
 	*/
 	void SetModel(const string_t iszModelName)
 	{
-		SetModel(STRING(iszModelName));
+		SetModel(edict(),STRING(iszModelName));
+	}
+
+	/**
+	*	Sets the model.
+	*/
+	void SetModel()
+	{
+		if (pev->model)
+			SetModel(edict(), STRING(pev->model)); //LRC
+		else
+			SetModel(edict(), "models/error.mdl"); //LRC
 	}
 
 	/**

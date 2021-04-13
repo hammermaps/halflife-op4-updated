@@ -453,11 +453,8 @@ int	CBarney::Classify()
 void CBarney :: Spawn()
 {
 	Precache( );
-
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel("models/barney.mdl");
+	
+	SetModel("models/barney.mdl");
 	
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 

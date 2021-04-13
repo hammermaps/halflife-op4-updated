@@ -463,10 +463,7 @@ void COFBabyVoltigore :: Spawn()
 {
 	Precache( );
 	
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel("models/baby_voltigore.mdl");
+	SetModel("models/baby_voltigore.mdl");
 	
 	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 32));
 

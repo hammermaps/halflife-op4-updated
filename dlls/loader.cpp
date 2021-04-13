@@ -65,10 +65,7 @@ void COFLoader::Spawn()
 {
 	Precache();
 
-	if (pev->model)
-		SET_MODEL(edict(), STRING(pev->model)); //LRC
-	else
-		SET_MODEL(edict(), "models/loader.mdl");
+	SetModel("models/loader.mdl");
 
 	if (FStrEq(STRING(pev->model), "models/player.mdl")
 		|| FStrEq(STRING(pev->model), "models/holo.mdl"))

@@ -34,13 +34,13 @@ LINK_WEAPON_TO_CLASS(weapon_penguin, CPenguin);
 
 void CPenguin::Precache()
 {
-	g_engfuncs.pfnPrecacheModel("models/w_penguinnest.mdl");
-	g_engfuncs.pfnPrecacheModel("models/v_penguin.mdl");
-	g_engfuncs.pfnPrecacheModel("models/p_penguin.mdl");
-	g_engfuncs.pfnPrecacheSound("squeek/sqk_hunt2.wav");
-	g_engfuncs.pfnPrecacheSound("squeek/sqk_hunt3.wav");
+	PrecacheModel("models/w_penguinnest.mdl");
+	PrecacheModel("models/v_penguin.mdl");
+	PrecacheModel("models/p_penguin.mdl");
+	PrecacheSound("squeek/sqk_hunt2.wav");
+	PrecacheSound("squeek/sqk_hunt3.wav");
 	UTIL_PrecacheOther("monster_penguin");
-	m_usPenguinFire = g_engfuncs.pfnPrecacheEvent(1, "events/penguinfire.sc");
+	m_usPenguinFire = PrecacheEvent("events/penguinfire.sc");
 }
 
 void CPenguin::Spawn()
@@ -48,7 +48,7 @@ void CPenguin::Spawn()
 	Precache();
 
 	m_iId = WEAPON_PENGUIN;
-	g_engfuncs.pfnSetModel(edict(), "models/w_penguinnest.mdl");
+	SetModel("models/w_penguinnest.mdl");
 	FallInit();
 
 	m_iDefaultAmmo = PENGUIN_MAX_CLIP;

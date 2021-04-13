@@ -65,7 +65,7 @@ void CM249::Spawn()
 
 	m_iId = WEAPON_M249;
 
-	SET_MODEL( edict(), "models/w_saw.mdl" );
+	SetModel( "models/w_saw.mdl" );
 
 	m_iDefaultAmmo = M249_DEFAULT_GIVE;
 
@@ -378,7 +378,7 @@ public:
 	{
 		Precache();
 
-		SET_MODEL( edict(), "models/w_saw_clip.mdl" );
+		SetModel( "models/w_saw_clip.mdl" );
 
 		BaseClass::Spawn();
 	}

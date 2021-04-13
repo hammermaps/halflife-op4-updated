@@ -1009,7 +1009,7 @@ void CPushable :: Spawn()
 
 	pev->movetype	= MOVETYPE_PUSHSTEP;
 	pev->solid		= SOLID_BBOX;
-	SET_MODEL( ENT(pev), STRING(pev->model) );
+	SetModel();
 
 //	UTIL_SetSize( pev, vecMins, vecMaxs );
 

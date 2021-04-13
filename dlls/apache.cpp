@@ -120,10 +120,7 @@ void CApache :: Spawn()
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel("models/apache.mdl");
+	SetModel("models/apache.mdl");
 	
 	UTIL_SetSize( pev, Vector( -32, -32, -64 ), Vector( 32, 32, 0 ) );
 	UTIL_SetOrigin( this, pev->origin );

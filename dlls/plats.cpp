@@ -1815,8 +1815,8 @@ void CSpriteTrain::Spawn()
 	pev->movetype = MOVETYPE_PUSH;
 
 	pev->solid = SOLID_NOT;
-
-	SET_MODEL( ENT( pev ), STRING( pev->model ) );
+	
+	SetModel();
 	UTIL_SetSize( pev, pev->mins, pev->maxs );
 	UTIL_SetOrigin( this, pev->origin );
 
@@ -2812,7 +2812,7 @@ void CFuncTrainControls :: Spawn()
 {
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_NONE;
-	SET_MODEL( ENT(pev), STRING(pev->model) );
+	SetModel();
 
 	UTIL_SetSize( pev, pev->mins, pev->maxs );
 	UTIL_SetOrigin( this, pev->origin );

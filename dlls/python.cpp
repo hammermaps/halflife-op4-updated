@@ -282,7 +282,11 @@ class CPythonAmmo : public CBasePlayerAmmo
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_357ammobox.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_357ammobox.mdl");
+		
 		PrecacheSound("items/9mmclip1.wav");
 	}
 	BOOL AddAmmo( CBaseEntity *pOther ) override

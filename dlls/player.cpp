@@ -177,7 +177,7 @@ static void ThrowGib(entvars_t *pev, char *szGibModel, float flDamage)
 	entvars_t *pevNew = VARS(pentNew);
 
 	pevNew->origin = pev->origin;
-	SET_MODEL(ENT(pevNew), szGibModel);
+	SetModel(ENT(pevNew), szGibModel);
 	UTIL_SetSize(pevNew, g_vecZero, g_vecZero);
 
 	pevNew->velocity		= VecVelocityForDamage(flDamage);

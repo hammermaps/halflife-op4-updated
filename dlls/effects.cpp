@@ -2357,7 +2357,7 @@ CBaseEntity* CEnvShooter::CreateGib(Vector vecPos, Vector vecVel)
 	pShot->pev->solid = SOLID_SLIDEBOX;
 	pShot->pev->origin = vecPos;
 	pShot->pev->velocity = vecVel;
-	SET_MODEL(ENT(pShot->pev), STRING(pev->model));
+	pShot->SetModel();
 	UTIL_SetSize(pShot->pev, -m_vecSize, m_vecSize);
 	pShot->pev->renderamt = pev->renderamt;
 	pShot->pev->rendermode = pev->rendermode;
@@ -4544,7 +4544,7 @@ void CParticle::Spawn()
 	Precache();
 
 	UTIL_SetOrigin(this, pev->origin);
-	SET_MODEL(edict(), "sprites/null.spr");
+	SetModel( "sprites/null.spr");
 }
 
 

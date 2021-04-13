@@ -131,7 +131,7 @@ void COFChargedBolt::Spawn()
 
 	pev->gravity = 0.5;
 
-	SET_MODEL( edict(), "sprites/blueflare2.spr" );
+	SetModel( "sprites/blueflare2.spr" );
 
 	UTIL_SetOrigin( this, pev->origin );
 

@@ -104,10 +104,7 @@ void CBarnacle :: Spawn()
 {
 	Precache( );
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel("models/barnacle.mdl");
+	SetModel("models/barnacle.mdl");
 	
 	UTIL_SetSize( pev, Vector(-16, -16, -32), Vector(16, 16, 0) );
 

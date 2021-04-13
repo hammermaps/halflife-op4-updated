@@ -29,8 +29,12 @@ LINK_ENTITY_TO_CLASS(item_ctfbackpack, CItemBackpackCTF);
 
 void CItemBackpackCTF::Precache()
 {
-	g_engfuncs.pfnPrecacheModel("models/w_backpack.mdl");
-	g_engfuncs.pfnPrecacheSound("ctf/pow_backpack.wav");
+	if (pev->model)
+		PrecacheModel((char*)STRING(pev->model)); //LRC
+	else
+		PrecacheModel("models/w_backpack.mdl");
+	
+	PrecacheSound("ctf/pow_backpack.wav");
 }
 
 void CItemBackpackCTF::RemoveEffect(CBasePlayer* pPlayer)
@@ -81,17 +85,15 @@ bool CItemBackpackCTF::MyTouch(CBasePlayer* pPlayer)
 
 void CItemBackpackCTF::Spawn()
 {
-	//TODO: precache calls should be in Precache
 	if (pev->model)
-		g_engfuncs.pfnPrecacheModel((char*)STRING(pev->model));
+		PrecacheModel((char*)STRING(pev->model));
 
-	g_engfuncs.pfnPrecacheSound("ctf/itemthrow.wav");
-	g_engfuncs.pfnPrecacheSound("items/ammopickup1.wav");
+	PrecacheSound("ctf/itemthrow.wav");
+	PrecacheSound("items/ammopickup1.wav");
 
 	Precache();
-
-	//TODO: shouldn't this be using pev->model?
-	g_engfuncs.pfnSetModel(edict(), "models/w_backpack.mdl");
+	
+	SetModel("models/w_backpack.mdl");
 
 	pev->spawnflags |= SF_NORESPAWN;
 	pev->oldorigin = pev->origin;

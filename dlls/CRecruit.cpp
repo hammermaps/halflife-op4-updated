@@ -20,21 +20,9 @@
 #include	"talkmonster.h"
 #include	"schedule.h"
 #include	"defaultai.h"
-#include	"scripted.h"
-#include	"weapons.h"
 #include	"soundent.h"
 
-//=========================================================
-// Monster's Anim Events Go Here
-//=========================================================
-// first flag is barney dying for scripted sequences?
-#define		BARNEY_AE_DRAW		( 2 )
-#define		BARNEY_AE_SHOOT		( 3 )
-#define		BARNEY_AE_HOLSTER	( 4 )
-
-#define	BARNEY_BODY_GUNHOLSTERED	0
-#define	BARNEY_BODY_GUNDRAWN		1
-#define BARNEY_BODY_GUNGONE			2
+#define	BARNEY_AE_DRAW		( 2 )
 
 /**
 *	@brief A copy of Barney that speaks military
@@ -46,17 +34,11 @@ public:
 	int		Restore( CRestore &restore ) override;
 	static	TYPEDESCRIPTION m_SaveData[];
 
-	CUSTOM_SCHEDULES;
-
 	int ISoundMask() override;
 
 	int Classify() override;
 
 	void SetYawSpeed() override;
-
-	void DeclineFollowing() override;
-
-	MONSTERSTATE GetIdealState() override;
 
 	Schedule_t* GetSchedule() override;
 
@@ -72,8 +54,6 @@ public:
 
 	void AlertSound() override;
 
-	Schedule_t* GetScheduleOfType( int Type ) override;
-
 	void RunTask( Task_t *pTask ) override;
 
 	void PainSound() override;
@@ -83,12 +63,6 @@ public:
 	int TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType ) override;
 
 	void Precache() override;
-
-	void BarneyFirePistol();
-
-	void HandleAnimEvent( MonsterEvent_t *pEvent ) override;
-
-	void TalkInit();
 
 	int ObjectCaps() override;
 
@@ -113,120 +87,6 @@ TYPEDESCRIPTION	CRecruit::m_SaveData[] =
 
 IMPLEMENT_SAVERESTORE( CRecruit, CTalkMonster );
 
-//=========================================================
-// AI Schedules Specific to this monster
-//=========================================================
-Task_t	tlRcFollow[] =
-{
-	{ TASK_MOVE_TO_TARGET_RANGE,( float ) 128		},	// Move within 128 of target ent (client)
-	{ TASK_SET_SCHEDULE,		( float ) SCHED_TARGET_FACE },
-};
-
-Schedule_t	slRcFollow[] =
-{
-	{
-		tlRcFollow,
-		ARRAYSIZE( tlRcFollow ),
-		bits_COND_NEW_ENEMY |
-		bits_COND_LIGHT_DAMAGE |
-		bits_COND_HEAVY_DAMAGE |
-		bits_COND_HEAR_SOUND |
-		bits_COND_PROVOKED,
-		bits_SOUND_DANGER,
-		"Follow"
-	},
-};
-
-//=========================================================
-// BarneyDraw- much better looking draw schedule for when
-// barney knows who he's gonna attack.
-//=========================================================
-Task_t	tlRcrneyEnemyDraw[] =
-{
-	{ TASK_STOP_MOVING,					0				},
-	{ TASK_FACE_ENEMY,					0				},
-	{ TASK_PLAY_SEQUENCE_FACE_ENEMY,	( float ) ACT_ARM },
-};
-
-Schedule_t slRcrneyEnemyDraw[] =
-{
-	{
-		tlRcrneyEnemyDraw,
-		ARRAYSIZE( tlRcrneyEnemyDraw ),
-		0,
-		0,
-		"Barney Enemy Draw"
-	}
-};
-
-Task_t	tlRcFaceTarget[] =
-{
-	{ TASK_SET_ACTIVITY,		( float ) ACT_IDLE },
-	{ TASK_FACE_TARGET,			( float ) 0		},
-	{ TASK_SET_ACTIVITY,		( float ) ACT_IDLE },
-	{ TASK_SET_SCHEDULE,		( float ) SCHED_TARGET_CHASE },
-};
-
-Schedule_t	slRcFaceTarget[] =
-{
-	{
-		tlRcFaceTarget,
-		ARRAYSIZE( tlRcFaceTarget ),
-		bits_COND_CLIENT_PUSH |
-		bits_COND_NEW_ENEMY |
-		bits_COND_LIGHT_DAMAGE |
-		bits_COND_HEAVY_DAMAGE |
-		bits_COND_HEAR_SOUND |
-		bits_COND_PROVOKED,
-		bits_SOUND_DANGER,
-		"FaceTarget"
-	},
-};
-
-
-Task_t	tlIdleRcStand[] =
-{
-	{ TASK_STOP_MOVING,			0				},
-	{ TASK_SET_ACTIVITY,		( float ) ACT_IDLE },
-	{ TASK_WAIT,				( float ) 2		}, // repick IDLESTAND every two seconds.
-	{ TASK_TLK_HEADRESET,		( float ) 0		}, // reset head position
-};
-
-Schedule_t	slIdleRcStand[] =
-{
-	{
-		tlIdleRcStand,
-		ARRAYSIZE( tlIdleRcStand ),
-		bits_COND_NEW_ENEMY |
-		bits_COND_LIGHT_DAMAGE |
-		bits_COND_HEAVY_DAMAGE |
-		bits_COND_HEAR_SOUND |
-		bits_COND_SMELL |
-		bits_COND_PROVOKED,
-
-		bits_SOUND_COMBAT |// sound flags - change these, and you'll break the talking code.
-		//bits_SOUND_PLAYER		|
-		//bits_SOUND_WORLD		|
-
-		bits_SOUND_DANGER |
-		bits_SOUND_MEAT |// scents
-		bits_SOUND_CARCASS |
-		bits_SOUND_GARBAGE,
-		"IdleStand"
-	},
-};
-
-DEFINE_CUSTOM_SCHEDULES( CRecruit )
-{
-	slRcFollow,
-		slRcrneyEnemyDraw,
-		slRcFaceTarget,
-		slIdleRcStand,
-};
-
-
-IMPLEMENT_CUSTOM_SCHEDULES( CRecruit, CTalkMonster );
-
 int CRecruit::ISoundMask()
 {
 	return bits_SOUND_WORLD |
@@ -234,8 +94,7 @@ int CRecruit::ISoundMask()
 		bits_SOUND_CARCASS |
 		bits_SOUND_MEAT |
 		bits_SOUND_GARBAGE |
-		bits_SOUND_DANGER |
-		bits_SOUND_PLAYER;
+		bits_SOUND_DANGER;
 }
 
 int CRecruit::Classify()
@@ -251,16 +110,6 @@ void CRecruit::SetYawSpeed()
 		speed = 70;
 
 	pev->yaw_speed = speed;
-}
-
-void CRecruit::DeclineFollowing()
-{
-	PlaySentence("RC_POK", 2, VOL_NORM, ATTN_NORM );
-}
-
-MONSTERSTATE CRecruit::GetIdealState()
-{
-	return CBaseMonster::GetIdealState();
 }
 
 Schedule_t* CRecruit::GetSchedule()
@@ -391,10 +240,7 @@ void CRecruit::Spawn()
 {
 	Precache();
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SET_MODEL( ENT( pev ), "models/recruit.mdl" );
+	SetModel("models/recruit.mdl" );
 	
 	UTIL_SetSize( pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 
@@ -432,51 +278,6 @@ void CRecruit::AlertSound()
 			PlaySentence( "RC_ATTACK", RANDOM_FLOAT( 2.8, 3.2 ), VOL_NORM, ATTN_IDLE );
 		}
 	}
-}
-
-Schedule_t* CRecruit::GetScheduleOfType( int Type )
-{
-	Schedule_t *psched;
-
-	switch( Type )
-	{
-	case SCHED_ARM_WEAPON:
-		if( m_hEnemy != NULL )
-		{
-			// face enemy, then draw.
-			return slRcrneyEnemyDraw;
-		}
-		break;
-
-		// Hook these to make a looping schedule
-	case SCHED_TARGET_FACE:
-		// call base class default so that barney will talk
-		// when 'used' 
-		psched = CTalkMonster::GetScheduleOfType( Type );
-
-		if( psched == slIdleStand )
-			return slRcFaceTarget;	// override this for different target face behavior
-		else
-			return psched;
-
-	case SCHED_TARGET_CHASE:
-		return slRcFollow;
-
-	case SCHED_IDLE_STAND:
-		// call base class default so that scientist will talk
-		// when standing during idle
-		psched = CTalkMonster::GetScheduleOfType( Type );
-
-		if( psched == slIdleStand )
-		{
-			// just look straight ahead.
-			return slIdleRcStand;
-		}
-		else
-			return psched;
-	}
-
-	return CTalkMonster::GetScheduleOfType( Type );
 }
 
 void CRecruit::RunTask( Task_t *pTask )
@@ -594,95 +395,6 @@ void CRecruit::Precache()
 	// when a level is loaded, nobody will talk (time is reset to 0)
 	TalkInit();
 	CTalkMonster::Precache();
-}
-
-void CRecruit::BarneyFirePistol()
-{
-	Vector vecShootOrigin;
-
-	UTIL_MakeVectors( pev->angles );
-	vecShootOrigin = pev->origin + Vector( 0, 0, 55 );
-	Vector vecShootDir = ShootAtEnemy( vecShootOrigin );
-
-	Vector angDir = UTIL_VecToAngles( vecShootDir );
-	SetBlending( 0, angDir.x );
-	pev->effects = EF_MUZZLEFLASH;
-
-	FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_2DEGREES, 1024, BULLET_MONSTER_9MM );
-
-	int pitchShift = RANDOM_LONG( 0, 20 );
-
-	// Only shift about half the time
-	if( pitchShift > 10 )
-		pitchShift = 0;
-	else
-		pitchShift -= 5;
-	EMIT_SOUND_DYN( ENT( pev ), CHAN_WEAPON, "barney/ba_attack2.wav", 1, ATTN_NORM, 0, 100 + pitchShift );
-
-	CSoundEnt::InsertSound( bits_SOUND_COMBAT, pev->origin, 384, 0.3 );
-
-	// UNDONE: Reload?
-	m_cAmmoLoaded--;// take away a bullet!
-}
-
-void CRecruit::HandleAnimEvent( MonsterEvent_t *pEvent )
-{
-	switch( pEvent->event )
-	{
-	case BARNEY_AE_SHOOT:
-		BarneyFirePistol();
-		break;
-
-	case BARNEY_AE_DRAW:
-		// barney's bodygroup switches here so he can pull gun from holster
-		pev->body = BARNEY_BODY_GUNDRAWN;
-		m_fGunDrawn = TRUE;
-		break;
-
-	case BARNEY_AE_HOLSTER:
-		// change bodygroup to replace gun in holster
-		pev->body = BARNEY_BODY_GUNHOLSTERED;
-		m_fGunDrawn = FALSE;
-		break;
-
-	default:
-		CTalkMonster::HandleAnimEvent( pEvent );
-	}
-}
-
-void CRecruit::TalkInit()
-{
-
-	CTalkMonster::TalkInit();
-
-	// scientists speach group names (group names are in sentences.txt)
-
-	m_szGrp[ TLK_ANSWER ] = "RC_ANSWER";
-	m_szGrp[ TLK_QUESTION ] = "RC_QUESTION";
-	m_szGrp[ TLK_IDLE ] = "RC_IDLE";
-	m_szGrp[ TLK_STARE ] = "RC_STARE";
-	m_szGrp[ TLK_USE ] = "RC_OK";
-	m_szGrp[ TLK_UNUSE ] = "RC_WAIT";
-	m_szGrp[ TLK_STOP ] = "RC_STOP";
-
-	m_szGrp[ TLK_NOSHOOT ] = "RC_SCARED";
-	m_szGrp[ TLK_HELLO ] = "RC_HELLO";
-
-	m_szGrp[ TLK_PLHURT1 ] = "!RC_CUREA";
-	m_szGrp[ TLK_PLHURT2 ] = "!RC_CUREB";
-	m_szGrp[ TLK_PLHURT3 ] = "!RC_CUREC";
-
-	m_szGrp[ TLK_PHELLO ] = NULL;	//"BA_PHELLO";		// UNDONE
-	m_szGrp[ TLK_PIDLE ] = NULL;	//"BA_PIDLE";			// UNDONE
-	m_szGrp[ TLK_PQUESTION ] = "RC_PQUEST";		// UNDONE
-
-	m_szGrp[ TLK_SMELL ] = "RC_SMELL";
-
-	m_szGrp[ TLK_WOUND ] = "RC_WOUND";
-	m_szGrp[ TLK_MORTAL ] = "RC_MORTAL";
-
-	// get voice for head - just one barney voice for now
-	m_voicePitch = 100;
 }
 
 int CRecruit::ObjectCaps()

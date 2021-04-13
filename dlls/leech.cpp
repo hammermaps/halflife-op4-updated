@@ -297,7 +297,6 @@ void CLeech::AlertSound()
 
 void CLeech::Precache()
 {
-	//PRECACHE_MODEL("models/icky.mdl");
 	if (pev->model)
 		PrecacheModel((char*)STRING(pev->model)); //LRC
 	else

@@ -68,7 +68,7 @@ void CShockRifle::Spawn()
 
 	Precache();
 
-	SET_MODEL( edict(), "models/w_shock_rifle.mdl" );
+	SetModel( "models/w_shock_rifle.mdl" );
 
 	m_iDefaultAmmo = SHOCKRIFLE_DEFAULT_GIVE;
 
@@ -259,7 +259,7 @@ void CShockRifle::PrimaryAttack()
 
 void CShockRifle::SecondaryAttack()
 {
-	//Nothing
+	
 }
 
 void CShockRifle::Reload()

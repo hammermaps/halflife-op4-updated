@@ -393,10 +393,7 @@ void CDrillSergeant::Spawn()
 {
 	Precache();
 	
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SET_MODEL( ENT( pev ), "models/drill.mdl" );
+	SetModel( "models/drill.mdl" );
 	
 	UTIL_SetSize( pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 

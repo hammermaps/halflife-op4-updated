@@ -69,7 +69,7 @@ void CBaseEntity::AbsoluteNextThink(float time, BOOL correctSpeed)
 void CBaseEntity::ThinkCorrection() { }//LRC
 void CBaseEntity::UpdateOnRemove() { }
 
-void CBaseEntity::SetModel(const char* const pszModelName) { }
+void CBaseEntity::SetModel(edict_t* pev, const char* const pszModelName) { }
 int CBaseEntity::PrecacheModel(const char* const pszModelName) { return 0; }
 int CBaseEntity::PrecacheSound(const char* const pszSoundName) { return 0; }
 unsigned short CBaseEntity::PrecacheEvent(int type, const char* psz) {

@@ -48,6 +48,7 @@ void CDisplacer::Precache()
 	PrecacheSound( "weapons/displacer_spin2.wav" );
 
 	PrecacheSound( "buttons/button11.wav" );
+	PrecacheSound("debris/beamstart11.wav");
 
 	m_iSpriteTexture = PrecacheModel( "sprites/shockwave.spr" );
 
@@ -64,7 +65,7 @@ void CDisplacer::Spawn()
 
 	m_iId = WEAPON_DISPLACER;
 
-	SET_MODEL( edict(), "models/w_displacer.mdl" );
+	SetModel( "models/w_displacer.mdl" );
 
 	m_iDefaultAmmo = DISPLACER_DEFAULT_GIVE;
 
@@ -116,7 +117,7 @@ void CDisplacer::WeaponIdle()
 {
 	ResetEmptySound();
 
-	if( m_flSoundDelay != 0 && gpGlobals->time >= m_flSoundDelay )
+	if( m_flSoundDelay && gpGlobals->time >= m_flSoundDelay )
 		m_flSoundDelay = 0;
 
 	if( m_flTimeWeaponIdle <= UTIL_WeaponTimeBase() )
@@ -318,7 +319,28 @@ void CDisplacer::FireThink()
 	//Update auto-aim
 	m_pPlayer->GetAutoaimVectorFromPoint( vecSrc, AUTOAIM_10DEGREES );
 
-	CDisplacerBall::CreateDisplacerBall( vecSrc, vecAnglesAim, m_pPlayer );
+	CDisplacerBall* ball = CDisplacerBall::CreateDisplacerBall( vecSrc, vecAnglesAim, m_pPlayer );
+
+	if (m_pPlayer->pev->waterlevel == WATERLEVEL_HEAD)
+	{
+		//Water goes zap.
+		const float flVolume = RANDOM_FLOAT(0.8, 0.9);
+
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "debris/beamstart11.wav", flVolume, ATTN_NONE, 0, PITCH_NORM);
+
+		RadiusDamage(
+			pev->origin,
+			m_pPlayer->pev,
+			m_pPlayer->pev,
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] * 100.0,
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] * 150.0,
+			CLASS_NONE,
+			DMG_ALWAYSGIB | DMG_BLAST);
+
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+
+		ball->BallTouch(this);
+	}
 
 	if( m_pPlayer->m_rgAmmo[ m_iPrimaryAmmoType ] == 0 )
 	{

@@ -30,8 +30,12 @@ LINK_ENTITY_TO_CLASS(item_ctfregeneration, CItemRegenerationCTF);
 
 void CItemRegenerationCTF::Precache()
 {
-	g_engfuncs.pfnPrecacheModel("models/w_health.mdl");
-	g_engfuncs.pfnPrecacheSound("ctf/pow_health_charge.wav");
+	if (pev->model)
+		PrecacheModel((char*)STRING(pev->model)); //LRC
+	else
+		PrecacheModel("models/w_health.mdl");
+	
+	PrecacheSound("ctf/pow_health_charge.wav");
 }
 
 void CItemRegenerationCTF::RemoveEffect(CBasePlayer* pPlayer)
@@ -77,17 +81,17 @@ bool CItemRegenerationCTF::MyTouch(CBasePlayer* pPlayer)
 
 void CItemRegenerationCTF::Spawn()
 {
-	//TODO: precache calls should be in Precache
 	if (pev->model)
-		g_engfuncs.pfnPrecacheModel((char*)STRING(pev->model));
+		PrecacheModel((char*)STRING(pev->model));
+	else
+		PrecacheModel("models/w_health.mdl");
 
-	g_engfuncs.pfnPrecacheSound("ctf/itemthrow.wav");
-	g_engfuncs.pfnPrecacheSound("items/ammopickup1.wav");
+	PrecacheSound("ctf/itemthrow.wav");
+	PrecacheSound("items/ammopickup1.wav");
 	
 	Precache();
 
-	//TODO: shouldn't this be using pev->model?
-	g_engfuncs.pfnSetModel(edict(), "models/w_health.mdl");
+	SetModel("models/w_health.mdl");
 
 	pev->spawnflags |= SF_NORESPAWN;
 	pev->oldorigin = pev->origin;

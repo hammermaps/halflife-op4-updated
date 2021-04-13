@@ -273,10 +273,7 @@ void CZombieSoldier :: Spawn()
 {
 	Precache( );
 	
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel( "models/zombie_soldier.mdl");
+	SetModel( "models/zombie_soldier.mdl");
 	
 	UTIL_SetSize( pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 
@@ -379,8 +376,12 @@ LINK_ENTITY_TO_CLASS( monster_zombie_soldier_dead, CDeadZombieSoldier );
 //=========================================================
 void CDeadZombieSoldier::Spawn()
 {
-	PRECACHE_MODEL( "models/zombie_soldier.mdl" );
-	SET_MODEL( ENT( pev ), "models/zombie_soldier.mdl" );
+	if (pev->model)
+		PrecacheModel((char*)STRING(pev->model)); //LRC
+	else
+		PrecacheModel( "models/zombie_soldier.mdl" );
+	
+	SetModel("models/zombie_soldier.mdl");
 
 	pev->effects = 0;
 	pev->yaw_speed = 8;

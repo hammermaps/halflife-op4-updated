@@ -181,7 +181,10 @@ class CItemSuit : public CItem
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_suit.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_suit.mdl");
 	}
 	BOOL MyTouch( CBasePlayer *pPlayer ) override
 	{
@@ -293,7 +296,10 @@ class CItemAntidote : public CItem
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_antidote.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_antidote.mdl");
 	}
 	BOOL MyTouch( CBasePlayer *pPlayer ) override
 	{
@@ -317,7 +323,10 @@ class CItemSecurity : public CItem
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_security.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_security.mdl");
 	}
 	BOOL MyTouch( CBasePlayer *pPlayer ) override
 	{
@@ -338,7 +347,10 @@ class CItemLongJump : public CItem
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_longjump.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_longjump.mdl");
 	}
 	BOOL MyTouch( CBasePlayer *pPlayer ) override
 	{

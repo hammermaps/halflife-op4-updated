@@ -590,10 +590,7 @@ void CAGrunt :: Spawn()
 {
 	Precache( );
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel("models/agrunt.mdl");
+	SetModel("models/agrunt.mdl");
 	
 	UTIL_SetSize(pev, Vector(-32, -32, 0), Vector(32, 32, 64));
 
@@ -621,10 +618,7 @@ void CAGrunt :: Spawn()
 //=========================================================
 void CAGrunt :: Precache()
 {
-	if (pev->model)
-		PrecacheModel((char*)STRING(pev->model)); //LRC
-	else
-		PrecacheModel("models/agrunt.mdl");
+	PrecacheModel("models/agrunt.mdl");
 
 	PRECACHE_SOUND_ARRAY(pAttackHitSounds);
 	PRECACHE_SOUND_ARRAY(pAttackMissSounds);

@@ -924,7 +924,7 @@ LINK_ENTITY_TO_CLASS( monster_alien_slave_dead, CDeadISlave );
 void CDeadISlave::Spawn()
 {
 	PrecacheModel( "models/islave.mdl" );
-	SET_MODEL( ENT( pev ), "models/islave.mdl" );
+	SetModel( "models/islave.mdl" );
 
 	pev->effects = 0;
 	pev->sequence = 0;

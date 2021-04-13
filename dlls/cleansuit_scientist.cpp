@@ -658,10 +658,7 @@ void CCleansuitScientist :: Spawn()
 {
 	Precache( );
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel( "models/cleansuit_scientist.mdl");
+	SetModel( "models/cleansuit_scientist.mdl");
 	
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 

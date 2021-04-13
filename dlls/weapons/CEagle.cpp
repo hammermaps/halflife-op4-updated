@@ -56,7 +56,7 @@ void CEagle::Spawn()
 
 	m_iId = WEAPON_EAGLE;
 
-	SET_MODEL( edict(), "models/w_desert_eagle.mdl" );
+	SetModel( "models/w_desert_eagle.mdl" );
 
 	m_iDefaultAmmo = EAGLE_MAX_CLIP;
 
@@ -374,7 +374,7 @@ class CEagleAmmo : public CBasePlayerAmmo
 	{
 		Precache();
 		//TODO: could probably use a better model
-		SET_MODEL( ENT( pev ), "models/w_9mmclip.mdl" );
+		SetModel( "models/w_9mmclip.mdl" );
 		CBasePlayerAmmo::Spawn();
 	}
 

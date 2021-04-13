@@ -938,7 +938,7 @@ BOOL CBaseEntity::ShouldToggle(USE_TYPE useType)
 	return TRUE;
 }
 
-int	CBaseEntity :: DamageDecal( int bitsDamageType )
+int	CBaseEntity :: DamageDecal(int bitsDamageType )
 {
 	if ( pev->rendermode == kRenderTransAlpha )
 		return -1;
@@ -949,18 +949,20 @@ int	CBaseEntity :: DamageDecal( int bitsDamageType )
 	return DECAL_GUNSHOT1 + RANDOM_LONG(0,4);
 }
 
-void CBaseEntity::SetModel(const char* const pszModelName)
+
+
+void CBaseEntity::SetModel(edict_t* pev, const char* const pszModelName)
 {
 	if (!pszModelName || !(*pszModelName))
 	{
-		SET_MODEL(edict(), "models/null.mdl");
+		SET_MODEL(pev, "models/null.mdl");
 		return;
 	}
 
 	//is this brush model?
 	if (pszModelName[0] == '*')
 	{
-		SET_MODEL(edict(), pszModelName);
+		SET_MODEL(pev, pszModelName);
 		return;
 	}
 
@@ -969,7 +971,7 @@ void CBaseEntity::SetModel(const char* const pszModelName)
 	if (data)
 	{
 		FREE_FILE(data);
-		SET_MODEL(edict(), pszModelName);
+		SET_MODEL(pev, pszModelName);
 		return;
 	}
 
@@ -977,20 +979,18 @@ void CBaseEntity::SetModel(const char* const pszModelName)
 	if (FStrEq(ext, "mdl"))
 	{
 		//this is model
-		SET_MODEL(edict(), "models/error.mdl");
+		SET_MODEL(pev, "models/error.mdl");
 	}
 	else if (FStrEq(ext, "spr"))
 	{
 		//this is sprite
-		SET_MODEL(edict(), "sprites/error.spr");
+		SET_MODEL(pev, "sprites/error.spr");
 	}
 	else
 	{
 		//set null model
-		SET_MODEL(edict(), "models/null.mdl");
+		SET_MODEL(pev, "models/null.mdl");
 	}
-
-	SET_MODEL(edict(), pszModelName);
 }
 
 int CBaseEntity::PrecacheModel(const char* const pszModelName)

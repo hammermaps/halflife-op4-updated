@@ -339,10 +339,7 @@ void COFPitWormUp::Spawn()
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SET_MODEL( edict(), "models/pit_worm_up.mdl" );
+	SetModel( "models/pit_worm_up.mdl" );
 
 	UTIL_SetSize( pev, { -32, -32, 0 }, { 32, 32, 64 } );
 
@@ -1515,7 +1512,7 @@ void COFPitWormGib::Spawn()
 
 	pev->classname = MAKE_STRING( "pitworm_gib" );
 
-	SET_MODEL( edict(), "models/pit_worm_gibs.mdl" );
+	SetModel( "models/pit_worm_gibs.mdl" );
 
 	UTIL_SetSize( pev, { -8, -8, -4 }, { 8, 8, 16 } );
 
@@ -1917,7 +1914,11 @@ int COFPitWorm::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 
 void COFPitWorm::Precache()
 {
-	g_engfuncs.pfnPrecacheModel("models/pit_worm.mdl");
+	if (pev->model)
+		PrecacheModel((char*)STRING(pev->model)); //LRC
+	else
+		PrecacheModel("models/pit_worm.mdl");
+	
 	PRECACHE_SOUND_ARRAY(pChildDieSounds);
 	PRECACHE_SOUND_ARRAY(pSackSounds);
 	PRECACHE_SOUND_ARRAY(pDeathSounds);
@@ -1928,12 +1929,13 @@ void COFPitWorm::Precache()
 	PRECACHE_SOUND_ARRAY(pPainSounds);
 	PRECACHE_SOUND_ARRAY(pFootSounds);
 
-	g_engfuncs.pfnPrecacheModel("sprites/xspark1.spr");
-	gSpikeSprite = g_engfuncs.pfnPrecacheModel("sprites/mommaspout.spr");
-	gSpikeDebrisSprite = g_engfuncs.pfnPrecacheModel("sprites/mommablob.spr");
-	g_engfuncs.pfnPrecacheSound("bullchicken/bc_acid1.wav");
-	g_engfuncs.pfnPrecacheSound("bullchicken/bc_spithit1.wav");
-	g_engfuncs.pfnPrecacheSound("bullchicken/bc_spithit2.wav");
+	PrecacheModel("sprites/xspark1.spr");
+	gSpikeSprite = PrecacheModel("sprites/mommaspout.spr");
+	gSpikeDebrisSprite = PrecacheModel("sprites/mommablob.spr");
+	
+	PrecacheSound("bullchicken/bc_acid1.wav");
+	PrecacheSound("bullchicken/bc_spithit1.wav");
+	PrecacheSound("bullchicken/bc_spithit2.wav");
 }
 
 void COFPitWorm::StartMonster()
@@ -2030,6 +2032,7 @@ void COFPitWorm::Spawn()
 	Precache();
 
 	SetModel( "models/pit_worm.mdl");
+	
 	UTIL_SetSize(pev, Vector(-32, -32, 0), Vector(32, 32, 64));
 
 	pev->solid = SOLID_SLIDEBOX;

@@ -1114,8 +1114,8 @@ void CHFGrunt :: Precache()
 	else
 		m_voicePitch = 100;
 
-	m_iBrassShell = PRECACHE_MODEL ("models/shell.mdl");// brass shell
-	m_iShotgunShell = PRECACHE_MODEL ("models/shotgunshell.mdl");
+	m_iBrassShell = PrecacheModel("models/shell.mdl");// brass shell
+	m_iShotgunShell = PrecacheModel("models/shotgunshell.mdl");
 }	
 
 //=========================================================

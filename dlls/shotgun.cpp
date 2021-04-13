@@ -405,7 +405,11 @@ class CShotgunAmmo : public CBasePlayerAmmo
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_shotbox.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_shotbox.mdl");
+		
 		PrecacheSound("items/9mmclip1.wav");
 	}
 	BOOL AddAmmo( CBaseEntity *pOther ) override

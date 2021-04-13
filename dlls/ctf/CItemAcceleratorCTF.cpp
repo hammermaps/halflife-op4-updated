@@ -34,7 +34,7 @@ void CItemAcceleratorCTF::Spawn()
 {
 	Precache();
 
-	SET_MODEL( edict(), "models/w_accelerator.mdl" );
+	SetModel( "models/w_accelerator.mdl" );
 	
 	//TODO: is this actually used?
 	pev->spawnflags |= SF_NORESPAWN;

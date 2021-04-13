@@ -29,8 +29,12 @@ LINK_ENTITY_TO_CLASS(item_ctfportablehev, CItemPortableHEVCTF);
 
 void CItemPortableHEVCTF::Precache()
 {
-	g_engfuncs.pfnPrecacheModel("models/w_porthev.mdl");
-	g_engfuncs.pfnPrecacheSound("ctf/pow_armor_charge.wav");
+	if (pev->model)
+		PrecacheModel((char*)STRING(pev->model)); //LRC
+	else
+		PrecacheModel("models/w_porthev.mdl");
+	
+	PrecacheSound("ctf/pow_armor_charge.wav");
 }
 
 void CItemPortableHEVCTF::RemoveEffect(CBasePlayer* pPlayer)
@@ -71,15 +75,16 @@ bool CItemPortableHEVCTF::MyTouch(CBasePlayer* pPlayer)
 void CItemPortableHEVCTF::Spawn()
 {
 	if (pev->model)
-		g_engfuncs.pfnPrecacheModel((char*)STRING(pev->model));
+		PrecacheModel((char*)STRING(pev->model)); //LRC
+	else
+		PrecacheModel("models/w_porthev.mdl");
 
-	g_engfuncs.pfnPrecacheSound("ctf/itemthrow.wav");
-	g_engfuncs.pfnPrecacheSound("items/ammopickup1.wav");
+	PrecacheSound("ctf/itemthrow.wav");
+	PrecacheSound("items/ammopickup1.wav");
 
 	Precache();
 
-	//TODO: shouldn't this be using pev->model?
-	g_engfuncs.pfnSetModel(edict(), "models/w_porthev.mdl");
+	SetModel("models/w_porthev.mdl");
 
 	pev->spawnflags |= SF_NORESPAWN;
 	pev->oldorigin = pev->origin;

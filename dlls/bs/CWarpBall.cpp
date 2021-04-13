@@ -108,7 +108,7 @@ void CWarpBall::WarpBallUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_T
 				UTIL_SetOrigin(this, targetEntity->v.origin);
 		}
 
-		SET_MODEL(pev->pContainingEntity, "sprites/XFlare1.spr");
+		SetModel(pev->pContainingEntity, "sprites/XFlare1.spr");
 
 		m_flMaxFrame = MODEL_FRAMES(pev->modelindex) - 1;
 

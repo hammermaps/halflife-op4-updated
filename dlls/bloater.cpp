@@ -190,10 +190,7 @@ void CBloater :: Spawn()
 {
 	Precache( );
 
-	if (pev->model)
-		SetModel(pev->model); //LRC
-	else
-		SetModel( "models/floater.mdl");
+	SetModel( "models/floater.mdl");
 	
 	UTIL_SetSize( pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 

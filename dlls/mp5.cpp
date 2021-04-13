@@ -293,7 +293,11 @@ class CMP5AmmoClip : public CBasePlayerAmmo
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_9mmARclip.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_9mmARclip.mdl");
+		
 		PrecacheSound("items/9mmclip1.wav");
 	}
 	BOOL AddAmmo( CBaseEntity *pOther ) override
@@ -321,7 +325,11 @@ class CMP5Chainammo : public CBasePlayerAmmo
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_chainammo.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_chainammo.mdl");
+		
 		PrecacheSound("items/9mmclip1.wav");
 	}
 	BOOL AddAmmo( CBaseEntity *pOther ) override
@@ -347,7 +355,11 @@ class CMP5AmmoGrenade : public CBasePlayerAmmo
 	}
 	void Precache() override
 	{
-		PRECACHE_MODEL ("models/w_ARgrenade.mdl");
+		if (pev->model)
+			PrecacheModel((char*)STRING(pev->model)); //LRC
+		else
+			PrecacheModel("models/w_ARgrenade.mdl");
+		
 		PrecacheSound("items/9mmclip1.wav");
 	}
 	BOOL AddAmmo( CBaseEntity *pOther ) override

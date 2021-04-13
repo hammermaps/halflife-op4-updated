@@ -94,7 +94,7 @@ void CDisplacerBall::Spawn()
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	SET_MODEL( edict(), "sprites/exit1.spr" );
+	SetModel( "sprites/exit1.spr" );
 
 	UTIL_SetOrigin( this, pev->origin );
 
@@ -279,6 +279,11 @@ void CDisplacerBall::BallTouch( CBaseEntity* pOther )
 void CDisplacerBall::FlyThink()
 {
 	Animate();
+
+	if (pev->waterlevel != WATERLEVEL_DRY)
+	{
+		SetThink(&CDisplacerBall::FizzleThink);
+	}
 	
 	SetNextThink(0.05);
 }
@@ -288,6 +293,11 @@ void CDisplacerBall::FlyThink2()
 	UTIL_SetSize( pev, Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
 
 	Animate();
+
+	if (pev->waterlevel != WATERLEVEL_DRY)
+	{
+		SetThink(&CDisplacerBall::FizzleThink);
+	}
 
 	SetNextThink(0.05);
 }

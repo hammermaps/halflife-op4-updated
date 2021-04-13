@@ -1862,7 +1862,7 @@ void CEnvCustomize::Affect(CBaseEntity* pTarget, USE_TYPE useType)
 		Vector vecMins, vecMaxs;
 		vecMins = pTarget->pev->mins;
 		vecMaxs = pTarget->pev->maxs;
-		SET_MODEL(pTarget->edict(), STRING(m_iszModel));
+		SetModel(pTarget->edict(), STRING(m_iszModel));
 		//		if (pTarget->pev->flags & FL_CLIENT)
 		//			g_ulModelIndexPlayer = pTarget->pev->modelindex;
 		UTIL_SetSize(pTarget->pev, vecMins, vecMaxs);
