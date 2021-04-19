@@ -132,7 +132,6 @@
     <ClCompile Include="..\..\dlls\combat.cpp" />
     <ClCompile Include="..\..\dlls\controller.cpp" />
     <ClCompile Include="..\..\dlls\coopplay_gamerules.cpp" />
-    <ClCompile Include="..\..\dlls\CRecruit.cpp" />
     <ClCompile Include="..\..\dlls\crossbow.cpp" />
     <ClCompile Include="..\..\dlls\crowbar.cpp" />
     <ClCompile Include="..\..\dlls\ctf\CHUDIconTrigger.cpp" />
@@ -163,6 +162,7 @@
     <ClCompile Include="..\..\dlls\entities\monsters\CDeadBarney.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CDeadOtis.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\COtis.cpp" />
+    <ClCompile Include="..\..\dlls\entities\monsters\CRecruit.cpp" />
     <ClCompile Include="..\..\dlls\explode.cpp" />
     <ClCompile Include="..\..\dlls\flyingmonster.cpp" />
     <ClCompile Include="..\..\dlls\func_break.cpp" />
@@ -365,6 +365,7 @@
     <ClInclude Include="..\..\dlls\entities\monsters\CDeadBarney.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CDeadOtis.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\COtis.h" />
+    <ClInclude Include="..\..\dlls\entities\monsters\CRecruit.h" />
     <ClInclude Include="..\..\dlls\explode.h" />
     <ClInclude Include="..\..\dlls\extdll.h" />
     <ClInclude Include="..\..\dlls\flyingmonster.h" />

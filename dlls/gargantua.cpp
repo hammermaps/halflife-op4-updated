@@ -159,7 +159,7 @@ void CStomp::Think()
 	
 	if ( tr.pHit && tr.pHit != pev->owner )
 	{
-		CBaseEntity *pEntity = CBaseEntity::Instance( tr.pHit );
+		CBaseEntity *pEntity = Instance( tr.pHit );
 		entvars_t *pevOwner = pev;
 		if ( pev->owner )
 			pevOwner = VARS(pev->owner);
@@ -171,6 +171,19 @@ void CStomp::Think()
 	// Accelerate the effect
 	pev->speed = pev->speed + deltaTime * pev->framerate;
 	pev->framerate = pev->framerate + deltaTime * 1500;
+
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_DLIGHT);
+		WRITE_COORD(pev->origin.x); // origin
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_BYTE(RANDOM_FLOAT(20, 32));     // radius
+		WRITE_BYTE(255);     // R
+		WRITE_BYTE(255);     // G
+		WRITE_BYTE(128);     // B
+		WRITE_BYTE(1);     // life * 10
+		WRITE_BYTE(0); // decay
+	MESSAGE_END();
 	
 	// Move and spawn trails
 	while ( gpGlobals->time - pev->dmgtime > STOMP_INTERVAL )
@@ -190,6 +203,7 @@ void CStomp::Think()
 				pSprite->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxFadeFast );
 			}
 		}
+
 		pev->dmgtime += STOMP_INTERVAL;
 		// Scale has the "life" of this effect
 		pev->scale -= STOMP_INTERVAL * pev->speed;
@@ -255,7 +269,6 @@ public:
 	void EyeOff();
 	void EyeOn( int level );
 	void EyeUpdate();
-	void Leap();
 	void StompAttack();
 	void FlameCreate();
 	void FlameUpdate();
@@ -622,6 +635,19 @@ void CGargantua :: FlameUpdate()
 				WRITE_BYTE( 255 );	// B
 				WRITE_BYTE( 2 );	// life * 10
 				WRITE_COORD( 0 ); // decay
+			MESSAGE_END();
+
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_DLIGHT);
+				WRITE_COORD(vecStart.x); // origin
+				WRITE_COORD(vecStart.y);
+				WRITE_COORD(vecStart.z);
+				WRITE_BYTE(RANDOM_FLOAT(16, 32));     // radius
+				WRITE_BYTE(255);     // R
+				WRITE_BYTE(255);     // G
+				WRITE_BYTE(128);     // B
+				WRITE_BYTE(2);     // life * 10
+				WRITE_BYTE(0); // decay
 			MESSAGE_END();
 		}
 	}

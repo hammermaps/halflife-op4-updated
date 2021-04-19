@@ -296,9 +296,23 @@ void CBarney::BarneyFirePistol()
 	SetBlending(0, angDir.x);
 	pev->effects = EF_MUZZLEFLASH;
 
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_DLIGHT);
+		WRITE_COORD(vecShootOrigin.x); // origin
+		WRITE_COORD(vecShootOrigin.y);
+		WRITE_COORD(vecShootOrigin.z);
+		WRITE_BYTE(16);     // radius
+		WRITE_BYTE(255);     // R
+		WRITE_BYTE(255);     // G
+		WRITE_BYTE(128);     // B
+		WRITE_BYTE(5);     // life * 10
+		WRITE_BYTE(32); // decay
+	MESSAGE_END();
+
 	if (pev->frags)
 	{
 		FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_2DEGREES, 1024, BULLET_PLAYER_357);
+		
 		if (RANDOM_LONG(0, 1))
 			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/357_shot1.wav", 1, ATTN_NORM, 0, 100);
 		else
@@ -307,19 +321,6 @@ void CBarney::BarneyFirePistol()
 	else
 	{
 		FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_2DEGREES, 1024, BULLET_MONSTER_9MM);
-
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_DLIGHT);
-		WRITE_COORD(vecShootOrigin.x); // origin
-		WRITE_COORD(vecShootOrigin.y);
-		WRITE_COORD(vecShootOrigin.z);
-		WRITE_BYTE(20); // radius
-		WRITE_BYTE(255); // R
-		WRITE_BYTE(255); // G
-		WRITE_BYTE(128); // B
-		WRITE_BYTE(0); // life * 10
-		WRITE_BYTE(0); // decay
-		MESSAGE_END();
 
 		int pitchShift = RANDOM_LONG(0, 20);
 

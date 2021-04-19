@@ -288,6 +288,19 @@ void CController :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				WRITE_COORD( -32 ); // decay
 			MESSAGE_END();
 
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+				WRITE_BYTE(TE_DLIGHT);
+				WRITE_COORD(vecStart.x); // origin
+				WRITE_COORD(vecStart.y);
+				WRITE_COORD(vecStart.z);
+				WRITE_BYTE(10);     // radius
+				WRITE_BYTE(255);     // R
+				WRITE_BYTE(192);     // G
+				WRITE_BYTE(64);     // B
+				WRITE_BYTE(20);     // life * 10
+				WRITE_BYTE(-32); // decay
+			MESSAGE_END();
+
 			m_iBall[0] = 192;
 			m_iBallTime[0] = gpGlobals->time + atoi( pEvent->options ) / 15.0;
 			m_iBall[1] = 255;
@@ -316,6 +329,19 @@ void CController :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				WRITE_COORD( 32 ); // decay
 			MESSAGE_END();
 
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+				WRITE_BYTE(TE_DLIGHT);
+				WRITE_COORD(vecStart.x);     // origin
+				WRITE_COORD(vecStart.y);
+				WRITE_COORD(vecStart.z);
+				WRITE_BYTE(32);     // radius
+				WRITE_BYTE(255);     // R
+				WRITE_BYTE(192);     // G
+				WRITE_BYTE(64);     // B
+				WRITE_BYTE(10);     // life * 10
+				WRITE_BYTE(32); // decay
+			MESSAGE_END();
+				
 			CBaseMonster *pBall = (CBaseMonster*)Create( "controller_head_ball", vecStart, pev->angles, edict() );
 
 			pBall->pev->velocity = Vector( 0, 0, 32 );
@@ -1256,6 +1282,19 @@ void CControllerHeadBall :: HuntThink()
 		WRITE_COORD( 0 ); // decay
 	MESSAGE_END();
 
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_DLIGHT);
+		WRITE_COORD(pev->origin.x);     // origin
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_BYTE(pev->renderamt / 16);// radius
+		WRITE_BYTE(255);     // R
+		WRITE_BYTE(192);     // G
+		WRITE_BYTE(255);     // B
+		WRITE_BYTE(2);     // life * 10
+		WRITE_BYTE(0); // decay
+	MESSAGE_END();
+
 	// check world boundaries
 	if (gpGlobals->time - pev->dmgtime > 5 || pev->renderamt < 64 || m_hEnemy == NULL || m_hOwner == NULL || pev->origin.x < -4096 || pev->origin.x > 4096 || pev->origin.y < -4096 || pev->origin.y > 4096 || pev->origin.z < -4096 || pev->origin.z > 4096)
 	{
@@ -1432,6 +1471,33 @@ void CControllerZapBall :: AnimateThink()
 	SetNextThink(0.1);
 	
 	pev->frame = ((int)pev->frame + 1) % 11;
+
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_DLIGHT);
+		WRITE_COORD(pev->origin.x);     // origin
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_BYTE(8);     // radius
+		WRITE_BYTE(255);     // R
+		WRITE_BYTE(192);     // G
+		WRITE_BYTE(64);     // B
+		WRITE_BYTE(2);     // life * 10
+		WRITE_BYTE(0); // decay
+	MESSAGE_END();
+
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_ELIGHT);
+		WRITE_SHORT(entindex());     // entity, attachment
+		WRITE_COORD(pev->origin.x);     // origin
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_COORD(8);     // radius
+		WRITE_BYTE(255);     // R
+		WRITE_BYTE(192);     // G
+		WRITE_BYTE(64);     // B
+		WRITE_BYTE(2);     // life * 10
+		WRITE_COORD(0); // decay
+	MESSAGE_END();
 
 	if (gpGlobals->time - pev->dmgtime > 5 || pev->velocity.Length() < 10)
 	{
