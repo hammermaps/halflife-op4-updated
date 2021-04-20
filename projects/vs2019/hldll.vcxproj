@@ -109,7 +109,6 @@
     <ClCompile Include="..\..\dlls\alias.cpp" />
     <ClCompile Include="..\..\dlls\animation.cpp" />
     <ClCompile Include="..\..\dlls\apache.cpp" />
-    <ClCompile Include="..\..\dlls\baby_voltigore.cpp" />
     <ClCompile Include="..\..\dlls\barnacle.cpp" />
     <ClCompile Include="..\..\dlls\bigmomma.cpp" />
     <ClCompile Include="..\..\dlls\blkop_osprey.cpp" />
@@ -161,6 +160,7 @@
     <ClCompile Include="..\..\dlls\entities\monsters\CBarney.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CDeadBarney.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CDeadOtis.cpp" />
+    <ClCompile Include="..\..\dlls\entities\monsters\COFBabyVoltigore.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\COtis.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CRecruit.cpp" />
     <ClCompile Include="..\..\dlls\explode.cpp" />
@@ -364,6 +364,7 @@
     <ClInclude Include="..\..\dlls\entities\monsters\CBarney.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CDeadBarney.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CDeadOtis.h" />
+    <ClInclude Include="..\..\dlls\entities\monsters\COFBabyVoltigore.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\COtis.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CRecruit.h" />
     <ClInclude Include="..\..\dlls\explode.h" />

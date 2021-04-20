@@ -462,9 +462,6 @@
     <ClCompile Include="..\..\dlls\voltigore.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\baby_voltigore.cpp">
-      <Filter>Source Files\dlls</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dlls\weapons\CGrappleTip.cpp">
       <Filter>Source Files\dlls\weapons</Filter>
     </ClCompile>
@@ -616,6 +613,9 @@
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\entities\monsters\CRecruit.cpp">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\monsters\COFBabyVoltigore.cpp">
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1044,6 +1044,9 @@
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\entities\monsters\CRecruit.h">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\monsters\COFBabyVoltigore.h">
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClInclude>
   </ItemGroup>
