@@ -81,9 +81,6 @@
     <ClCompile Include="..\..\dlls\apache.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\barnacle.cpp">
-      <Filter>Source Files\dlls</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dlls\bigmomma.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
@@ -618,6 +615,9 @@
     <ClCompile Include="..\..\dlls\entities\monsters\COFBabyVoltigore.cpp">
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\monsters\CBarnacle.cpp">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\doors.h">
@@ -1047,6 +1047,9 @@
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\entities\monsters\COFBabyVoltigore.h">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\monsters\CBarnacle.h">
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClInclude>
   </ItemGroup>
