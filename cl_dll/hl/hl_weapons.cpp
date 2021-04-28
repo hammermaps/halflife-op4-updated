@@ -41,6 +41,8 @@
 #include "../com_weapons.h"
 #include "../demo.h"
 
+Vector g_vPlayerVelocity;
+
 extern globalvars_t *gpGlobals;
 extern int g_iUser1;
 
@@ -689,6 +691,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	player.ammo_spores		= ( int ) from->client.vuser2.y;
 	player.ammo_762			= ( int ) from->client.vuser2.z;
 
+	g_vPlayerVelocity = player.pev->velocity;
 	
 	// Point to current weapon object
 	if ( from->client.m_iId )

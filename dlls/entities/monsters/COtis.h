@@ -15,13 +15,16 @@
 #ifndef GAME_SERVER_ENTITIES_NPCS_COTIS_H
 #define GAME_SERVER_ENTITIES_NPCS_COTIS_H
 
-#define	OTIS_AE_DRAW	( 2 )
-#define	OTIS_AE_SHOOT	( 3 )
-#define	OTIS_AE_HOLSTER	( 4 )
+constexpr auto OTIS_AE_DRAW    = (2);
+constexpr auto OTIS_AE_SHOOT   = (3);
+constexpr auto OTIS_AE_HOLSTER = (4);
 
-#define	OTIS_BODY_GUNHOLSTERED	0
-#define	OTIS_BODY_GUNDRAWN		1
-#define OTIS_BODY_GUNGONE		2
+enum
+{
+	OTIS_BODY_GUNHOLSTERED = 0,
+	OTIS_BODY_GUNDRAWN,
+	OTIS_BODY_GUNGONE,
+};
 
 namespace OtisBodyGroup
 {

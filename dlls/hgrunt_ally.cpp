@@ -1193,7 +1193,7 @@ void CHGruntAlly :: Spawn()
 	m_bloodColor		= BLOOD_COLOR_RED;
 	pev->effects		= 0;
 
-	if (pev->health == 0) //LRC
+	if (!pev->health) //LRC
 		pev->health = gSkillData.hgruntAllyHealth;
 	
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
@@ -1422,18 +1422,6 @@ void CHGruntAlly :: PainSound ()
 {
 	if ( gpGlobals->time > m_flNextPainTime )
 	{
-#if 0
-		if ( RANDOM_LONG(0,99) < 5 )
-		{
-			// pain sentences are rare
-			if (FOkToSpeak())
-			{
-				SENTENCEG_PlayRndSz(ENT(pev), "FG_PAIN", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, PITCH_NORM);
-				JustSpoke();
-				return;
-			}
-		}
-#endif 
 		switch ( RANDOM_LONG(0,7) )
 		{
 		case 0:	

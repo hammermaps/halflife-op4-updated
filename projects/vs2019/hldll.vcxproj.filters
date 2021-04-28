@@ -360,9 +360,6 @@
     <ClCompile Include="..\..\pm_shared\pm_shared.cpp">
       <Filter>Source Files\pm_shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\CDrillSergeant.cpp">
-      <Filter>Source Files\dlls</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dlls\hgrunt_ally.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
@@ -616,6 +613,9 @@
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\entities\monsters\CBarnacle.cpp">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\monsters\CDrillSergeant.cpp">
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1050,6 +1050,9 @@
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\entities\monsters\CBarnacle.h">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\monsters\CDrillSergeant.h">
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClInclude>
   </ItemGroup>
