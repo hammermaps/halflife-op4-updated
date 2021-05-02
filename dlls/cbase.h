@@ -146,6 +146,7 @@ class CBaseMonster;
 class CBasePlayerItem;
 class CSquadMonster;
 class COFSquadTalkMonster;
+class CBaseSquad;
 class CThinker;
 
 #define	SF_NORESPAWN	( 1 << 30 )// !!!set this bit on guns and stuff that should never respawn.
@@ -317,7 +318,7 @@ public:
 	virtual int BloodColor() { return DONT_BLEED; }
 	virtual void TraceBleed(float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType);
 	virtual CBaseMonster* MyMonsterPointer() { return nullptr; }
-	virtual CSquadMonster* MySquadMonsterPointer() { return nullptr; }
+	virtual CBaseSquad* MySquadMonsterPointer() { return nullptr; }
 	virtual COFSquadTalkMonster* MySquadTalkMonsterPointer() { return nullptr; }
 	virtual int GetToggleState() { return TS_AT_TOP; }
 

@@ -164,7 +164,7 @@ public:
 	// check validity of a straight move through space
 	virtual void Move(float flInterval = 0.1);
 	virtual void MoveExecute(CBaseEntity* pTargetEnt, const Vector& vecDir, float flInterval);
-	virtual BOOL ShouldAdvanceRoute(float flWaypointDist);
+	virtual bool ShouldAdvanceRoute(float flWaypointDist);
 
 	virtual Activity GetStoppedActivity() { return ACT_IDLE; }
 	virtual void Stop() { m_IdealActivity = GetStoppedActivity(); }

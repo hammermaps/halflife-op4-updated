@@ -13,9 +13,9 @@
 *
 ****/
 
-//=========================================================
-// CSquadMonster - for any monster that forms squads.
-//=========================================================
+#ifndef COFSQUADTALKMONSTER_H
+#define COFSQUADTALKMONSTER_H
+
 class COFSquadTalkMonster : public COFAllyMonster
 {
 public:
@@ -40,7 +40,7 @@ public:
 	void ScheduleChange() override;
 	void Killed( entvars_t *pevAttacker, int iGib ) override;
 	BOOL OccupySlot( int iDesiredSlot );
-	BOOL NoFriendlyFire();
+	BOOL NoFriendlyFire() override;
 
 	// squad functions still left in base class
 	COFSquadTalkMonster *MySquadLeader()
@@ -57,16 +57,13 @@ public:
 		else
 			return ( COFSquadTalkMonster * ) ( ( CBaseEntity * ) m_hSquadMember[ i ] );
 	}
+	
 	int	InSquad() { return m_hSquadLeader != NULL; }
 	int IsLeader() { return m_hSquadLeader == this; }
-	int SquadJoin( int searchRadius );
 	int SquadRecruit( int searchRadius, int maxMembers );
 	int	SquadCount();
 	void SquadRemove( COFSquadTalkMonster *pRemove );
-	void SquadUnlink();
-	BOOL SquadAdd( COFSquadTalkMonster *pAdd );
-	void SquadDisband();
-	void SquadAddConditions( int iConditions );
+	bool SquadAdd( COFSquadTalkMonster *pAdd );
 	void SquadMakeEnemy( CBaseEntity *pEnemy );
 	void SquadPasteEnemyInfo();
 	void SquadCopyEnemyInfo();
@@ -96,3 +93,4 @@ public:
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 };
 
+#endif // COFSQUADTALKMONSTER_H

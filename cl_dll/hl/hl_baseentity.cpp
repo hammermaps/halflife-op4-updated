@@ -182,7 +182,7 @@ BOOL CBaseMonster :: BuildRoute ( const Vector &vecGoal, int iMoveFlag, CBaseEnt
 void CBaseMonster :: InsertWaypoint ( Vector vecLocation, int afMoveFlags ) { }
 BOOL CBaseMonster :: FTriangulate ( const Vector &vecStart , const Vector &vecEnd, float flDist, CBaseEntity *pTargetEnt, Vector *pApex ) { return FALSE; }
 void CBaseMonster :: Move ( float flInterval ) { }
-BOOL CBaseMonster:: ShouldAdvanceRoute( float flWaypointDist ) { return FALSE; }
+bool CBaseMonster:: ShouldAdvanceRoute( float flWaypointDist ) { return false; }
 void CBaseMonster::MoveExecute( CBaseEntity *pTargetEnt, const Vector &vecDir, float flInterval ) { }
 void CBaseMonster :: MonsterInit () { }
 void CBaseMonster :: MonsterInitThink () { }

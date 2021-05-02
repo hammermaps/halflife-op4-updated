@@ -138,7 +138,7 @@ public:
 	CBaseEntity		*EnumFriends( CBaseEntity *pentPrevious, int listNumber, BOOL bTrace );
 	void			AlertFriends();
 	void			ShutUpFriends();
-	BOOL			IsTalking();
+	bool			IsTalking();
 	void			Talk( float flDuration );	
 	// For following
 	BOOL			CanFollow();

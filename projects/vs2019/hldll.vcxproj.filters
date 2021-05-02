@@ -69,9 +69,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dlls\aflock.cpp">
-      <Filter>Source Files\dlls</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dlls\airtank.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
@@ -618,6 +615,15 @@
     <ClCompile Include="..\..\dlls\entities\monsters\CDrillSergeant.cpp">
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\monsters\CFlockingFlyerFlock.cpp">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\monsters\CFlockingFlyer.cpp">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\CBaseSquad.cpp">
+      <Filter>Source Files\dlls\entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\doors.h">
@@ -1054,6 +1060,15 @@
     </ClInclude>
     <ClInclude Include="..\..\dlls\entities\monsters\CDrillSergeant.h">
       <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\monsters\CFlockingFlyerFlock.h">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\monsters\CFlockingFlyer.h">
+      <Filter>Source Files\dlls\entities\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\CBaseSquad.h">
+      <Filter>Source Files\dlls\entities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

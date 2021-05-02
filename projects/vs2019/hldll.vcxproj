@@ -104,7 +104,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\mathlib.cpp" />
-    <ClCompile Include="..\..\dlls\aflock.cpp" />
     <ClCompile Include="..\..\dlls\airtank.cpp" />
     <ClCompile Include="..\..\dlls\alias.cpp" />
     <ClCompile Include="..\..\dlls\animation.cpp" />
@@ -154,12 +153,15 @@
     <ClCompile Include="..\..\dlls\ehandle.cpp" />
     <ClCompile Include="..\..\dlls\entities\CActAnimating.cpp" />
     <ClCompile Include="..\..\dlls\entities\CBaseAnimating.cpp" />
+    <ClCompile Include="..\..\dlls\entities\CBaseSquad.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CAGrunt.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CBarnacle.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CBarney.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CDeadBarney.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CDeadOtis.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CDrillSergeant.cpp" />
+    <ClCompile Include="..\..\dlls\entities\monsters\CFlockingFlyer.cpp" />
+    <ClCompile Include="..\..\dlls\entities\monsters\CFlockingFlyerFlock.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\COFBabyVoltigore.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\COtis.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CRecruit.cpp" />
@@ -360,12 +362,15 @@
     <ClInclude Include="..\..\dlls\enginecallback.h" />
     <ClInclude Include="..\..\dlls\entities\CActAnimating.h" />
     <ClInclude Include="..\..\dlls\entities\CBaseAnimating.h" />
+    <ClInclude Include="..\..\dlls\entities\CBaseSquad.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CAGrunt.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CBarnacle.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CBarney.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CDeadBarney.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CDeadOtis.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CDrillSergeant.h" />
+    <ClInclude Include="..\..\dlls\entities\monsters\CFlockingFlyer.h" />
+    <ClInclude Include="..\..\dlls\entities\monsters\CFlockingFlyerFlock.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\COFBabyVoltigore.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\COtis.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CRecruit.h" />

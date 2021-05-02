@@ -12,15 +12,11 @@
 *   use or distribution of this code by or to any unlicensed person is illegal.
 *
 ****/
-//=========================================================
-// Squadmonster  functions
-//=========================================================
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
-#include "nodes.h"
 #include "monsters.h"
-#include "animation.h"
 #include "saverestore.h"
 #include "talkmonster.h"
 #include "squadmonster.h"
@@ -31,39 +27,29 @@
 //=========================================================
 // Save/Restore
 //=========================================================
-TYPEDESCRIPTION	COFSquadTalkMonster::m_SaveData[] =
+TYPEDESCRIPTION COFSquadTalkMonster::m_SaveData[] =
 {
-	DEFINE_FIELD( COFSquadTalkMonster, m_hSquadLeader, FIELD_EHANDLE ),
-	DEFINE_ARRAY( COFSquadTalkMonster, m_hSquadMember, FIELD_EHANDLE, MAX_SQUAD_MEMBERS - 1 ),
-
-	// DEFINE_FIELD( COFSquadTalkMonster, m_afSquadSlots, FIELD_INTEGER ), // these need to be reset after transitions!
-	DEFINE_FIELD( COFSquadTalkMonster, m_fEnemyEluded, FIELD_BOOLEAN ),
-	DEFINE_FIELD( COFSquadTalkMonster, m_flLastEnemySightTime, FIELD_TIME ),
-
-	DEFINE_FIELD( COFSquadTalkMonster, m_iMySlot, FIELD_INTEGER ),
-
-
+	DEFINE_FIELD(COFSquadTalkMonster, m_hSquadLeader, FIELD_EHANDLE),
+	DEFINE_ARRAY(COFSquadTalkMonster, m_hSquadMember, FIELD_EHANDLE, MAX_SQUAD_MEMBERS - 1),
+	DEFINE_FIELD(COFSquadTalkMonster, m_fEnemyEluded, FIELD_BOOLEAN),
+	DEFINE_FIELD(COFSquadTalkMonster, m_flLastEnemySightTime, FIELD_TIME),
+	DEFINE_FIELD(COFSquadTalkMonster, m_iMySlot, FIELD_INTEGER),
 };
 
-IMPLEMENT_SAVERESTORE( COFSquadTalkMonster, CBaseMonster );
-
+IMPLEMENT_SAVERESTORE(COFSquadTalkMonster, CBaseMonster);
 
 //=========================================================
 // OccupySlot - if any slots of the passed slots are 
 // available, the monster will be assigned to one.
 //=========================================================
-BOOL COFSquadTalkMonster::OccupySlot( int iDesiredSlots )
+BOOL COFSquadTalkMonster::OccupySlot(int iDesiredSlots)
 {
-	int i;
-	int iMask;
-	int iSquadSlots;
-
-	if( !InSquad() )
+	if (!InSquad())
 	{
 		return TRUE;
 	}
 
-	if( SquadEnemySplit() )
+	if (SquadEnemySplit())
 	{
 		// if the squad members aren't all fighting the same enemy, slots are disabled
 		// so that a squad member doesn't get stranded unable to engage his enemy because
@@ -72,22 +58,22 @@ BOOL COFSquadTalkMonster::OccupySlot( int iDesiredSlots )
 		return TRUE;
 	}
 
-	COFSquadTalkMonster *pSquadLeader = MySquadLeader();
+	COFSquadTalkMonster* pSquadLeader = MySquadLeader();
 
-	if( !( iDesiredSlots ^ pSquadLeader->m_afSquadSlots ) )
+	if (!(iDesiredSlots ^ pSquadLeader->m_afSquadSlots))
 	{
 		// none of the desired slots are available. 
 		return FALSE;
 	}
 
-	iSquadSlots = pSquadLeader->m_afSquadSlots;
+	int iSquadSlots = pSquadLeader->m_afSquadSlots;
 
-	for( i = 0; i < NUM_SLOTS; i++ )
+	for (int i = 0; i < NUM_SLOTS; i++)
 	{
-		iMask = 1 << i;
-		if( iDesiredSlots & iMask ) // am I looking for this bit?
+		int iMask = 1 << i;
+		if (iDesiredSlots & iMask) // am I looking for this bit?
 		{
-			if( !( iSquadSlots & iMask ) )	// Is it already taken?
+			if (!(iSquadSlots & iMask)) // Is it already taken?
 			{
 				// No, use this bit
 				pSquadLeader->m_afSquadSlots |= iMask;
@@ -106,9 +92,9 @@ BOOL COFSquadTalkMonster::OccupySlot( int iDesiredSlots )
 //=========================================================
 void COFSquadTalkMonster::VacateSlot()
 {
-	if( m_iMySlot != bits_NO_SLOT && InSquad() )
+	if (m_iMySlot != bits_NO_SLOT && InSquad())
 	{
-		//		ALERT ( at_aiconsole, "Vacated Slot %d - %d\n", m_iMySlot, m_hSquadLeader->m_afSquadSlots );
+		//ALERT ( at_aiconsole, "Vacated Slot %d - %d\n", m_iMySlot, m_hSquadLeader->m_afSquadSlots );
 		MySquadLeader()->m_afSquadSlots &= ~m_iMySlot;
 		m_iMySlot = bits_NO_SLOT;
 	}
@@ -125,16 +111,16 @@ void COFSquadTalkMonster::ScheduleChange()
 //=========================================================
 // Killed
 //=========================================================
-void COFSquadTalkMonster::Killed( entvars_t *pevAttacker, int iGib )
+void COFSquadTalkMonster::Killed(entvars_t* pevAttacker, int iGib)
 {
 	VacateSlot();
 
-	if( InSquad() )
+	if (InSquad())
 	{
-		MySquadLeader()->SquadRemove( this );
+		MySquadLeader()->SquadRemove(this);
 	}
 
-	COFAllyMonster::Killed( pevAttacker, iGib );
+	COFAllyMonster::Killed(pevAttacker, iGib);
 }
 
 //=========================================================
@@ -143,42 +129,42 @@ void COFSquadTalkMonster::Killed( entvars_t *pevAttacker, int iGib )
 // If I am pRemove, promote m_pSquadNext to leader
 //
 //=========================================================
-void COFSquadTalkMonster::SquadRemove( COFSquadTalkMonster *pRemove )
+void COFSquadTalkMonster::SquadRemove(COFSquadTalkMonster* pRemove)
 {
-	ASSERT( pRemove != NULL );
-	ASSERT( this->IsLeader() );
-	ASSERT( pRemove->m_hSquadLeader == this );
+	ASSERT(pRemove != NULL);
+	ASSERT(this->IsLeader());
+	ASSERT(pRemove->m_hSquadLeader == this);
 
 	// If I'm the leader, get rid of my squad
-	if( pRemove == MySquadLeader() )
+	if (pRemove == MySquadLeader())
 	{
-		for( int i = 0; i < MAX_SQUAD_MEMBERS - 1; i++ )
+		for (int i = 0; i < MAX_SQUAD_MEMBERS - 1; i++)
 		{
-			COFSquadTalkMonster *pMember = MySquadMember( i );
-			if( pMember )
+			COFSquadTalkMonster* pMember = MySquadMember(i);
+			if (pMember)
 			{
-				pMember->m_hSquadLeader = NULL;
-				m_hSquadMember[ i ] = NULL;
+				pMember->m_hSquadLeader = nullptr;
+				m_hSquadMember[i] = nullptr;
 			}
 		}
 	}
 	else
 	{
-		COFSquadTalkMonster *pSquadLeader = MySquadLeader();
-		if( pSquadLeader )
+		COFSquadTalkMonster* pSquadLeader = MySquadLeader();
+		if (pSquadLeader)
 		{
-			for( int i = 0; i < MAX_SQUAD_MEMBERS - 1; i++ )
+			for (int i = 0; i < MAX_SQUAD_MEMBERS - 1; i++)
 			{
-				if( pSquadLeader->m_hSquadMember[ i ] == this )
+				if (pSquadLeader->m_hSquadMember[i] == this)
 				{
-					pSquadLeader->m_hSquadMember[ i ] = NULL;
+					pSquadLeader->m_hSquadMember[i] = nullptr;
 					break;
 				}
 			}
 		}
 	}
 
-	pRemove->m_hSquadLeader = NULL;
+	pRemove->m_hSquadLeader = nullptr;
 }
 
 //=========================================================
@@ -186,25 +172,24 @@ void COFSquadTalkMonster::SquadRemove( COFSquadTalkMonster *pRemove )
 // SquadAdd(), add pAdd to my squad
 //
 //=========================================================
-BOOL COFSquadTalkMonster::SquadAdd( COFSquadTalkMonster *pAdd )
+bool COFSquadTalkMonster::SquadAdd(COFSquadTalkMonster* pAdd)
 {
-	ASSERT( pAdd != NULL );
-	ASSERT( !pAdd->InSquad() );
-	ASSERT( this->IsLeader() );
+	ASSERT(pAdd != NULL);
+	ASSERT(!pAdd->InSquad());
+	ASSERT(this->IsLeader());
 
-	for( int i = 0; i < MAX_SQUAD_MEMBERS - 1; i++ )
+	for (int i = 0; i < MAX_SQUAD_MEMBERS - 1; i++)
 	{
-		if( m_hSquadMember[ i ] == NULL )
+		if (m_hSquadMember[i] == nullptr)
 		{
-			m_hSquadMember[ i ] = pAdd;
+			m_hSquadMember[i] = pAdd;
 			pAdd->m_hSquadLeader = this;
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
-	// should complain here
+	
+	return false;
 }
-
 
 //=========================================================
 // 
@@ -215,8 +200,8 @@ BOOL COFSquadTalkMonster::SquadAdd( COFSquadTalkMonster *pAdd )
 //=========================================================
 void COFSquadTalkMonster::SquadPasteEnemyInfo()
 {
-	COFSquadTalkMonster *pSquadLeader = MySquadLeader();
-	if( pSquadLeader )
+	COFSquadTalkMonster* pSquadLeader = MySquadLeader();
+	if (pSquadLeader)
 		pSquadLeader->m_vecEnemyLKP = m_vecEnemyLKP;
 }
 
@@ -230,8 +215,8 @@ void COFSquadTalkMonster::SquadPasteEnemyInfo()
 //=========================================================
 void COFSquadTalkMonster::SquadCopyEnemyInfo()
 {
-	COFSquadTalkMonster *pSquadLeader = MySquadLeader();
-	if( pSquadLeader )
+	COFSquadTalkMonster* pSquadLeader = MySquadLeader();
+	if (pSquadLeader)
 		m_vecEnemyLKP = pSquadLeader->m_vecEnemyLKP;
 }
 
@@ -251,7 +236,7 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 	if (!InSquad())
 	{
 		//TODO: pEnemy could be null here
-		if (m_hEnemy != NULL)
+		if (m_hEnemy != nullptr)
 		{
 			// remember their current enemy
 			PushEnemy(m_hEnemy, m_vecEnemyLKP);
@@ -273,8 +258,8 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 
 	auto squadLeader = MySquadLeader();
 
-	const bool fLeaderIsFollowing = squadLeader->m_hTargetEnt != NULL && squadLeader->m_hTargetEnt->IsPlayer();
-	const bool fImFollowing = m_hTargetEnt != NULL && m_hTargetEnt->IsPlayer();
+	const bool fLeaderIsFollowing = squadLeader->m_hTargetEnt != nullptr && squadLeader->m_hTargetEnt->IsPlayer();
+	const bool fImFollowing = m_hTargetEnt != nullptr && m_hTargetEnt->IsPlayer();
 
 	if (!IsLeader() && fLeaderIsFollowing != fImFollowing)
 	{
@@ -288,18 +273,20 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 
 		if (squadMember)
 		{
-			const bool isFollowing = squadMember->m_hTargetEnt != NULL && squadMember->m_hTargetEnt->IsPlayer();
+			const bool isFollowing = squadMember->m_hTargetEnt != nullptr && squadMember->m_hTargetEnt->IsPlayer();
 
 			// reset members who aren't activly engaged in fighting
-			if (fLeaderIsFollowing == isFollowing && squadMember->m_hEnemy != pEnemy && !squadMember->HasConditions(bits_COND_SEE_ENEMY))
+			if (fLeaderIsFollowing == isFollowing && squadMember->m_hEnemy != pEnemy && !squadMember->HasConditions(
+				bits_COND_SEE_ENEMY))
 			{
-				if (squadMember->m_hEnemy != NULL)
+				if (squadMember->m_hEnemy != nullptr)
 				{
 					// remember their current enemy
 					squadMember->PushEnemy(squadMember->m_hEnemy, squadMember->m_vecEnemyLKP);
 				}
 
-				ALERT(at_aiconsole, "Non-Squad friendly grunt adopted enemy of type %s\n", STRING(pEnemy->pev->classname));
+				ALERT(at_aiconsole, "Non-Squad friendly grunt adopted enemy of type %s\n",
+				      STRING(pEnemy->pev->classname));
 
 				// give them a new enemy
 				squadMember->m_hEnemy = pEnemy;
@@ -310,12 +297,13 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 	}
 
 	//Seems a bit redundant to recalculate this now
-	const bool leaderIsStillFollowing = squadLeader->m_hTargetEnt != NULL && squadLeader->m_hTargetEnt->IsPlayer();
+	const bool leaderIsStillFollowing = squadLeader->m_hTargetEnt != nullptr && squadLeader->m_hTargetEnt->IsPlayer();
 
 	// reset members who aren't activly engaged in fighting
-	if (fLeaderIsFollowing == leaderIsStillFollowing && squadLeader->m_hEnemy != pEnemy && !squadLeader->HasConditions(bits_COND_SEE_ENEMY))
+	if (fLeaderIsFollowing == leaderIsStillFollowing && squadLeader->m_hEnemy != pEnemy && !squadLeader->HasConditions(
+		bits_COND_SEE_ENEMY))
 	{
-		if (squadLeader->m_hEnemy != NULL)
+		if (squadLeader->m_hEnemy != nullptr)
 		{
 			// remember their current enemy
 			squadLeader->PushEnemy(squadLeader->m_hEnemy, squadLeader->m_vecEnemyLKP);
@@ -332,7 +320,7 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 	// reset members who aren't activly engaged in fighting
 	if (squadLeader->m_hEnemy != pEnemy && !squadLeader->HasConditions(bits_COND_SEE_ENEMY))
 	{
-		if (squadLeader->m_hEnemy != NULL)
+		if (squadLeader->m_hEnemy != nullptr)
 		{
 			// remember their current enemy
 			squadLeader->PushEnemy(squadLeader->m_hEnemy, squadLeader->m_vecEnemyLKP);
@@ -347,7 +335,6 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 	}
 }
 
-
 //=========================================================
 //
 // SquadCount(), return the number of members of this squad
@@ -356,20 +343,19 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 //=========================================================
 int COFSquadTalkMonster::SquadCount()
 {
-	if( !InSquad() )
+	if (!InSquad())
 		return 0;
 
-	COFSquadTalkMonster *pSquadLeader = MySquadLeader();
+	COFSquadTalkMonster* pSquadLeader = MySquadLeader();
 	int squadCount = 0;
-	for( int i = 0; i < MAX_SQUAD_MEMBERS; i++ )
+	for (int i = 0; i < MAX_SQUAD_MEMBERS; i++)
 	{
-		if( pSquadLeader->MySquadMember( i ) != NULL )
+		if (pSquadLeader->MySquadMember(i) != nullptr)
 			squadCount++;
 	}
 
 	return squadCount;
 }
-
 
 //=========================================================
 //
@@ -377,65 +363,65 @@ int COFSquadTalkMonster::SquadCount()
 // link them as a group.  returns the group size
 //
 //=========================================================
-int COFSquadTalkMonster::SquadRecruit( int searchRadius, int maxMembers )
+int COFSquadTalkMonster::SquadRecruit(int searchRadius, int maxMembers)
 {
-	int squadCount;
-	int iMyClass = Classify();// cache this monster's class
-
+	int iMyClass = Classify(); // cache this monster's class
 
 	// Don't recruit if I'm already in a group
-	if( InSquad() )
+	if (InSquad())
 		return 0;
 
-	if( maxMembers < 2 )
+	if (maxMembers < 2)
 		return 0;
 
 	// I am my own leader
 	m_hSquadLeader = this;
-	squadCount = 1;
+	int squadCount = 1;
 
-	CBaseEntity *pEntity = NULL;
+	CBaseEntity* pEntity = nullptr;
 
-	if( !FStringNull( pev->netname ) )
+	if (!FStringNull(pev->netname))
 	{
 		// I have a netname, so unconditionally recruit everyone else with that name.
-		pEntity = UTIL_FindEntityByString( pEntity, "netname", STRING( pev->netname ) );
-		while( pEntity )
+		pEntity = UTIL_FindEntityByString(pEntity, "netname", STRING(pev->netname));
+		while (pEntity)
 		{
-			COFSquadTalkMonster *pRecruit = pEntity->MySquadTalkMonsterPointer();
+			COFSquadTalkMonster* pRecruit = pEntity->MySquadTalkMonsterPointer();
 
-			if( pRecruit )
+			if (pRecruit)
 			{
-				if( !pRecruit->InSquad() && pRecruit->Classify() == iMyClass && pRecruit != this )
+				if (!pRecruit->InSquad() && pRecruit->Classify() == iMyClass && pRecruit != this)
 				{
 					// minimum protection here against user error.in worldcraft. 
-					if( !SquadAdd( pRecruit ) )
+					if (!SquadAdd(pRecruit))
 						break;
 					squadCount++;
 				}
 			}
 
-			pEntity = UTIL_FindEntityByString( pEntity, "netname", STRING( pev->netname ) );
+			pEntity = UTIL_FindEntityByString(pEntity, "netname", STRING(pev->netname));
 		}
 	}
 	else
 	{
-		while( ( pEntity = UTIL_FindEntityInSphere( pEntity, pev->origin, searchRadius ) ) != NULL )
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, searchRadius)) != nullptr)
 		{
-			COFSquadTalkMonster *pRecruit = pEntity->MySquadTalkMonsterPointer();
+			COFSquadTalkMonster* pRecruit = pEntity->MySquadTalkMonsterPointer();
 
-			if( pRecruit && pRecruit != this && pRecruit->IsAlive() && !pRecruit->m_pCine )
+			if (pRecruit && pRecruit != this && pRecruit->IsAlive() && !pRecruit->m_pCine)
 			{
 				// Can we recruit this guy?
-				if( !pRecruit->InSquad() && pRecruit->Classify() == iMyClass &&
-					( ( iMyClass != CLASS_ALIEN_MONSTER ) || FStrEq( STRING( pev->classname ), STRING( pRecruit->pev->classname ) ) ) &&
-					FStringNull( pRecruit->pev->netname ) )
+				if (!pRecruit->InSquad() && pRecruit->Classify() == iMyClass &&
+					((iMyClass != CLASS_ALIEN_MONSTER) || FStrEq(
+						STRING(pev->classname), STRING(pRecruit->pev->classname))) &&
+					FStringNull(pRecruit->pev->netname))
 				{
 					TraceResult tr;
-					UTIL_TraceLine( pev->origin + pev->view_ofs, pRecruit->pev->origin + pev->view_ofs, ignore_monsters, pRecruit->edict(), &tr );// try to hit recruit with a traceline.
-					if( tr.flFraction == 1.0 )
+					UTIL_TraceLine(pev->origin + pev->view_ofs, pRecruit->pev->origin + pev->view_ofs, ignore_monsters,
+					               pRecruit->edict(), &tr); // try to hit recruit with a traceline.
+					if (tr.flFraction == 1.0)
 					{
-						if( !SquadAdd( pRecruit ) )
+						if (!SquadAdd(pRecruit))
 							break;
 
 						squadCount++;
@@ -446,9 +432,9 @@ int COFSquadTalkMonster::SquadRecruit( int searchRadius, int maxMembers )
 	}
 
 	// no single member squads
-	if( squadCount == 1 )
+	if (squadCount == 1)
 	{
-		m_hSquadLeader = NULL;
+		m_hSquadLeader = nullptr;
 	}
 
 	return squadCount;
@@ -457,16 +443,14 @@ int COFSquadTalkMonster::SquadRecruit( int searchRadius, int maxMembers )
 //=========================================================
 // CheckEnemy
 //=========================================================
-int COFSquadTalkMonster::CheckEnemy( CBaseEntity *pEnemy )
+int COFSquadTalkMonster::CheckEnemy(CBaseEntity* pEnemy)
 {
-	int iUpdatedLKP;
-
-	iUpdatedLKP = COFAllyMonster::CheckEnemy( m_hEnemy );
+	const int iUpdatedLKP = COFAllyMonster::CheckEnemy(m_hEnemy);
 
 	// communicate with squad members about the enemy IF this individual has the same enemy as the squad leader.
-	if( InSquad() && ( CBaseEntity * ) m_hEnemy == MySquadLeader()->m_hEnemy )
+	if (InSquad() && static_cast<CBaseEntity*>(m_hEnemy) == MySquadLeader()->m_hEnemy)
 	{
-		if( iUpdatedLKP )
+		if (iUpdatedLKP)
 		{
 			// have new enemy information, so paste to the squad.
 			SquadPasteEnemyInfo();
@@ -488,23 +472,23 @@ void COFSquadTalkMonster::StartMonster()
 {
 	COFAllyMonster::StartMonster();
 
-	if( ( m_afCapability & bits_CAP_SQUAD ) && !InSquad() )
+	if ((m_afCapability & bits_CAP_SQUAD) && !InSquad())
 	{
-		if( !FStringNull( pev->netname ) )
+		if (!FStringNull(pev->netname))
 		{
 			// if I have a groupname, I can only recruit if I'm flagged as leader
-			if( !( pev->spawnflags & SF_SQUADMONSTER_LEADER ) )
+			if (!(pev->spawnflags & SF_SQUADMONSTER_LEADER))
 			{
 				return;
 			}
 		}
 
 		// try to form squads now.
-		int iSquadSize = SquadRecruit( 1024, 4 );
+		int iSquadSize = SquadRecruit(1024, 4);
 
-		if( iSquadSize )
+		if (iSquadSize)
 		{
-			ALERT( at_aiconsole, "Squad of %d %s formed\n", iSquadSize, STRING( pev->classname ) );
+			ALERT(at_aiconsole, "Squad of %d %s formed\n", iSquadSize, STRING(pev->classname));
 		}
 	}
 
@@ -520,24 +504,20 @@ void COFSquadTalkMonster::StartMonster()
 //=========================================================
 BOOL COFSquadTalkMonster::NoFriendlyFire()
 {
-	if( !InSquad() )
+	if (!InSquad())
 	{
 		return TRUE;
 	}
 
-	CPlane	backPlane;
-	CPlane  leftPlane;
-	CPlane	rightPlane;
-
-	Vector	vecLeftSide;
-	Vector	vecRightSide;
-	Vector	v_left;
+	CPlane backPlane;
+	CPlane leftPlane;
+	CPlane rightPlane;
 
 	//!!!BUGBUG - to fix this, the planes must be aligned to where the monster will be firing its gun, not the direction it is facing!!!
 
-	if( m_hEnemy != NULL )
+	if (m_hEnemy != nullptr)
 	{
-		UTIL_MakeVectors( UTIL_VecToAngles( m_hEnemy->Center() - pev->origin ) );
+		UTIL_MakeVectors(UTIL_VecToAngles(m_hEnemy->Center() - pev->origin));
 	}
 	else
 	{
@@ -547,13 +527,13 @@ BOOL COFSquadTalkMonster::NoFriendlyFire()
 
 	//UTIL_MakeVectors ( pev->angles );
 
-	vecLeftSide = pev->origin - ( gpGlobals->v_right * ( pev->size.x * 1.5 ) );
-	vecRightSide = pev->origin + ( gpGlobals->v_right * ( pev->size.x * 1.5 ) );
-	v_left = gpGlobals->v_right * -1;
+	Vector vecLeftSide = pev->origin - (gpGlobals->v_right * (pev->size.x * 1.5));
+	Vector vecRightSide = pev->origin + (gpGlobals->v_right * (pev->size.x * 1.5));
+	Vector v_left = gpGlobals->v_right * -1;
 
-	leftPlane.InitializePlane( gpGlobals->v_right, vecLeftSide );
-	rightPlane.InitializePlane( v_left, vecRightSide );
-	backPlane.InitializePlane( gpGlobals->v_forward, pev->origin );
+	leftPlane.InitializePlane(gpGlobals->v_right, vecLeftSide);
+	rightPlane.InitializePlane(v_left, vecRightSide);
+	backPlane.InitializePlane(gpGlobals->v_forward, pev->origin);
 
 	/*
 		ALERT ( at_console, "LeftPlane: %f %f %f : %f\n", leftPlane.m_vecNormal.x, leftPlane.m_vecNormal.y, leftPlane.m_vecNormal.z, leftPlane.m_flDist );
@@ -561,16 +541,15 @@ BOOL COFSquadTalkMonster::NoFriendlyFire()
 		ALERT ( at_console, "BackPlane: %f %f %f : %f\n", backPlane.m_vecNormal.x, backPlane.m_vecNormal.y, backPlane.m_vecNormal.z, backPlane.m_flDist );
 	*/
 
-	COFSquadTalkMonster *pSquadLeader = MySquadLeader();
-	for( int i = 0; i < MAX_SQUAD_MEMBERS; i++ )
+	COFSquadTalkMonster* pSquadLeader = MySquadLeader();
+	for (int i = 0; i < MAX_SQUAD_MEMBERS; i++)
 	{
-		COFSquadTalkMonster *pMember = pSquadLeader->MySquadMember( i );
-		if( pMember && pMember != this )
+		COFSquadTalkMonster* pMember = pSquadLeader->MySquadMember(i);
+		if (pMember && pMember != this)
 		{
-
-			if( backPlane.PointInFront( pMember->pev->origin ) &&
-				leftPlane.PointInFront( pMember->pev->origin ) &&
-				rightPlane.PointInFront( pMember->pev->origin ) )
+			if (backPlane.PointInFront(pMember->pev->origin) &&
+				leftPlane.PointInFront(pMember->pev->origin) &&
+				rightPlane.PointInFront(pMember->pev->origin))
 			{
 				// this guy is in the check volume! Don't shoot!
 				return FALSE;
@@ -587,18 +566,14 @@ BOOL COFSquadTalkMonster::NoFriendlyFire()
 //=========================================================
 MONSTERSTATE COFSquadTalkMonster::GetIdealState()
 {
-	int	iConditions;
-
-	iConditions = IScheduleFlags();
-
 	// If no schedule conditions, the new ideal state is probably the reason we're in here.
-	switch( m_MonsterState )
+	switch(m_MonsterState)
 	{
 	case MONSTERSTATE_IDLE:
 	case MONSTERSTATE_ALERT:
-		if( HasConditions( bits_COND_NEW_ENEMY ) && InSquad() )
+		if (HasConditions(bits_COND_NEW_ENEMY) && InSquad())
 		{
-			SquadMakeEnemy( m_hEnemy );
+			SquadMakeEnemy(m_hEnemy);
 		}
 		break;
 	}
@@ -611,14 +586,14 @@ MONSTERSTATE COFSquadTalkMonster::GetIdealState()
 // cover location is a good one to move to. (currently based
 // on proximity to others in the squad)
 //=========================================================
-BOOL COFSquadTalkMonster::FValidateCover( const Vector &vecCoverLocation )
+BOOL COFSquadTalkMonster::FValidateCover(const Vector& vecCoverLocation)
 {
-	if( !InSquad() )
+	if (!InSquad())
 	{
 		return TRUE;
 	}
 
-	if( SquadMemberInRange( vecCoverLocation, 128 ) )
+	if (SquadMemberInRange(vecCoverLocation, 128))
 	{
 		// another squad member is too close to this piece of cover.
 		return FALSE;
@@ -633,16 +608,16 @@ BOOL COFSquadTalkMonster::FValidateCover( const Vector &vecCoverLocation )
 //=========================================================
 BOOL COFSquadTalkMonster::SquadEnemySplit()
 {
-	if( !InSquad() )
+	if (!InSquad())
 		return FALSE;
 
-	COFSquadTalkMonster	*pSquadLeader = MySquadLeader();
-	CBaseEntity		*pEnemy = pSquadLeader->m_hEnemy;
+	COFSquadTalkMonster* pSquadLeader = MySquadLeader();
+	CBaseEntity* pEnemy = pSquadLeader->m_hEnemy;
 
-	for( int i = 0; i < MAX_SQUAD_MEMBERS; i++ )
+	for (int i = 0; i < MAX_SQUAD_MEMBERS; i++)
 	{
-		COFSquadTalkMonster *pMember = pSquadLeader->MySquadMember( i );
-		if( pMember != NULL && pMember->m_hEnemy != NULL && pMember->m_hEnemy != pEnemy )
+		COFSquadTalkMonster* pMember = pSquadLeader->MySquadMember(i);
+		if (pMember != nullptr && pMember->m_hEnemy != nullptr && pMember->m_hEnemy != pEnemy)
 		{
 			return TRUE;
 		}
@@ -655,47 +630,46 @@ BOOL COFSquadTalkMonster::SquadEnemySplit()
 // cover location is a good one to move to. (currently based
 // on proximity to others in the squad)
 //=========================================================
-BOOL COFSquadTalkMonster::SquadMemberInRange( const Vector &vecLocation, float flDist )
+BOOL COFSquadTalkMonster::SquadMemberInRange(const Vector& vecLocation, float flDist)
 {
-	if( !InSquad() )
+	if (!InSquad())
 		return FALSE;
 
-	COFSquadTalkMonster *pSquadLeader = MySquadLeader();
+	COFSquadTalkMonster* pSquadLeader = MySquadLeader();
 
-	for( int i = 0; i < MAX_SQUAD_MEMBERS; i++ )
+	for (int i = 0; i < MAX_SQUAD_MEMBERS; i++)
 	{
-		COFSquadTalkMonster *pSquadMember = pSquadLeader->MySquadMember( i );
-		if( pSquadMember && ( vecLocation - pSquadMember->pev->origin ).Length2D() <= flDist )
+		COFSquadTalkMonster* pSquadMember = pSquadLeader->MySquadMember(i);
+		if (pSquadMember && (vecLocation - pSquadMember->pev->origin).Length2D() <= flDist)
 			return TRUE;
 	}
 	return FALSE;
 }
 
 
-extern Schedule_t	slChaseEnemyFailed[];
+extern Schedule_t slChaseEnemyFailed[];
 
-Schedule_t *COFSquadTalkMonster::GetScheduleOfType( int iType )
+Schedule_t* COFSquadTalkMonster::GetScheduleOfType(int iType)
 {
-	switch( iType )
+	switch (iType)
 	{
-
 	case SCHED_CHASE_ENEMY_FAILED:
 		{
-			return &slChaseEnemyFailed[ 0 ];
+			return &slChaseEnemyFailed[0];
 		}
 
 	default:
-		return COFAllyMonster::GetScheduleOfType( iType );
+		return COFAllyMonster::GetScheduleOfType(iType);
 	}
 }
 
-void COFSquadTalkMonster::FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+void COFSquadTalkMonster::FollowerUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
 	// Don't allow use during a scripted_sentence
 	if (m_useTime > gpGlobals->time)
 		return;
 
-	if (pCaller != NULL && pCaller->IsPlayer())
+	if (pCaller != nullptr && pCaller->IsPlayer())
 	{
 		// Pre-disaster followers can't be used
 		if (pev->spawnflags & SF_MONSTER_PREDISASTER)
@@ -712,7 +686,7 @@ void COFSquadTalkMonster::FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCa
 			else
 			{
 				StartFollowing(pCaller);
-				SetBits(m_bitsSaid, bit_saidHelloPlayer);	// Don't say hi after you've started following
+				SetBits(m_bitsSaid, bit_saidHelloPlayer); // Don't say hi after you've started following
 			}
 		}
 		else
@@ -724,11 +698,11 @@ void COFSquadTalkMonster::FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCa
 
 COFSquadTalkMonster* COFSquadTalkMonster::MySquadMedic()
 {
-	for( auto& member : m_hSquadMember )
+	for (auto& member : m_hSquadMember)
 	{
 		auto pMember = member.Entity<COFSquadTalkMonster>();
 
-		if( pMember && FClassnameIs( pMember->pev, "monster_human_medic_ally" ) )
+		if (pMember && FClassnameIs(pMember->pev, "monster_human_medic_ally"))
 		{
 			return pMember;
 		}
@@ -737,17 +711,17 @@ COFSquadTalkMonster* COFSquadTalkMonster::MySquadMedic()
 	return nullptr;
 }
 
-COFSquadTalkMonster* COFSquadTalkMonster::FindSquadMedic( int searchRadius )
+COFSquadTalkMonster* COFSquadTalkMonster::FindSquadMedic(int searchRadius)
 {
-	for( CBaseEntity* pEntity = nullptr; ( pEntity = UTIL_FindEntityInSphere( pEntity, pev->origin, searchRadius ) ); )
+	for (CBaseEntity* pEntity = nullptr; (pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, searchRadius));)
 	{
 		auto pMonster = pEntity->MySquadTalkMonsterPointer();
 
-		if( pMonster
+		if (pMonster
 			&& pMonster != this
 			&& pMonster->IsAlive()
 			&& !pMonster->m_pCine
-			&& FClassnameIs( pMonster->pev, "monster_human_medic_ally" ) )
+			&& FClassnameIs(pMonster->pev, "monster_human_medic_ally"))
 		{
 			return pMonster;
 		}
@@ -756,7 +730,7 @@ COFSquadTalkMonster* COFSquadTalkMonster::FindSquadMedic( int searchRadius )
 	return nullptr;
 }
 
-BOOL COFSquadTalkMonster::HealMe( COFSquadTalkMonster* pTarget )
+BOOL COFSquadTalkMonster::HealMe(COFSquadTalkMonster* pTarget)
 {
 	return false;
 }
@@ -787,10 +761,11 @@ int COFSquadTalkMonster::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttac
 					//Friendly fire!
 					pSquadMember->Remember(bits_MEMORY_PROVOKED);
 				}
-				//Attacked by an NPC...
+					//Attacked by an NPC...
 				else
 				{
-					g_vecAttackDir = ((pevAttacker->origin + pevAttacker->view_ofs) - (pSquadMember->pev->origin + pSquadMember->pev->view_ofs)).Normalize();
+					g_vecAttackDir = ((pevAttacker->origin + pevAttacker->view_ofs) - (pSquadMember->pev->origin +
+						pSquadMember->pev->view_ofs)).Normalize();
 
 					const Vector vecStart = pSquadMember->pev->origin + pSquadMember->pev->view_ofs;
 					const Vector vecEnd = pevAttacker->origin + pevAttacker->view_ofs + (g_vecAttackDir * m_flDistLook);
@@ -799,16 +774,16 @@ int COFSquadTalkMonster::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttac
 					UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, pSquadMember->edict(), &tr);
 
 					//If they didn't see any enemy...
-					if (tr.flFraction == 1.0)
+					if (tr.flFraction == 1.0f)
 					{
 						//Hunt for enemies
 						m_IdealMonsterState = MONSTERSTATE_HUNT;
 					}
-					//They can see an enemy
+						//They can see an enemy
 					else
 					{
 						//Make the enemy an enemy of my squadmate
-						pSquadMember->m_hEnemy = CBaseEntity::Instance(tr.pHit);
+						pSquadMember->m_hEnemy = Instance(tr.pHit);
 						pSquadMember->m_vecEnemyLKP = pevAttacker->origin;
 						pSquadMember->SetConditions(bits_COND_NEW_ENEMY);
 					}

@@ -17,10 +17,12 @@
 // form squads.
 //=========================================================
 
+#ifndef SQUADMONSTER_H
+#define SQUADMONSTER_H
+
 #define	SF_SQUADMONSTER_LEADER	32
 
-
-#define bits_NO_SLOT		0
+#include "entities/CBaseSquad.h"
 
 // HUMAN GRUNT SLOTS
 #define bits_SLOT_HGRUNT_ENGAGE1	( 1 << 0 )
@@ -43,42 +45,27 @@
 #define bits_SLOT_HOUND_ATTACK3		( 1 << 9 )
 #define bits_SLOTS_HOUND_ATTACK		( bits_SLOT_HOUND_ATTACK1 | bits_SLOT_HOUND_ATTACK2 | bits_SLOT_HOUND_ATTACK3 )
 
-// global slots
-#define bits_SLOT_SQUAD_SPLIT		( 1 << 10 )// squad members don't all have the same enemy
-
-#define NUM_SLOTS			11// update this every time you add/remove a slot.
-
-#define	MAX_SQUAD_MEMBERS	5
-
 //=========================================================
 // CSquadMonster - for any monster that forms squads.
 //=========================================================
-class CSquadMonster : public CBaseMonster
+class CSquadMonster : public CBaseSquad
 {
 public:
-	using BaseClass = CBaseMonster;
+	using BaseClass = CBaseSquad;
 
 	// squad leader info
-	EHANDLE m_hSquadLeader; // who is my leader
-	EHANDLE m_hSquadMember[MAX_SQUAD_MEMBERS - 1]; // valid only for leader
 	int m_afSquadSlots;
 	float m_flLastEnemySightTime; // last time anyone in the squad saw the enemy
-	BOOL m_fEnemyEluded;
-
-	// squad member info
-	int m_iMySlot; // this is the behaviour slot that the monster currently holds in the squad. 
 
 	int CheckEnemy(CBaseEntity* pEnemy) override;
 	void StartMonster() override;
-	void VacateSlot();
 	void ScheduleChange() override;
 	void Killed(entvars_t* pevAttacker, int iGib) override;
-	BOOL OccupySlot(int iDesiredSlot);
 	BOOL NoFriendlyFire() override;
 	BOOL NoFriendlyFire(BOOL playerAlly);
 
 	// squad functions still left in base class
-	CSquadMonster* MySquadLeader()
+	CSquadMonster* MySquadLeader() override
 	{
 		CSquadMonster* pSquadLeader = static_cast<CSquadMonster*>(static_cast<CBaseEntity*>(m_hSquadLeader));
 		if (pSquadLeader != nullptr)
@@ -86,24 +73,14 @@ public:
 		return this;
 	}
 
-	CSquadMonster* MySquadMember(int i)
+	CSquadMonster* MySquadMember(int i) override
 	{
 		if (i >= MAX_SQUAD_MEMBERS - 1)
 			return this;
 		return static_cast<CSquadMonster*>(static_cast<CBaseEntity*>(m_hSquadMember[i]));
 	}
 
-	int InSquad() { return m_hSquadLeader != nullptr; }
-	int IsLeader() { return m_hSquadLeader == this; }
-	int SquadRecruit(int searchRadius, int maxMembers);
-	int SquadCount();
-	void SquadRemove(CSquadMonster* pRemove);
-	BOOL SquadAdd(CSquadMonster* pAdd);
 	void SquadMakeEnemy(CBaseEntity* pEnemy);
-	void SquadPasteEnemyInfo();
-	void SquadCopyEnemyInfo();
-	BOOL SquadEnemySplit();
-	BOOL SquadMemberInRange(const Vector& vecLocation, float flDist);
 
 	CSquadMonster* MySquadMonsterPointer() override { return this; }
 
@@ -119,3 +96,5 @@ public:
 
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 };
+
+#endif // SQUADMONSTER_H

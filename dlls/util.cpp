@@ -579,6 +579,7 @@ CBaseEntity* UTIL_FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& ve
 
 	if (!FNullEnt(pentEntity))
 		return CBaseEntity::Instance(pentEntity);
+	
 	return NULL;
 }
 

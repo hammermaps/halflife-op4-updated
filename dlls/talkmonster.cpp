@@ -1367,14 +1367,12 @@ Schedule_t* CTalkMonster::GetScheduleOfType(int Type)
 //=========================================================
 // IsTalking - am I saying a sentence right now?
 //=========================================================
-BOOL CTalkMonster::IsTalking()
+bool CTalkMonster::IsTalking()
 {
 	if (m_flStopTalkTime > gpGlobals->time)
-	{
-		return TRUE;
-	}
+		return true;
 
-	return FALSE;
+	return false;
 }
 
 //=========================================================

@@ -29,7 +29,7 @@ public:
 	void		HandleAnimEvent( MonsterEvent_t *pEvent ) override;
 	void		MoveExecute( CBaseEntity *pTargetEnt, const Vector &vecDir, float flInterval ) override;
 	void		Move( float flInterval = 0.1 ) override;
-	BOOL		ShouldAdvanceRoute( float flWaypointDist ) override;
+	bool		ShouldAdvanceRoute( float flWaypointDist ) override;
 
 	inline void	SetFlyingMomentum( float momentum ) { m_momentum = momentum; }
 	inline void	SetFlyingFlapSound( const char *pFlapSound ) { m_pFlapSound = pFlapSound; }
