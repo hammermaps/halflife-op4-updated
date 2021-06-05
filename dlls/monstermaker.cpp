@@ -22,12 +22,17 @@
 #include "cbase.h"
 #include "monsters.h"
 #include "saverestore.h"
+#include "effects.h"
+#include "weapons.h"
+#include "effects/CLightning.h"
+#include "bs/CWarpBall.h"
 
 // Monstermaker spawnflags
 #define	SF_MONSTERMAKER_START_ON	1 // start active ( if has targetname )
 #define	SF_MONSTERMAKER_CYCLIC		4 // drop one monster every time fired.
 #define SF_MONSTERMAKER_MONSTERCLIP	8 // Children are blocked by monsterclip
-#define SF_MONSTERMAKER_LEAVECORPSE 16 // Don't fade corpses.
+#define SF_MONSTERMAKER_WARPBALL	16
+#define SF_MONSTERMAKER_LEAVECORPSE 32 // Don't fade corpses.
 #define SF_MONSTERMAKER_NO_WPN_DROP	1024 // Corpses don't drop weapons.
 
 //=========================================================
@@ -55,7 +60,8 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 	string_t m_iszMonsterClassname; // classname of the monster(s) that will be created.
-
+	string_t m_iszWarpTarget;
+	
 	int m_cNumMonsters; // max number of monsters this ent can create
 
 	int m_cLiveChildren; // how many monsters made by this monster maker that are currently alive
@@ -66,13 +72,17 @@ public:
 
 	BOOL m_fActive;
 	BOOL m_fFadeChildren; // should we make the children fadeout?
+	BOOL m_fWarpball;
+	BOOL u_fWarpball;
 	float m_fSpawnDelay; // LRC- delay between triggering targets and making a child (for env_warpball, mainly)
 };
 
 LINK_ENTITY_TO_CLASS(monstermaker, CMonsterMaker);
+LINK_ENTITY_TO_CLASS(env_warpball, CMonsterMaker)
 
 TYPEDESCRIPTION CMonsterMaker::m_SaveData[] =
 {
+	DEFINE_FIELD(CMonsterMaker, m_iszWarpTarget, FIELD_STRING),
 	DEFINE_FIELD(CMonsterMaker, m_iszMonsterClassname, FIELD_STRING),
 	DEFINE_FIELD(CMonsterMaker, m_cNumMonsters, FIELD_INTEGER),
 	DEFINE_FIELD(CMonsterMaker, m_cLiveChildren, FIELD_INTEGER),
@@ -81,6 +91,7 @@ TYPEDESCRIPTION CMonsterMaker::m_SaveData[] =
 	DEFINE_FIELD(CMonsterMaker, m_fActive, FIELD_BOOLEAN),
 	DEFINE_FIELD(CMonsterMaker, m_fFadeChildren, FIELD_BOOLEAN),
 	DEFINE_FIELD(CMonsterMaker, m_fSpawnDelay, FIELD_FLOAT),
+	DEFINE_FIELD(CMonsterMaker, m_fWarpball, FIELD_BOOLEAN),
 };
 
 IMPLEMENT_SAVERESTORE(CMonsterMaker, CBaseMonster);
@@ -90,33 +101,44 @@ void CMonsterMaker::KeyValue(KeyValueData* pkvd)
 	if (FStrEq(pkvd->szKeyName, "monstercount"))
 	{
 		m_cNumMonsters = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		pkvd->fHandled = true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "m_imaxlivechildren"))
 	{
 		m_iMaxLiveChildren = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		pkvd->fHandled = true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "monstertype"))
 	{
 		m_iszMonsterClassname = ALLOC_STRING(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		pkvd->fHandled = true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "spawndelay"))
 	{
 		m_fSpawnDelay = atof(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		pkvd->fHandled = true;
+	}
+	else if (FStrEq(pkvd->szKeyName, "warp_target"))
+	{
+		m_iszWarpTarget = ALLOC_STRING(pkvd->szValue);
+		pkvd->fHandled = true;
 	}
 	else
-		CBaseMonster::KeyValue(pkvd);
+		BaseClass::KeyValue(pkvd);
 }
 
 void CMonsterMaker::Spawn()
 {
 	pev->solid = SOLID_NOT;
 
+	m_fWarpball = FClassnameIs(pev, "env_warpball");
+
 	m_cLiveChildren = 0;
 	Precache();
+
+	if (m_fWarpball && FBitSet(pev->spawnflags, SF_MONSTERMAKER_START_ON))
+		pev->spawnflags |= SF_MONSTERMAKER_WARPBALL;
+	
 	if (!FStringNull(pev->targetname))
 	{
 		if (pev->spawnflags & SF_MONSTERMAKER_CYCLIC)
@@ -126,20 +148,20 @@ void CMonsterMaker::Spawn()
 		}
 		else
 		{
-			SetUse(&CMonsterMaker :: ToggleUse); // can be turned on/off
+			SetUse(&CMonsterMaker::ToggleUse);// so can be turned on/off
+		}
 
-			if (FBitSet(pev->spawnflags, SF_MONSTERMAKER_START_ON))
-			{
-				// start making monsters as soon as monstermaker spawns
-				m_fActive = TRUE;
-				SetThink(&CMonsterMaker :: MakerThink);
-			}
-			else
-			{
-				// wait to be activated.
-				m_fActive = FALSE;
-				SetThink(&CMonsterMaker :: SUB_DoNothing);
-			}
+		if (!m_fWarpball && FBitSet(pev->spawnflags, SF_MONSTERMAKER_START_ON))
+		{
+			// start making monsters as soon as monstermaker spawns
+			m_fActive = TRUE;
+			SetThink(&CMonsterMaker::MakerThink);
+		}
+		else
+		{
+			// wait to be activated.
+			m_fActive = FALSE;
+			SetThink(&CMonsterMaker::SUB_DoNothing);
 		}
 	}
 	else
@@ -149,6 +171,8 @@ void CMonsterMaker::Spawn()
 		m_fActive = TRUE;
 		SetThink(&CMonsterMaker :: MakerThink);
 	}
+
+	m_cNumMonsters = m_cNumMonsters != -1 ? m_cNumMonsters : 1;
 
 	if (m_cNumMonsters == 1 || (m_cNumMonsters != -1 && pev->spawnflags & SF_MONSTERMAKER_LEAVECORPSE))
 	{
@@ -166,7 +190,16 @@ void CMonsterMaker::Precache()
 {
 	CBaseMonster::Precache();
 
-	UTIL_PrecacheOther(STRING(m_iszMonsterClassname));
+	if (m_fWarpball)
+	{
+		m_flDelay = 5.0f;
+		UTIL_PrecacheOther("effect_warpball");
+	}
+
+	if (FStringNull(m_iszMonsterClassname))
+		ALERT(at_console, "CMonsterMaker without a children name!\n");
+	else
+		UTIL_PrecacheOther(STRING(m_iszMonsterClassname));
 }
 
 //=========================================================
@@ -211,13 +244,13 @@ void CMonsterMaker::TryMakeMonster()
 			FireTargets(STRING(pev->target), this, this, USE_TOGGLE, 0);
 		}
 
-		//		ALERT(at_console,"Making Monster in %f seconds\n",m_fSpawnDelay);
+		//ALERT(at_console,"Making Monster in %f seconds\n",m_fSpawnDelay);
 		SetThink(&CMonsterMaker:: MakeMonsterThink);
 		SetNextThink(m_fSpawnDelay);
 	}
 	else
 	{
-		//		ALERT(at_console,"No delay. Making monster.\n",m_fSpawnDelay);
+		//ALERT(at_console,"No delay. Making monster.\n",m_fSpawnDelay);
 		CBaseMonster* pMonst = MakeMonster();
 
 		// delay already overloaded for this entity, so can't call SUB_UseTargets()
@@ -241,20 +274,31 @@ void CMonsterMaker::MakeMonsterThink()
 //=========================================================
 CBaseMonster* CMonsterMaker::MakeMonster()
 {
-	edict_t* pent;
-	entvars_t* pevCreate;
-
 	//	ALERT(at_console,"Making Monster NOW\n");
 
-	pent = CREATE_NAMED_ENTITY(m_iszMonsterClassname);
-
+	edict_t* pent = CREATE_NAMED_ENTITY(m_iszMonsterClassname);
 	if (FNullEnt(pent))
 	{
 		ALERT(at_console, "NULL Ent in MonsterMaker!\n");
 		return nullptr;
 	}
 
-	pevCreate = VARS(pent);
+	if (m_fWarpball && !u_fWarpball)
+	{
+		auto pBall = GetClassPtr<CWarpBall>(nullptr);
+		UTIL_SetOrigin(pBall, pev->origin);
+		pBall->m_iszWarpTarget = m_iszWarpTarget;
+		pBall->m_flDamageDelay = 0;
+		pBall->Spawn();
+		pBall->WarpBallUse(this, nullptr, USE_ON, 1);
+		u_fWarpball = true;
+		SetNextThink(0.3f);
+		SetThink(&CMonsterMaker::MakerThink);
+		return nullptr;
+	}
+	u_fWarpball = false;
+
+	entvars_t* pevCreate = VARS(pent);
 	pevCreate->origin = pev->origin;
 	pevCreate->angles = pev->angles;
 	SetBits(pevCreate->spawnflags, SF_MONSTER_FALL_TO_GROUND);

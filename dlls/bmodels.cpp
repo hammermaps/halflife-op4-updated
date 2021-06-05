@@ -806,6 +806,25 @@ void CFuncRotating::Blocked(CBaseEntity* pOther)
 	pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
 }
 
+class CFuncFrame : public CFuncWall
+{
+public:
+	void Spawn() override;
+};
+
+LINK_ENTITY_TO_CLASS(func_frame, CFuncFrame)
+
+void CFuncFrame::Spawn()
+{
+	pev->angles = g_vecZero;
+	pev->movetype = MOVETYPE_PUSH;
+	pev->solid = SOLID_NOT;
+	pev->flags |= FL_WORLDBRUSH;
+	pev->effects |= EF_NODRAW;
+	SetNextThink(0.1f);
+	SetModel(pev->model);
+}
+
 class CPendulum : public CBaseEntity
 {
 public:

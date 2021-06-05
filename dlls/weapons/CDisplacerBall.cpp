@@ -170,16 +170,7 @@ void CDisplacerBall::BallTouch( CBaseEntity* pOther )
 		WRITE_BYTE( 0 );							 // byte (scroll speed in 0.1's)
 	MESSAGE_END();
 
-	MESSAGE_BEGIN( MSG_PVS, SVC_TEMPENTITY, pev->origin );
-		WRITE_BYTE( TE_DLIGHT );
-		WRITE_COORD_VECTOR( pev->origin );			// coord, coord, coord (pos) 
-		WRITE_BYTE( 16 );							// byte (radius in 10's) 
-		WRITE_BYTE( 255 );							// byte byte byte (color)
-		WRITE_BYTE( 180 );							
-		WRITE_BYTE( 96 );							
-		WRITE_BYTE( 10 );							// byte (brightness)
-		WRITE_BYTE( 10 );							// byte (life in 10's)
-	MESSAGE_END();
+	UTIL_MuzzleLight(pOther->pev->origin, 160.0f, 255, 180, 96, 1.0f, 100.0f);
 
 	m_hDisplacedTarget = nullptr;
 
@@ -273,24 +264,26 @@ void CDisplacerBall::BallTouch( CBaseEntity* pOther )
 
 	SetThink( &CDisplacerBall::KillThink );
 
-	SetNextThink(g_pGameRules->IsMultiplayer() ? 0.2 : 0.5 );
+	SetNextThink(g_pGameRules->IsMultiplayer() ? 0.2f : 0.5f );
 }
 
 void CDisplacerBall::FlyThink()
 {
 	Animate();
+	UTIL_MuzzleLight(pev->origin, 160.0f, 255, 180, 96, 1.0f, 100.0f);
 
 	if (pev->waterlevel != WATERLEVEL_DRY)
 	{
 		SetThink(&CDisplacerBall::FizzleThink);
 	}
 	
-	SetNextThink(0.05);
+	SetNextThink(0.05f);
 }
 
 void CDisplacerBall::FlyThink2()
 {
 	UTIL_SetSize( pev, Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
+	UTIL_MuzzleLight(pev->origin, 160.0f, 255, 180, 96, 1.0f, 100.0f);
 
 	Animate();
 
@@ -299,7 +292,7 @@ void CDisplacerBall::FlyThink2()
 		SetThink(&CDisplacerBall::FizzleThink);
 	}
 
-	SetNextThink(0.05);
+	SetNextThink(0.05f);
 }
 
 void CDisplacerBall::FizzleThink()
@@ -369,6 +362,8 @@ void CDisplacerBall::ExplodeThink()
 
 	EMIT_SOUND( edict(), CHAN_WEAPON, "weapons/displacer_teleport.wav", RANDOM_FLOAT( 0.8, 0.9 ), ATTN_NORM );
 
+	UTIL_MuzzleLight(pev->origin, 160.0f, 255, 180, 96, 1.0f, 100.0f);
+	
 	UTIL_Remove( this );
 }
 

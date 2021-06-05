@@ -872,14 +872,14 @@ void CHalfLifeMultiplay::DeathNotice( CBasePlayer *pVictim, entvars_t *pKiller, 
 	const char *tau = "tau_cannon";
 	const char *gluon = "gluon gun";
 
-	if ( pKiller->flags & FL_CLIENT )
+	if (pevInflictor)
 	{
-		killer_index = ENTINDEX(ENT(pKiller));
-		
-		if ( pevInflictor )
+		if (pKiller->flags & FL_CLIENT)
 		{
 			if ( pevInflictor == pKiller )
 			{
+				killer_index = ENTINDEX(ENT(pKiller));
+				
 				// If the inflictor is the killer,  then it must be their current weapon doing the damage
 				CBasePlayer *pPlayer = (CBasePlayer*)CBaseEntity::Instance( pKiller );
 				

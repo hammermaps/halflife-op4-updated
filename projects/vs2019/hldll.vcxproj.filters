@@ -627,6 +627,15 @@
     <ClCompile Include="..\..\dlls\entities\CTriggerChangeKeyValue.cpp">
       <Filter>Source Files\dlls\entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\CWallHealthJar.cpp">
+      <Filter>Source Files\dlls\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\CWallHealthProp.cpp">
+      <Filter>Source Files\dlls\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\entities\CEyeScanner.cpp">
+      <Filter>Source Files\dlls\entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\doors.h">
@@ -1071,6 +1080,15 @@
       <Filter>Source Files\dlls\entities\monsters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\entities\CBaseSquad.h">
+      <Filter>Source Files\dlls\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\CWallHealthJar.h">
+      <Filter>Source Files\dlls\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\CWallHealthProp.h">
+      <Filter>Source Files\dlls\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\entities\CEyeScanner.h">
       <Filter>Source Files\dlls\entities</Filter>
     </ClInclude>
   </ItemGroup>

@@ -264,6 +264,7 @@ extern void			UTIL_SetOrigin(CBaseEntity* pEntity, const Vector& vecOrigin);
 extern void			UTIL_EmitAmbientSound(edict_t* entity, const Vector& vecOrigin, const char* samp, float vol, float attenuation, int fFlags, int pitch);
 extern void			UTIL_ParticleEffect(const Vector& vecOrigin, const Vector& vecDirection, ULONG ulColor, ULONG ulCount);
 extern void			UTIL_ScreenShake(const Vector& center, float amplitude, float frequency, float duration, float radius);
+extern void			UTIL_MuzzleLight(Vector vecSrc, float flRadius, byte r, byte g, byte b, float flTime, float flDecay);
 extern void			UTIL_ScreenShakeAll(const Vector& center, float amplitude, float frequency, float duration);
 extern void			UTIL_ShowMessage(const char* pString, CBaseEntity* pPlayer);
 extern void			UTIL_ShowMessageAll(const char* pString);

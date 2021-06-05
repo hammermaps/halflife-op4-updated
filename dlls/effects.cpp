@@ -1706,6 +1706,12 @@ class CEnvModel : public CBaseAnimating
 	string_t m_iszSequence_Off;
 	int m_iAction_On;
 	int m_iAction_Off;
+
+private:
+	int m_iSkin;
+	float m_flScale;
+	int m_iBody;
+	int m_iBodyGroup;
 };
 
 TYPEDESCRIPTION CEnvModel::m_SaveData[] =
@@ -1741,6 +1747,26 @@ void CEnvModel::KeyValue(KeyValueData* pkvd)
 		m_iAction_Off = atoi(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
+	if (FStrEq(pkvd->szKeyName, "skin"))
+	{
+		m_iSkin = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "scale"))
+	{
+		m_flScale = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "body"))
+	{
+		m_iBody = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "bodygroup"))
+	{
+		m_iBodyGroup = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
 	else
 	{
 		CBaseAnimating::KeyValue(pkvd);
@@ -1751,6 +1777,7 @@ void CEnvModel::Spawn()
 {
 	Precache();
 	SetModel( pev->model);
+	
 	UTIL_SetOrigin(this, pev->origin);
 
 	if (pev->spawnflags & SF_ENVMODEL_SOLID)
@@ -1765,6 +1792,10 @@ void CEnvModel::Spawn()
 		DROP_TO_FLOOR(ENT(pev));
 	}
 
+	SetBodygroup(m_iBodyGroup, m_iBody);
+	pev->skin = m_iSkin;
+	pev->scale = m_flScale;
+	
 	SetBoneController(0, 0);
 	SetBoneController(1, 0);
 
@@ -1775,7 +1806,7 @@ void CEnvModel::Spawn()
 
 void CEnvModel::Precache()
 {
-	PrecacheModel((char*)STRING(pev->model));
+	PrecacheModel(pev->model);
 }
 
 STATE CEnvModel::GetState()

@@ -154,7 +154,10 @@
     <ClCompile Include="..\..\dlls\entities\CActAnimating.cpp" />
     <ClCompile Include="..\..\dlls\entities\CBaseAnimating.cpp" />
     <ClCompile Include="..\..\dlls\entities\CBaseSquad.cpp" />
+    <ClCompile Include="..\..\dlls\entities\CEyeScanner.cpp" />
     <ClCompile Include="..\..\dlls\entities\CTriggerChangeKeyValue.cpp" />
+    <ClCompile Include="..\..\dlls\entities\CWallHealthJar.cpp" />
+    <ClCompile Include="..\..\dlls\entities\CWallHealthProp.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CAGrunt.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CBarnacle.cpp" />
     <ClCompile Include="..\..\dlls\entities\monsters\CBarney.cpp" />
@@ -364,6 +367,9 @@
     <ClInclude Include="..\..\dlls\entities\CActAnimating.h" />
     <ClInclude Include="..\..\dlls\entities\CBaseAnimating.h" />
     <ClInclude Include="..\..\dlls\entities\CBaseSquad.h" />
+    <ClInclude Include="..\..\dlls\entities\CEyeScanner.h" />
+    <ClInclude Include="..\..\dlls\entities\CWallHealthJar.h" />
+    <ClInclude Include="..\..\dlls\entities\CWallHealthProp.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CAGrunt.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CBarnacle.h" />
     <ClInclude Include="..\..\dlls\entities\monsters\CBarney.h" />

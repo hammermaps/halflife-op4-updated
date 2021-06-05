@@ -483,7 +483,7 @@ void CMultiSource::Register(void)
 	pTarget = UTIL_FindEntityByClassname(NULL, "multi_manager");
 	while (pTarget && (m_iTotal < MS_MAX_TARGETS))
 	{
-		if (pTarget->HasTarget(pev->targetname))
+		if (pTarget->HasTargetName(pev->targetname))
 			m_rgEntities[m_iTotal++] = pTarget;
 
 		pTarget = UTIL_FindEntityByClassname(pTarget, "multi_manager");

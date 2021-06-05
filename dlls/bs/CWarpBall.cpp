@@ -22,7 +22,7 @@
 
 #include "CWarpBall.h"
 
-LINK_ENTITY_TO_CLASS(env_warpball, CWarpBall);
+LINK_ENTITY_TO_CLASS(effect_warpball, CWarpBall);
 
 TYPEDESCRIPTION	CWarpBall::m_SaveData[] =
 {
@@ -115,7 +115,7 @@ void CWarpBall::WarpBallUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_T
 		pev->rendercolor.x = 77;
 		pev->rendercolor.y = 210;
 		pev->rendercolor.z = 130;
-		pev->scale = 1.2;
+		pev->scale = 1.2f;
 		pev->frame = 0;
 
 		if (m_pSprite)
@@ -163,17 +163,17 @@ void CWarpBall::WarpBallUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_T
 			m_pBeams->pev->solid = 0;
 			m_pBeams->Precache();
 			m_pBeams->SetThink(&CLightning::StrikeThink);
-			m_pBeams->SetNextThink(0.1);
+			m_pBeams->SetNextThink(0.1f);
 		}
 
 		SetThink(&CWarpBall::BallThink);
-		SetNextThink(0.1);
+		SetNextThink(0.1f);
 
 		m_flLastTime = gpGlobals->time;
 		m_fBeamsCleared = 0;
 		m_fPlaying = true;
 
-		if (m_flDamageDelay == 0)
+		if (!m_flDamageDelay)
 		{
 			::RadiusDamage(pev->origin, pev, pev, 300, 48, CLASS_NONE, DMG_SHOCK);
 			m_fDamageApplied = true;
@@ -235,7 +235,7 @@ void CWarpBall::BallThink()
 
 		EMIT_SOUND(edict(), CHAN_BODY, "debris/beamstart2.wav", 1, ATTN_NORM);
 
-		SetNextThink(0.1);
+		SetNextThink(0.1f);
 		m_flLastTime = gpGlobals->time;
 	}
 }

@@ -33,7 +33,14 @@ CBaseEntity
 					CBasePlayer
 					CCineMonster
 */
-#define		MAX_PATH_SIZE	10 // max number of nodes available for a path.
+
+#pragma once
+#define	MAX_PATH_SIZE	10 // max number of nodes available for a path.
+
+// 
+// PlayerUse - handles USE keypress
+//
+#define	PLAYER_SEARCH_RADIUS	(float)64
 
 // These are caps bits to indicate what an object's capabilities (currently used for save/restore and level transitions)
 #define		FCAP_CUSTOMSAVE				0x00000001
@@ -359,7 +366,8 @@ public:
 	virtual BOOL IsAlive() { return (pev->deadflag == DEAD_NO) && pev->health > 0; }
 	virtual BOOL IsBSPModel() { return pev->solid == SOLID_BSP || pev->movetype == MOVETYPE_PUSHSTEP; }
 	virtual BOOL ReflectGauss() { return (IsBSPModel() && !pev->takedamage); }
-	virtual BOOL HasTarget(string_t targetname) { return FStrEq(STRING(targetname), STRING(pev->targetname)); }
+	virtual BOOL HasTargetName(string_t targetname) { return FStrEq(STRING(targetname), STRING(pev->targetname)); }
+	virtual BOOL HasTarget(string_t target) { return FStrEq(STRING(target), STRING(pev->target)); }
 	virtual BOOL IsInWorld();
 	virtual BOOL IsPlayer() { return FALSE; }
 	virtual BOOL IsNetClient() { return FALSE; }

@@ -1627,11 +1627,6 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 	Observer_SetMode(m_iObserverLastMode);
 }
 
-// 
-// PlayerUse - handles USE keypress
-//
-#define	PLAYER_SEARCH_RADIUS	(float)64
-
 void CBasePlayer::PlayerUse()
 {
 	if (IsObserver())
