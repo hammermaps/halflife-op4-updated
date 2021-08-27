@@ -287,6 +287,10 @@ public:
 	
 	static	TYPEDESCRIPTION m_SaveData[];
 
+	virtual void Spawn();
+#ifndef CLIENT_DLL
+	virtual void KeyValue(KeyValueData* pkvd);
+#endif
 	virtual bool AddToPlayer( CBasePlayer *pPlayer );	// return TRUE if the item you want the item added to the player inventory
 	virtual int AddDuplicate( CBasePlayerItem *pItem ) { return FALSE; }	// return TRUE if you want your duplicate removed from world
 	void EXPORT DestroyItem();
@@ -328,6 +332,8 @@ public:
 
 	static ItemInfo ItemInfoArray[ MAX_WEAPONS ];
 	static AmmoInfo AmmoInfoArray[ MAX_AMMO_SLOTS ];
+
+	string_t m_sMaster;
 
 	CBasePlayer	*m_pPlayer;
 	CBasePlayerItem *m_pNext;
@@ -394,7 +400,7 @@ public:
 	virtual void SendWeaponAnim( int iAnim, int skiplocal = 1, int body = 0 );  // skiplocal is 1 if client is predicting weapon animations
 
     BOOL CanDeploy() override;
-	virtual BOOL IsUseable();
+	virtual BOOL IsUseable() { return CanDeploy(); };
 	BOOL DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt, int skiplocal = 0, int body = 0 );
 	int DefaultReload( int iClipSize, int iAnim, float fDelay, int body = 0 );
 
@@ -443,7 +449,7 @@ public:
 };
 
 
-class CBasePlayerAmmo : public CBaseEntity
+class CBasePlayerAmmo : public CBasePlayerItem
 {
 public:
 	using BaseClass = CBaseEntity;
@@ -649,7 +655,6 @@ public:
 	
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 2; }
 	int GetItemInfo(ItemInfo *p) override;
 	bool AddToPlayer(CBasePlayer* pPlayer) override;
 
@@ -700,7 +705,6 @@ public:
 	
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 1; }
 	void EXPORT SwingAgain();
 	void EXPORT Smack();
 	int GetItemInfo(ItemInfo *p) override;
@@ -743,7 +747,6 @@ public:
 	
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 2; }
 	int GetItemInfo(ItemInfo *p) override;
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 	bool AddToPlayer( CBasePlayer *pPlayer ) override;
@@ -786,7 +789,6 @@ public:
 	
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 3; }
 	int GetItemInfo(ItemInfo *p) override;
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 	bool AddToPlayer( CBasePlayer *pPlayer ) override;
@@ -837,7 +839,6 @@ public:
 	
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot( ) override { return 3; }
 	int GetItemInfo(ItemInfo *p) override;
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 
@@ -893,7 +894,6 @@ public:
 
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot( ) override { return 3; }
 	int GetItemInfo(ItemInfo *p) override;
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 	bool AddToPlayer( CBasePlayer *pPlayer ) override;
@@ -901,6 +901,7 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	BOOL Deploy( ) override;
+	void Holster(int skiplocal);
 	void Reload() override;
 	void WeaponIdle() override;
 	void ItemPostFrame() override;
@@ -965,7 +966,6 @@ public:
 	void Spawn() override;
 	void Precache() override;
 	void Reload() override;
-	int iItemSlot() override { return 4; }
 	int GetItemInfo(ItemInfo *p) override;
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 	bool AddToPlayer( CBasePlayer *pPlayer ) override;
@@ -1048,7 +1048,6 @@ public:
 
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 4; }
 	int GetItemInfo(ItemInfo *p) override;
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 	bool AddToPlayer( CBasePlayer *pPlayer ) override;
@@ -1130,7 +1129,6 @@ public:
 
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 4; }
 	int GetItemInfo(ItemInfo *p) override;
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 	bool AddToPlayer( CBasePlayer *pPlayer ) override;
@@ -1200,7 +1198,6 @@ public:
 	using BaseClass = CBasePlayerWeapon;
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 4; }
 	int GetItemInfo(ItemInfo *p) override;
 	bool AddToPlayer( CBasePlayer *pPlayer ) override;
 
@@ -1247,7 +1244,6 @@ public:
 	using BaseClass = CBasePlayerWeapon;
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 5; }
 	int GetItemInfo(ItemInfo *p) override;
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 
@@ -1296,7 +1292,6 @@ public:
 
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 5; }
 	int GetItemInfo(ItemInfo *p) override;
 	bool AddToPlayer( CBasePlayer *pPlayer ) override;
 	void PrimaryAttack() override;
@@ -1339,7 +1334,6 @@ public:
 	using BaseClass = CBasePlayerWeapon;
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 5; }
 	int GetItemInfo(ItemInfo *p) override;
 	void SetObjectCollisionBox() override
 	{
@@ -1383,7 +1377,6 @@ public:
 	using BaseClass = CBasePlayerWeapon;
 	void Spawn() override;
 	void Precache() override;
-	int iItemSlot() override { return 5; }
 	int GetItemInfo(ItemInfo *p) override;
 
 	void PrimaryAttack() override;

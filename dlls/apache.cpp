@@ -408,7 +408,11 @@ void CApache :: DyingThink()
 		MESSAGE_END();
 
 		SetThink( &CApache::SUB_Remove );
-		SetNextThink(0.1);
+		SetNextThink(0.1f);
+
+		pev->deadflag = DEAD_DYING;
+		FCheckAITrigger();
+		pev->deadflag = DEAD_NO;
 	}
 }
 

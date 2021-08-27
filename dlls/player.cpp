@@ -109,6 +109,7 @@ TYPEDESCRIPTION CBasePlayer::m_playerSaveData[] =
 	DEFINE_ARRAY(CBasePlayer, m_szAnimExtention, FIELD_CHARACTER, 32),
 	DEFINE_FIELD(CBasePlayer, m_pActiveItem, FIELD_CLASSPTR),
 	DEFINE_FIELD(CBasePlayer, m_pLastItem, FIELD_CLASSPTR),
+	DEFINE_FIELD(CBasePlayer, m_pNextItem, FIELD_CLASSPTR),
 
 	DEFINE_ARRAY(CBasePlayer, m_rgAmmo, FIELD_INTEGER, MAX_AMMO_SLOTS),
 	DEFINE_FIELD(CBasePlayer, m_idrowndmg, FIELD_INTEGER),
@@ -980,6 +981,8 @@ void CBasePlayer::Killed(entvars_t* pevAttacker, int iGib)
 	// Holster weapon immediately, to allow it to cleanup
 	if (m_pActiveItem)
 		m_pActiveItem->Holster();
+
+	m_pNextItem = nullptr;
 
 	g_pGameRules->PlayerKilled(this, pevAttacker, g_pevLastInflictor);
 
@@ -3531,13 +3534,28 @@ void CBasePlayer::SelectNextItem(int iItem)
 		m_pActiveItem->Holster();
 	}
 
-	m_pActiveItem = pItem;
+	QueueItem(pItem);
 
 	if (m_pActiveItem)
 	{
 		m_pActiveItem->Deploy();
 		m_pActiveItem->UpdateItemInfo();
 	}
+}
+
+void CBasePlayer::QueueItem(CBasePlayerItem* pItem)
+{
+	if (!m_pActiveItem)// no active weapon
+	{
+		m_pActiveItem = pItem;
+		return;// just set this item as active
+	}
+	else
+	{
+		m_pLastItem = m_pActiveItem;
+		m_pActiveItem = nullptr;// clear current
+	}
+	m_pNextItem = pItem;// add item to queue
 }
 
 void CBasePlayer::SelectItem(const char* pstr)
@@ -3578,8 +3596,7 @@ void CBasePlayer::SelectItem(const char* pstr)
 	if (m_pActiveItem)
 		m_pActiveItem->Holster();
 
-	m_pLastItem = m_pActiveItem;
-	m_pActiveItem = pItem;
+	QueueItem(pItem);
 
 	if (m_pActiveItem)
 	{
@@ -4260,6 +4277,17 @@ void CBasePlayer::ItemPreFrame()
 #endif
 	{
 		return;
+	}
+
+	if (!m_pActiveItem)// XWider
+	{
+		if (m_pNextItem)
+		{
+			m_pActiveItem = m_pNextItem;
+			m_pActiveItem->Deploy();
+			m_pActiveItem->UpdateItemInfo();
+			m_pNextItem = nullptr;
+		}
 	}
 
 	if (!m_pActiveItem)
@@ -5330,11 +5358,12 @@ BOOL CBasePlayer::SwitchWeapon(CBasePlayerItem* pWeapon)
 		m_pActiveItem->Holster();
 	}
 
-	m_pActiveItem = pWeapon;
+	QueueItem(pWeapon);
 
-	if (pWeapon)
+	if (m_pActiveItem)// XWider: QueueItem sets it if we have no current weapopn
 	{
-		pWeapon->Deploy();
+		m_pActiveItem->Deploy();
+		m_pActiveItem->UpdateItemInfo();
 	}
 
 	return TRUE;

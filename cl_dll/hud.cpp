@@ -486,6 +486,13 @@ CHud :: ~CHud()
 	delete [] m_rgrcRects;
 	delete [] m_rgszSpriteNames;
 
+	//LRC - clear all shiny surfaces
+	if (m_pShinySurface)
+	{
+		delete m_pShinySurface;
+		m_pShinySurface = nullptr;
+	}
+
 	if ( m_pHudList )
 	{
 		HUDLIST *pList;
@@ -527,6 +534,13 @@ void CHud :: VidInit()
 	
 	m_hsprLogo = 0;	
 	m_hsprCursor = 0;
+
+	//LRC - clear all shiny surfaces
+	if (m_pShinySurface)
+	{
+		delete m_pShinySurface;
+		m_pShinySurface = nullptr;
+	}
 
 	if (ScreenWidth < 640)
 		m_iRes = 320;

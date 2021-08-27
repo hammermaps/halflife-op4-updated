@@ -316,6 +316,13 @@ int CLeech::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float f
 	{
 		pev->velocity = (pev->origin - pevInflictor->origin).Normalize() * 25;
 	}
+	else if (pev->movetype == MOVETYPE_TOSS)
+	{
+		ALERT(at_console, "Waterlevel is out\n");
+		//		if ( RANDOM_LONG( 0, 99 ) < 1 )
+		pev->dmg += 2;
+	}
+
 
 	return CBaseMonster::TakeDamage( pevInflictor, pevAttacker, flDamage, bitsDamageType );
 }
@@ -524,6 +531,12 @@ void CLeech::UpdateMotion()
 		pev->movetype = MOVETYPE_FLY;
 		pev->flags &= ~FL_ONGROUND;
 		RecalculateWaterlevel();
+		ALERT(at_console, "Waterlevel is out\n");
+		if (RANDOM_LONG(0, 99) < 1)
+		{
+			pev->gravity = 0.02;
+			pev->takedamage += 2;
+		}
 		m_waterTime = gpGlobals->time + 2;	// Recalc again soon, water may be rising
 	}
 

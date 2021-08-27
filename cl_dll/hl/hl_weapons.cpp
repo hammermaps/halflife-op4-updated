@@ -347,6 +347,8 @@ void CBasePlayer::Killed( entvars_t *pevAttacker, int iGib )
 	// Holster weapon immediately, to allow it to cleanup
 	if ( m_pActiveItem )
 		 m_pActiveItem->Holster( );
+
+	m_pNextItem = nullptr;
 	
 	g_irunninggausspred = false;
 }
@@ -360,7 +362,12 @@ CBasePlayer::Spawn
 void CBasePlayer::Spawn()
 {
 	if (m_pActiveItem)
-		m_pActiveItem->Deploy( );
+	{
+		m_pActiveItem = m_pNextItem;
+		m_pActiveItem->Deploy();
+		m_pActiveItem->UpdateItemInfo();
+		m_pNextItem = nullptr;
+	}
 
 	g_irunninggausspred = false;
 }

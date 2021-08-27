@@ -476,6 +476,8 @@ void CPlatTrigger :: Touch( CBaseEntity *pOther )
 //
 void CFuncPlat :: PlatUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
+	m_hActivator = pActivator;	//AJH
+
 	if (IsTogglePlat())
 	{
 		// Top is off, bottom is on
@@ -580,8 +582,11 @@ void CFuncPlat :: HitTop()
 void CFuncPlat :: Blocked( CBaseEntity *pOther )
 {
 	ALERT(at_aiconsole, "%s Blocked by %s\n", STRING(pev->classname), STRING(pOther->pev->classname));
-	// Hurt the blocker a little
-	pOther->TakeDamage(pev, pev, 1, DMG_CRUSH);
+
+	if (m_hActivator)
+		pOther->TakeDamage(pev, m_hActivator->pev, 1, DMG_CRUSH);	//AJH Attribute damage to he who switched me.
+	else
+		pOther->TakeDamage(pev, pev, 1, DMG_CRUSH);
 
 	if (pev->noiseMovement)
 		STOP_SOUND(ENT(pev), CHAN_STATIC, (char*)STRING(pev->noiseMovement));
@@ -671,7 +676,19 @@ void CFuncPlatRot :: Spawn()
 void CFuncPlatRot :: GoDown()
 {
 	CFuncPlat :: GoDown();
-	RotMove( m_start, pev->nextthink - pev->ltime );
+
+	Vector vecDest;
+	if (m_pMoveWith)
+	{
+		vecDest = m_vecFinalDest + m_pMoveWith->pev->origin;
+	}
+	else
+		vecDest = m_vecFinalDest;
+
+	Vector vecDestDelta = vecDest - pev->origin;
+	float flTravelTime = vecDestDelta.Length() / m_flLinearMoveSpeed;
+
+	RotMove(m_start, flTravelTime);
 }
 
 //
@@ -690,7 +707,19 @@ void CFuncPlatRot :: HitBottom()
 void CFuncPlatRot :: GoUp()
 {
 	CFuncPlat :: GoUp();
-	RotMove( m_end, pev->nextthink - pev->ltime );
+
+	Vector vecDest;
+	if (m_pMoveWith)
+	{
+		vecDest = m_vecFinalDest + m_pMoveWith->pev->origin;
+	}
+	else
+		vecDest = m_vecFinalDest;
+
+	Vector vecDestDelta = vecDest - pev->origin;
+	float flTravelTime = vecDestDelta.Length() / m_flLinearMoveSpeed;
+
+	RotMove(m_end, flTravelTime);
 }
 
 //
@@ -802,12 +831,17 @@ void CFuncTrain::Blocked(CBaseEntity* pOther)
 	m_flActivateFinished = gpGlobals->time + 0.5;
 
 	if (pev->dmg)
-		pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
+		if (m_hActivator)
+			pOther->TakeDamage(pev, m_hActivator->pev, pev->dmg, DMG_CRUSH);	//AJH Attribute damage to he who switched me.
+		else
+			pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
 }
 
 
 void CFuncTrain::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
+	m_hActivator = pActivator;	//AJH
+
 	if (ShouldToggle(useType))
 	{
 		if (pev->spawnflags & SF_TRAIN_WAIT_RETRIGGER)
@@ -2152,13 +2186,18 @@ void CFuncTrackTrain::Blocked(CBaseEntity* pOther)
 	ALERT(at_aiconsole, "TRAIN(%s): Blocked by %s (dmg:%.2f)\n", STRING(pev->targetname), STRING(pOther->pev->classname), pev->dmg);
 	if (pev->dmg <= 0)
 		return;
-	// we can't hurt this thing, so we're not concerned with it
-	pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
+
+	if (m_hActivator)
+		pOther->TakeDamage(pev, m_hActivator->pev, pev->dmg, DMG_CRUSH);	//AJH Attribute damage to he who switched me.
+	else
+		pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
 }
 
 void CFuncTrackTrain::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
 	//	ALERT(at_console, "TRAIN: use\n");
+
+	m_hActivator = pActivator;	//AJH
 
 	if (useType != USE_SET)
 	{
@@ -2203,6 +2242,13 @@ void CFuncTrackTrain::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYP
 		{
 			UTIL_SetAvelocity(this, m_vecMasterAvel * delta);
 			//pev->avelocity = m_vecMasterAvel * delta; //LRC
+		}
+
+
+		if (m_ppath == nullptr)
+		{
+			delta = 0; //G-Cont. Set speed to 0, and don't controls, if tracktrain on trackchange
+			return;
 		}
 
 		PostponeNext();
@@ -2286,7 +2332,7 @@ void CFuncTrackTrain::UpdateSound()
 
 void CFuncTrackTrain::PostponeNext(void)
 {
-	UTIL_DesiredAction(this);
+	DesiredAction();  //this simply fix LAARGE BUG with func_traktrain in spirit ;) g-cont
 }
 
 void CFuncTrackTrain::DesiredAction(void) // Next( void )

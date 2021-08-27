@@ -60,8 +60,8 @@ public:
 	void StartMonster() override;
 	void ScheduleChange() override;
 	void Killed(entvars_t* pevAttacker, int iGib) override;
-	BOOL NoFriendlyFire() override;
-	BOOL NoFriendlyFire(BOOL playerAlly);
+	bool NoFriendlyFire() override;
+	bool NoFriendlyFire(bool playerAlly);
 
 	// squad functions still left in base class
 	CSquadMonster* MySquadLeader() override

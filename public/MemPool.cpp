@@ -38,9 +38,9 @@ CMemoryPool::~CMemoryPool()
 /* <3fe99c> ../public/MemPool.cpp:109 */
 void CMemoryPool::AddNewBlob()
 {
-	int sizeMultiplier = pow(2.0, _numBlobs);
-	int nElements = _blocksPerBlob * sizeMultiplier;
-	int blobSize = _blockSize * nElements;
+	const int sizeMultiplier = static_cast<int>(pow(2.0, _numBlobs));
+	const int nElements = _blocksPerBlob * sizeMultiplier;
+	const int blobSize = _blockSize * nElements;
 
 	_memBlob[_numBlobs] = malloc(blobSize);
 

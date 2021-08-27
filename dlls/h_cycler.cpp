@@ -183,6 +183,8 @@ void CCycler :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 		pev->framerate = 1.0;
 	else
 		pev->framerate = 0.0;
+
+	SUB_UseTargets(nullptr, USE_TOGGLE, 0);
 }
 
 //

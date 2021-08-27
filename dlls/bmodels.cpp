@@ -386,6 +386,7 @@ public:
 
 	STATE m_iState; //LRC
 	STATE GetState() override { return m_iState; }; //LRC
+	EHANDLE m_hActivator; //AJH
 };
 
 TYPEDESCRIPTION CFuncRotating::m_SaveData[] =
@@ -532,9 +533,7 @@ void CFuncRotating::Spawn()
 	//	if (pev->dmg == 0)
 	//		pev->dmg = 2;
 
-	// instant-use brush?
-	//LRC - start immediately if unnamed, too.
-	if (FBitSet(pev->spawnflags, SF_BRUSH_ROTATE_INSTANT) || FStringNull(pev->targetname))
+	if (FBitSet(pev->spawnflags, SF_BRUSH_ROTATE_INSTANT))
 	{
 		SetThink(&CFuncRotating::WaitForStart);
 		SetNextThink(1.5); // leave a magic delay for client to start up
@@ -643,7 +642,10 @@ void CFuncRotating::HurtTouch(CBaseEntity* pOther)
 	pev->dmg = m_fCurSpeed / 10; //LRC
 	//	pev->dmg = pev->avelocity.Length() / 10;
 
-	pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
+	if (m_hActivator)
+		pOther->TakeDamage(pev, m_hActivator->pev, pev->dmg, DMG_CRUSH);	//AJH Attribute damage to he who switched me.
+	else
+		pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
 
 	pevOther->velocity = (pevOther->origin - VecBModelOrigin(pev)).Normalize() * pev->dmg;
 }
@@ -746,6 +748,8 @@ void CFuncRotating::Rotate()
 //=========================================================
 void CFuncRotating::RotatingUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
+	m_hActivator = pActivator;	//AJH
+
 	if (!ShouldToggle(useType)) 
 		return;
 
@@ -803,7 +807,10 @@ void CFuncRotating::RotatingUse(CBaseEntity* pActivator, CBaseEntity* pCaller, U
 void CFuncRotating::Blocked(CBaseEntity* pOther)
 
 {
-	pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
+	if (m_hActivator)
+		pOther->TakeDamage(pev, m_hActivator->pev, pev->dmg, DMG_CRUSH);	//AJH Attribute damage to he who switched me.
+	else
+		pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
 }
 
 class CFuncFrame : public CFuncWall
@@ -851,6 +858,7 @@ public:
 	float m_dampSpeed;
 	Vector m_center;
 	Vector m_start;
+	EHANDLE m_hActivator;	//AJH (give frags to this entity)
 };
 
 LINK_ENTITY_TO_CLASS(func_pendulum, CPendulum);
@@ -935,6 +943,8 @@ void CPendulum::Spawn()
 
 void CPendulum::PendulumUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
+	m_hActivator = pActivator;	//AJH
+
 	if (!ShouldToggle(useType)) 
 		return;
 
@@ -1042,7 +1052,10 @@ void CPendulum::Touch(CBaseEntity* pOther)
 	if (damage < 0)
 		damage = -damage;
 
-	pOther->TakeDamage(pev, pev, damage, DMG_CRUSH);
+	if (m_hActivator)
+		pOther->TakeDamage(pev, m_hActivator->pev, damage, DMG_CRUSH);
+	else
+		pOther->TakeDamage(pev, pev, damage, DMG_CRUSH);
 
 	pevOther->velocity = (pevOther->origin - VecBModelOrigin(pev)).Normalize() * damage;
 }

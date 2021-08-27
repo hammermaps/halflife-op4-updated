@@ -105,9 +105,8 @@ void AddEntityHashValue(entvars_t* pev, const char* value, hash_types_e fieldTyp
 	
 	if (item->pev)
 	{
-		hash_item_t * next;
 		entvars_t * pevtemp;
-		next = item->next;
+		hash_item_t* next = item->next;
 		while (next)
 		{
 			if (item->pev == pev || item->pevIndex >= pevIndex)
@@ -131,10 +130,8 @@ void AddEntityHashValue(entvars_t* pev, const char* value, hash_types_e fieldTyp
 
 		if (item->pev != pevtemp)
 		{
-			hash_item_t * newp;
-			hash_item_t * temp;
-			temp = item->next;
-			newp = (hash_item_t*)hashItemMemPool.Alloc(sizeof(hash_item_t));
+			hash_item_t* temp = item->next;
+			hash_item_t* newp = (hash_item_t*)hashItemMemPool.Alloc(sizeof(hash_item_t));
 
 			item->next = newp;
 			newp->pev = pevtemp;
@@ -176,8 +173,7 @@ void RemoveEntityHashValue(entvars_t* pev, const char* value, hash_types_e field
 	}
 	if (item->pev)
 	{
-		hash_item_t * last;
-		last = item;
+		hash_item_t* last = item;
 		while (item->next)
 		{
 			if (item->pev == pev)
@@ -939,10 +935,9 @@ void CBaseEntity::ResetParent()
 	if (m_pChildMoveWith)
 	{
 		CBaseEntity* pCur = m_pChildMoveWith;
-		CBaseEntity* pNext;
 		while (pCur != NULL)
 		{
-			pNext = pCur->m_pSiblingMoveWith;
+			CBaseEntity* pNext = pCur->m_pSiblingMoveWith;
 			// bring children to a stop
 			UTIL_SetMoveWithVelocity(pCur, g_vecZero, 100);
 			UTIL_SetMoveWithAvelocity(pCur, g_vecZero, 100);
@@ -964,7 +959,7 @@ void CBaseEntity::ClearPointers()
 void CBaseEntity::DontThink()
 {
 	m_fNextThink = 0;
-	if (m_pMoveWith == NULL && m_pChildMoveWith == NULL)
+	if (m_pMoveWith == nullptr && m_pChildMoveWith == nullptr)
 	{
 		pev->nextthink = 0;
 		m_fPevNextThink = 0;
@@ -985,15 +980,14 @@ void CBaseEntity::SetEternalThink()
 		m_fPevNextThink = pev->nextthink;
 	}
 
-	CBaseEntity* pChild;
-	for (pChild = m_pChildMoveWith; pChild != NULL; pChild = pChild->m_pSiblingMoveWith)
+	for (CBaseEntity* pChild = m_pChildMoveWith; pChild != nullptr; pChild = pChild->m_pSiblingMoveWith)
 		pChild->SetEternalThink();
 }
 
 //LRC - for getting round the engine's preconceptions.
 // MoveWith entities have to be able to think independently of moving.
 // This is how we do so.
-void CBaseEntity::SetNextThink(float delay, BOOL correctSpeed)
+void CBaseEntity::SetNextThink(float delay, bool correctSpeed)
 {
 	// now monsters use this method, too.
 	if (m_pMoveWith || m_pChildMoveWith || pev->flags & FL_MONSTER)
@@ -1030,7 +1024,7 @@ void CBaseEntity::SetNextThink(float delay, BOOL correctSpeed)
 }
 
 //LRC
-void CBaseEntity::AbsoluteNextThink(float time, BOOL correctSpeed)
+void CBaseEntity::AbsoluteNextThink(float time, bool correctSpeed)
 {
 	if (m_pMoveWith || m_pChildMoveWith)
 	{
@@ -1200,9 +1194,8 @@ int CBaseEntity::Restore( CRestore &restore )
 
     if ( pev->modelindex != 0 && !FStringNull(pev->model) )
 	{
-		Vector mins, maxs;
-		mins = pev->mins;	// Set model is about to destroy these
-		maxs = pev->maxs;
+		Vector mins = pev->mins;	// Set model is about to destroy these
+		Vector maxs = pev->maxs;
 
 
 		PRECACHE_MODEL( (char *)STRING(pev->model) );
@@ -1220,13 +1213,12 @@ void SetObjectCollisionBox( entvars_t *pev )
 	if ( (pev->solid == SOLID_BSP) && 
 		 (pev->angles.x || pev->angles.y|| pev->angles.z) )
 	{	// expand for rotation
-		float		max, v;
 		int			i;
 
-		max = 0;
+		float max = 0;
 		for (i=0 ; i<3 ; i++)
 		{
-			v = fabs( ((float *)pev->mins)[i]);
+			float v = fabs(((float*)pev->mins)[i]);
 			if (v > max)
 				max = v;
 			v = fabs( ((float *)pev->maxs)[i]);

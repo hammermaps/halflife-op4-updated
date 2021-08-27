@@ -92,9 +92,9 @@ void CSquadMonster::StartMonster()
 	}
 }
 
-BOOL CSquadMonster::NoFriendlyFire()
+bool CSquadMonster::NoFriendlyFire()
 {
-	return NoFriendlyFire(FALSE); //default: don't like the player
+	return NoFriendlyFire(false); //default: don't like the player
 }
 
 //=========================================================
@@ -103,10 +103,10 @@ BOOL CSquadMonster::NoFriendlyFire()
 // Builds a large box in front of the grunt and checks to see 
 // if any squad members are in that box. 
 //=========================================================
-BOOL CSquadMonster::NoFriendlyFire(BOOL playerAlly)
+bool CSquadMonster::NoFriendlyFire(bool playerAlly)
 {
 	if (!playerAlly && !InSquad())
-		return TRUE;
+		return true;
 
 	CPlane	backPlane;
 	CPlane  leftPlane;
@@ -114,7 +114,7 @@ BOOL CSquadMonster::NoFriendlyFire(BOOL playerAlly)
 
 	//!!!BUGBUG - to fix this, the planes must be aligned to where the monster will be firing its gun, not the direction it is facing!!!
 
-	if (m_hEnemy != NULL)
+	if (m_hEnemy != nullptr)
 	{
 		UTIL_MakeVectors(UTIL_VecToAngles(m_hEnemy->Center() - pev->origin));
 	}
@@ -152,25 +152,25 @@ BOOL CSquadMonster::NoFriendlyFire(BOOL playerAlly)
 				rightPlane.PointInFront(pMember->pev->origin))
 			{
 				// this guy is in the check volume! Don't shoot!
-				return FALSE;
+				return false;
 			}
 		}
 	}
 
 	if (playerAlly)
 	{
-		edict_t* pentPlayer = FIND_CLIENT_IN_PVS(edict());
+		const edict_t* pentPlayer = FIND_CLIENT_IN_PVS(edict());
 		if (!FNullEnt(pentPlayer) &&
 			backPlane.PointInFront(pentPlayer->v.origin) &&
 			leftPlane.PointInFront(pentPlayer->v.origin) &&
 			rightPlane.PointInFront(pentPlayer->v.origin))
 		{
 			// the player is in the check volume! Don't shoot!
-			return FALSE;
+			return false;
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 //=========================================================

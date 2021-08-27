@@ -201,6 +201,18 @@ enum STATE
 					// In_Use isn't very useful, I'll probably remove it.
 };
 
+enum USE_TYPE
+{
+	USE_OFF = 0,
+	USE_ON,
+	USE_SET,
+	USE_TOGGLE,
+	USE_KILL,
+	USE_SAME,
+	USE_NOT,
+	USE_SPAWN,
+};
+
 extern char* GetStringForState(STATE state);
 
 // Things that toggle (buttons/triggers/doors) need this
@@ -379,8 +391,11 @@ extern float UTIL_DotPoints ( const Vector &vecSrc, const Vector &vecCheck, cons
 
 extern void UTIL_StripToken( const char *pKey, char *pDest );// for redundant keynames
 
+extern char* GetStringForUseType(USE_TYPE useType);
+
 // Misc functions
 extern void SetMovedir(entvars_t* pev);
+extern Vector GetMovedir(Vector vecAngles);
 extern Vector VecBModelOrigin( entvars_t* pevBModel );
 extern int BuildChangeList( LEVELLIST *pLevelList, int maxList );
 

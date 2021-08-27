@@ -40,7 +40,7 @@ public:
 	void ScheduleChange() override;
 	void Killed( entvars_t *pevAttacker, int iGib ) override;
 	BOOL OccupySlot( int iDesiredSlot );
-	BOOL NoFriendlyFire() override;
+	bool NoFriendlyFire() override;
 
 	// squad functions still left in base class
 	COFSquadTalkMonster *MySquadLeader()

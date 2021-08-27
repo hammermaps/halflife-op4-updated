@@ -83,6 +83,10 @@ public:
 	BOOL m_iImmediateMode;
 
 	BOOL m_iDirectUse;
+
+	float   m_fAcceleration;	//AJH
+	float	m_fDeceleration;	//AJH
+	BOOL	m_iSpeedMode;		//AJH for changing door speeds
 };
 
 
@@ -101,6 +105,10 @@ TYPEDESCRIPTION CBaseDoor::m_SaveData[] =
 	DEFINE_FIELD(CBaseDoor, m_iImmediateMode, FIELD_BOOLEAN),
 
 	DEFINE_FIELD(CBaseDoor, m_iDirectUse, FIELD_BOOLEAN),
+
+	DEFINE_FIELD(CBaseDoor, m_fAcceleration, FIELD_FLOAT),	//AJH
+	DEFINE_FIELD(CBaseDoor, m_fDeceleration, FIELD_FLOAT),	//AJH
+	DEFINE_FIELD(CBaseDoor, m_iSpeedMode, FIELD_BOOLEAN),		//AJH for changing door speeds
 };
 
 IMPLEMENT_SAVERESTORE(CBaseDoor, CBaseToggle);
@@ -275,6 +283,21 @@ void CBaseDoor::KeyValue(KeyValueData* pkvd)
 	else if (FStrEq(pkvd->szKeyName, "WaveHeight"))
 	{
 		pev->scale = atof(pkvd->szValue) * (1.0 / 8.0);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "acceleration")) //AJH (for both 'usemode' accel and normal accel)
+	{
+		m_fAcceleration = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "deceleration")) //AJH
+	{
+		m_fDeceleration = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "speedmode")) //AJH for changing door speeds (for 'usemode' acceleration)
+	{
+		m_iSpeedMode = atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
 	else
@@ -687,39 +710,45 @@ void CBaseDoor::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useT
 
 	if (!UTIL_IsMasterTriggered(m_sMaster, pActivator))
 		return;
-
-	//LRC:
-	if (m_iOnOffMode)
-	{
-		if (useType == USE_ON)
-		{
-			if (m_toggle_state == TS_AT_BOTTOM)
-			{
-				PlayLockSounds(pev, &m_ls, FALSE, FALSE);
-				DoorGoUp();
-			}
-			return;
-		}
-		if (useType == USE_OFF)
-		{
-			if (m_toggle_state == TS_AT_TOP)
-			{
-				DoorGoDown();
-			}
-			return;
-		}
+	if (m_iSpeedMode == 1) {			//AJH for changing door speeds
+		pev->speed += m_fAcceleration;
+		DoorActivate();
+		ALERT(at_console, "speed increased by %f and is now %f\n", m_fAcceleration, pev->speed);
 	}
+	else {
+		if (m_iOnOffMode)
+		{
+			if (useType == USE_ON)
+			{
+				if (m_toggle_state == TS_AT_BOTTOM)
+				{
+					PlayLockSounds(pev, &m_ls, FALSE, FALSE);
+					DoorGoUp();
+				}
+				return;
+			}
+			else if (useType == USE_OFF)
+			{
+				if (m_toggle_state == TS_AT_TOP)
+				{
+					DoorGoDown();
+				}
+				return;
+			}
+		}
 
-	// if not ready to be used, ignore "use" command.
-	if (m_toggle_state == TS_AT_TOP)
-	{
-		if (!FBitSet(pev->spawnflags, SF_DOOR_NO_AUTO_RETURN))
+
+		// if not ready to be used, ignore "use" command.
+		if (m_toggle_state == TS_AT_TOP)
+		{
+			if (!FBitSet(pev->spawnflags, SF_DOOR_NO_AUTO_RETURN))
+				return;
+		}
+		else if (m_toggle_state != TS_AT_BOTTOM)
 			return;
-	}
-	else if (m_toggle_state != TS_AT_BOTTOM)
-		return;
 
-	DoorActivate();
+		DoorActivate();
+	}
 }
 
 //
@@ -814,7 +843,12 @@ void CBaseDoor::DoorGoUp()
 		AngularMove(m_vecAngle2 * sign, pev->speed);
 	}
 	else
-		LinearMove(m_vecPosition2, pev->speed);
+		if (m_iSpeedMode == 1) {		//AJH modifed to allow two types of accelerating doors	
+			LinearMove(m_vecPosition2, pev->speed);
+		}
+		else {
+			LinearMove(m_vecPosition2, pev->speed, m_fAcceleration, m_fDeceleration);
+		}
 }
 
 
@@ -913,7 +947,13 @@ void CBaseDoor::DoorGoDown()
 		{
 			SUB_UseTargets(m_hActivator, USE_OFF, 0);
 		}
-		LinearMove(m_vecPosition1, pev->speed);
+
+		if (m_iSpeedMode == 1) {		//AJH modifed to allow two types of accelerating doors	
+			LinearMove(m_vecPosition1, pev->speed);
+		}
+		else {
+			LinearMove(m_vecPosition1, pev->speed, m_fAcceleration, m_fDeceleration);
+		}
 	}
 }
 
@@ -973,7 +1013,10 @@ void CBaseDoor::Blocked(CBaseEntity* pOther)
 
 	// Hurt the blocker a little.
 	if (pev->dmg)
-		pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
+		if (m_hActivator)
+			pOther->TakeDamage(pev, m_hActivator->pev, pev->dmg, DMG_CRUSH);	//AJH Attribute damage to he who switched me.
+		else
+			pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
 
 	// Detonate satchels
 	if (!strcmp("monster_satchel", STRING(pOther->pev->classname)))
@@ -1191,12 +1234,14 @@ public:
 	int Restore(CRestore& restore) override;
 	static TYPEDESCRIPTION m_SaveData[];
 
-	BYTE m_bMoveSnd; // sound a door makes while moving	
+	BYTE m_bMoveSnd;			// sound a door makes while moving
+	BYTE m_bStopSnd;			// sound a door makes while stops
+
 	STATE m_iState;
 	float m_fLastPos;
 
 	STATE GetState() override { return m_iState; }
-	float CalcRatio(CBaseEntity* pLocus) override { return m_fLastPos; }
+	float CalcRatio(CBaseEntity* pLocus, int mode) override { return m_fLastPos; }//AJH added 'mode' = ratio to return
 };
 
 LINK_ENTITY_TO_CLASS(momentary_door, CMomentaryDoor);
@@ -1204,6 +1249,7 @@ LINK_ENTITY_TO_CLASS(momentary_door, CMomentaryDoor);
 TYPEDESCRIPTION CMomentaryDoor::m_SaveData[] =
 {
 	DEFINE_FIELD(CMomentaryDoor, m_bMoveSnd, FIELD_CHARACTER),
+	DEFINE_FIELD(CMomentaryDoor, m_bStopSnd, FIELD_CHARACTER),
 	DEFINE_FIELD(CMomentaryDoor, m_iState, FIELD_INTEGER),
 	DEFINE_FIELD(CMomentaryDoor, m_fLastPos, FIELD_FLOAT),
 };
@@ -1249,9 +1295,8 @@ void CMomentaryDoor::Spawn()
 		m_vecPosition2 = m_vecPosition2 - m_pMoveWith->pev->origin;
 	}
 
-	SetTouch(NULL);
-
 	Precache();
+	SetTouch(NULL);
 }
 
 void CMomentaryDoor::Precache()
@@ -1298,6 +1343,49 @@ void CMomentaryDoor::Precache()
 		pev->noiseMoving = ALLOC_STRING("common/null.wav");
 		break;
 	}
+
+	// set the door's "stop" sound
+	switch (m_bStopSnd)
+	{
+	case	0:
+		pev->noiseArrived = ALLOC_STRING("common/null.wav");
+		break;
+	case	1:
+		PRECACHE_SOUND("doors/doorstop1.wav");
+		pev->noiseArrived = ALLOC_STRING("doors/doorstop1.wav");
+		break;
+	case	2:
+		PRECACHE_SOUND("doors/doorstop2.wav");
+		pev->noiseArrived = ALLOC_STRING("doors/doorstop2.wav");
+		break;
+	case	3:
+		PRECACHE_SOUND("doors/doorstop3.wav");
+		pev->noiseArrived = ALLOC_STRING("doors/doorstop3.wav");
+		break;
+	case	4:
+		PRECACHE_SOUND("doors/doorstop4.wav");
+		pev->noiseArrived = ALLOC_STRING("doors/doorstop4.wav");
+		break;
+	case	5:
+		PRECACHE_SOUND("doors/doorstop5.wav");
+		pev->noiseArrived = ALLOC_STRING("doors/doorstop5.wav");
+		break;
+	case	6:
+		PRECACHE_SOUND("doors/doorstop6.wav");
+		pev->noiseArrived = ALLOC_STRING("doors/doorstop6.wav");
+		break;
+	case	7:
+		PRECACHE_SOUND("doors/doorstop7.wav");
+		pev->noiseArrived = ALLOC_STRING("doors/doorstop7.wav");
+		break;
+	case	8:
+		PRECACHE_SOUND("doors/doorstop8.wav");
+		pev->noiseArrived = ALLOC_STRING("doors/doorstop8.wav");
+		break;
+	default:
+		pev->noiseArrived = ALLOC_STRING("common/null.wav");
+		break;
+	}
 }
 
 void CMomentaryDoor::KeyValue(KeyValueData* pkvd)
@@ -1309,7 +1397,7 @@ void CMomentaryDoor::KeyValue(KeyValueData* pkvd)
 	}
 	else if (FStrEq(pkvd->szKeyName, "stopsnd"))
 	{
-		//		m_bStopSnd = atof(pkvd->szValue);
+		m_bStopSnd = atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
 	else if (FStrEq(pkvd->szKeyName, "healthvalue"))
@@ -1337,6 +1425,7 @@ void CMomentaryDoor::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE
 	Vector move = m_vecPosition1 + (value * (m_vecPosition2 - m_vecPosition1));
 
 	float speed = 0;
+	Vector delta;
 	if (pev->speed)
 	{
 		//LRC- move at the given speed, if any.
@@ -1345,9 +1434,7 @@ void CMomentaryDoor::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE
 	else
 	{
 		// default: get there in 0.1 secs
-		Vector delta;
 		delta = move - pev->origin;
-
 		speed = delta.Length() * 10;
 	}
 
@@ -1373,7 +1460,7 @@ void CMomentaryDoor::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE
 void CMomentaryDoor::MomentaryMoveDone()
 {
 	SetThink(&CMomentaryDoor::StopMoveSound);
-	SetNextThink(0.1);
+	SetNextThink(0.1f);
 }
 
 void CMomentaryDoor::StopMoveSound()

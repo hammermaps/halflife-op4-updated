@@ -144,6 +144,9 @@ void CBreakable::KeyValue( KeyValueData* pkvd )
 		CBaseDelay::KeyValue( pkvd );
 }
 
+float CBreakable::CalcRatio(CBaseEntity* plocus, int mode) {//AJH added 'mode' = ratio to return
+	return pev->health / m_iInitialHealth;
+}
 
 //
 // func_breakable - bmodel that breaks into pieces after taking damage

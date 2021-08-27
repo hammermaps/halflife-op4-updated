@@ -68,6 +68,7 @@ public:
 	int m_iCrosshair; //LRC - show a crosshair while in use. (currently this is just yes or no,
 	// but in future it will be the id of the weapon whose crosshair should be used.)
 	//	CFuncTank *m_pTank;
+	EHANDLE m_hPlayer;
 };
 
 
@@ -153,6 +154,9 @@ public:
 
 	void StartRotSound();
 	void StopRotSound();
+
+	STATE GetState() { return m_iActive ? STATE_ON : STATE_OFF; }//Support this stuff for watcher
+	int m_iActive;
 
 	// Bmodels don't go across transitions
 	int ObjectCaps() override { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
@@ -287,6 +291,7 @@ TYPEDESCRIPTION CFuncTank::m_SaveData[] =
 	DEFINE_FIELD(CFuncTank, m_iszFireMaster, FIELD_STRING), //LRC
 	DEFINE_FIELD(CFuncTank, m_iszLocusFire, FIELD_STRING), //LRC
 	DEFINE_FIELD(CFuncTank, m_pFireProxy, FIELD_CLASSPTR), //LRC
+	DEFINE_FIELD(CFuncTank, m_iActive, FIELD_INTEGER),//G-Cont.
 };
 
 IMPLEMENT_SAVERESTORE(CFuncTank, CBaseEntity);
@@ -315,6 +320,16 @@ void CFuncTank::Spawn()
 	if (IsActive())
 	{
 		SetNextThink(1.0);
+	}
+
+	if (!m_iTankClass)
+	{
+		m_iTankClass = 0;
+	}
+
+	if ((m_maxRange == 0) || (FStringNull(m_maxRange)))
+	{
+		m_maxRange = 4096; //G-Cont. for normal working func_tank in original HL
 	}
 
 	m_sightOrigin = BarrelPosition(); // Point at the end of the barrel
@@ -487,22 +502,6 @@ void CFuncTank::KeyValue(KeyValueData* pkvd)
 
 ////////////// START NEW STUFF //////////////
 
-//==================================================================================
-// TANK CONTROLLING
-/*LRC- TankControls checks this instead
-BOOL CFuncTank :: OnControls( entvars_t *pevTest )
-{
-	if ( !(pev->spawnflags & SF_TANK_CANCONTROL) )
-		return FALSE;
-
-	Vector offset = pevTest->origin - pev->origin;
-
-	if ( (m_vecControllerUsePos - pevTest->origin).Length() < 30 )
-		return TRUE;
-
-	return FALSE;
-} */
-
 BOOL CFuncTank::StartControl(CBasePlayer* pController, CFuncTankControls* pControls)
 {
 	//	ALERT(at_console, "StartControl\n");
@@ -525,6 +524,7 @@ BOOL CFuncTank::StartControl(CBasePlayer* pController, CFuncTankControls* pContr
 
 	//	ALERT( at_console, "using TANK!\n");
 
+	m_iActive = 1;
 	m_pControls = pControls;
 
 	if (m_pSpot) m_pSpot->Revive();
@@ -547,8 +547,11 @@ void CFuncTank::StopControl(CFuncTankControls* pControls)
 	//	ALERT(at_debug,"StopControl succeeded\n");
 
 	//	ALERT( at_debug, "stopped using TANK\n");
+	m_iActive = 0;
 
-	if (m_pSpot) m_pSpot->Suspend(-1);
+	if (m_pSpot) 
+		m_pSpot->Suspend(-1);
+
 	//	if (m_pViewTarg) m_pViewTarg->Suspend(-1);
 	StopRotSound(); //LRC
 
@@ -854,7 +857,7 @@ void CFuncTank::TrackTarget()
 	if (m_pSequence)
 	{
 		UpdateSpot();
-		SetNextThink(0.05, FALSE);
+		SetNextThink(0.05f, false);
 
 		if (m_pSequence->m_iTurn == TSEQ_TURN_ENEMY)
 		{
@@ -885,7 +888,7 @@ void CFuncTank::TrackTarget()
 		//		ALERT( at_console, "TANK has controller\n");
 		UpdateSpot();
 		pController = m_pControls->m_pController;
-		SetNextThink(0.05, FALSE);
+		SetNextThink(0.05f, false);
 
 		// LRC- changed here to allow "match target" as well as "match angles" mode.
 		if (pev->spawnflags & SF_TANK_MATCHTARGET)
@@ -911,12 +914,6 @@ void CFuncTank::TrackTarget()
 
 			pev->owner = ownerTemp; //LRC put the owner back
 
-			//			if (!m_pViewTarg)
-			//			{
-			//				m_pViewTarg = CLaserSpot::CreateSpot("sprites/mommablob.spr");
-			//			}
-			//			UTIL_SetOrigin( m_pViewTarg, tr.vecEndPos );
-
 			// Work out what angle we need to face to look at that point
 			direction = tr.vecEndPos - pev->origin;
 			angles = UTIL_VecToAngles(direction);
@@ -935,6 +932,9 @@ void CFuncTank::TrackTarget()
 			// just get the player's angles
 			angles = pController->pev->v_angle;
 			angles[0] = 0 - angles[0];
+
+			UpdateSpot();
+			SetNextThink(0.05);//G-Cont.For more smoothing motion a laser spot
 		}
 	}
 	else
@@ -1663,7 +1663,8 @@ void CFuncTankControls::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_T
 		//LRC- Now uses FindEntityByTargetname, so that aliases work.
 		while (tryTank = UTIL_FindEntityByTargetname(tryTank, STRING(pev->target)))
 		{
-			if (FClassnameIs(tryTank->pev, "func_tank"))
+			if (FClassnameIs(tryTank->pev, "func_tank") || FClassnameIs(tryTank->pev, "func_tanklaser") || 
+				FClassnameIs(tryTank->pev, "func_tankmortar") || FClassnameIs(tryTank->pev, "func_tankrocket"))
 			{
 				// this is a tank we're controlling.
 				static_cast<CFuncTank*>(tryTank)->StopControl(this);

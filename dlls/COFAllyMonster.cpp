@@ -1205,14 +1205,14 @@ Schedule_t* COFAllyMonster::GetScheduleOfType(int Type)
 			// sustained light wounds?
 			if (!FBitSet(m_bitsSaid, bit_saidWoundLight) && (pev->health <= (pev->max_health * 0.75)))
 			{
-				PlaySentence(m_szGrp[TLK_WOUND], RANDOM_FLOAT(2.8, 3.2), VOL_NORM, ATTN_IDLE);
+				PlaySentence(m_szGrp[TLK_WOUND], RANDOM_FLOAT(2.8f, 3.2f), VOL_NORM, ATTN_IDLE);
 				SetBits(m_bitsSaid, bit_saidWoundLight);
 				return slIdleStand;
 			}
 			// sustained heavy wounds?
 			if (!FBitSet(m_bitsSaid, bit_saidWoundHeavy) && (pev->health <= (pev->max_health * 0.5)))
 			{
-				PlaySentence(m_szGrp[TLK_MORTAL], RANDOM_FLOAT(2.8, 3.2), VOL_NORM, ATTN_IDLE);
+				PlaySentence(m_szGrp[TLK_MORTAL], RANDOM_FLOAT(2.8f, 3.2f), VOL_NORM, ATTN_IDLE);
 				SetBits(m_bitsSaid, bit_saidWoundHeavy);
 				return slIdleStand;
 			}

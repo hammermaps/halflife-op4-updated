@@ -56,12 +56,12 @@ int	CBaseEntity :: DamageDecal( int bitsDamageType ) { return -1; }
 CBaseEntity * CBaseEntity::Create( const char *szName, const Vector &vecOrigin, const Vector &vecAngles, edict_t *pentOwner ) { return NULL; }
 void CBaseEntity::SUB_Remove() { }
 void CBaseEntity::Activate() { } //LRC
-void CBaseEntity::SetNextThink(float delay, BOOL correctSpeed)
+void CBaseEntity::SetNextThink(float delay, bool correctSpeed)
 {
 	m_fNextThink = gpGlobals->time + delay;
 	pev->nextthink = m_fNextThink;
 }//LRC
-void CBaseEntity::AbsoluteNextThink(float time, BOOL correctSpeed)
+void CBaseEntity::AbsoluteNextThink(float time, bool correctSpeed)
 {
 	pev->nextthink = time;
 }//LRC
@@ -362,7 +362,6 @@ bool CBasePlayerWeapon::AddToPlayer( CBasePlayer *pPlayer ) { return false; }
 int CBasePlayerWeapon::UpdateClientData( CBasePlayer *pPlayer ) { return 0; }
 BOOL CBasePlayerWeapon :: AddPrimaryAmmo( int iCount, char *szName, int iMaxClip, int iMaxCarry ) { return TRUE; }
 BOOL CBasePlayerWeapon :: AddSecondaryAmmo( int iCount, char *szName, int iMax ) { return TRUE; }
-BOOL CBasePlayerWeapon :: IsUseable() { return TRUE; }
 int CBasePlayerWeapon::PrimaryAmmoIndex() { return m_iPrimaryAmmoType; }
 int CBasePlayerWeapon::SecondaryAmmoIndex() {	return m_iSecondaryAmmoType; }
 void CBasePlayerAmmo::Spawn() { }
@@ -374,4 +373,6 @@ int CBasePlayerWeapon::ExtractClipAmmo( CBasePlayerWeapon *pWeapon ) { return 0;
 void CBasePlayerWeapon::RetireWeapon() { }
 void CSoundEnt::InsertSound ( int iType, const Vector &vecOrigin, int iVolume, float flDuration ) {}
 void CBasePlayerWeapon::SetNextThink(float delay) { pev->nextthink = UTIL_WeaponTimeBase() + delay; }//LRC
+void CBasePlayerItem::Spawn(){ }
+void CBasePlayer::QueueItem(CBasePlayerItem* pItem) {}
 void RadiusDamage( Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType ){}

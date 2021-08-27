@@ -152,17 +152,6 @@ extern void SaveGlobalState(SAVERESTOREDATA* pSaveData);
 extern void RestoreGlobalState(SAVERESTOREDATA* pSaveData);
 extern void ResetGlobalState();
 
-typedef enum
-{
-	USE_OFF = 0,
-	USE_ON = 1,
-	USE_SET = 2,
-	USE_TOGGLE = 3,
-	USE_KILL = 4,
-	USE_SAME = 5,
-	USE_NOT = 6,
-} USE_TYPE;
-
 extern void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType,
                         float value);
 
@@ -275,10 +264,10 @@ public:
 
 	//LRC - decent mechanisms for setting think times!
 	// this should have been done a long time ago, but MoveWith finally forced me.
-	virtual void SetNextThink(float delay) { SetNextThink(delay, FALSE); }
-	virtual void SetNextThink(float delay, BOOL correctSpeed);
-	virtual void AbsoluteNextThink(float time) { AbsoluteNextThink(time, FALSE); }
-	virtual void AbsoluteNextThink(float time, BOOL correctSpeed);
+	virtual void SetNextThink(float delay) { SetNextThink(delay, false); }
+	virtual void SetNextThink(float delay, bool correctSpeed);
+	virtual void AbsoluteNextThink(float time) { AbsoluteNextThink(time, false); }
+	virtual void AbsoluteNextThink(float time, bool correctSpeed);
 	void SetEternalThink();
 	void DontThink();
 	virtual void ThinkCorrection();
@@ -286,7 +275,7 @@ public:
 	//LRC - loci
 	virtual Vector CalcPosition(CBaseEntity* pLocus) { return pev->origin; }
 	virtual Vector CalcVelocity(CBaseEntity* pLocus) { return pev->velocity; }
-	virtual float CalcRatio(CBaseEntity* pLocus) { return 0; }
+	virtual float CalcRatio(CBaseEntity* pLocus, int mode) { return 0; }	//AJH added 'mode' = ratio to return
 
 	//LRC - aliases
 	virtual BOOL IsAlias() { return FALSE; }
@@ -853,6 +842,14 @@ public:
 	Vector m_vecFinalDest;
 	float m_flLinearMoveSpeed; // LRC- allows a LinearMove to be delayed until a think.
 	float m_flAngularMoveSpeed; // LRC
+
+	float	m_flLinearAccel;		//AJH - For acceleration, used in subs.cpp
+	float	m_flLinearDecel;		//AJH
+	float	m_flCurrentTime;		//AJH
+	float	m_flAccelTime;			//AJH
+	float	m_flDecelTime;			//AJH
+	bool	m_bDecelerate;			//AJH
+
 	Vector m_vecFinalAngle;
 
 	int m_bitsDamageInflict; // DMG_ damage type that the door or tigger does
@@ -872,6 +869,7 @@ public:
 	// common member functions
 	void LinearMove(Vector vecInput, float flSpeed);
 	//void LinearMove( Vector	vecInput, float flSpeed, BOOL bNow );
+	void LinearMove(Vector vecInput, float flSpeed, float flAccel, float flDecel); //AJH-Accelerated linear movement
 	void EXPORT LinearMoveNow(); //LRC- think function that lets us guarantee a LinearMove gets done as a think.
 	void EXPORT LinearMoveDone();
 	void EXPORT LinearMoveDoneNow(); //LRC

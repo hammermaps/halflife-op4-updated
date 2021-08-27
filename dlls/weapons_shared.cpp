@@ -249,9 +249,11 @@ void CBasePlayer::SelectLastItem()
 	if (m_pActiveItem)
 		m_pActiveItem->Holster();
 
-	CBasePlayerItem* pTemp = m_pActiveItem;
-	m_pActiveItem = m_pLastItem;
-	m_pLastItem = pTemp;
-	m_pActiveItem->Deploy();
-	m_pActiveItem->UpdateItemInfo();
+	QueueItem(m_pLastItem);
+
+	if (m_pActiveItem)
+	{
+		m_pActiveItem->Deploy();
+		m_pActiveItem->UpdateItemInfo();
+	}
 }

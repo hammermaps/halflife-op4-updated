@@ -268,6 +268,12 @@ void CBaseTurret::Spawn()
 		m_iAutoStart = TRUE;
 	}
 
+	if (m_iOrientation == 1)
+	{
+		pev->idealpitch = 180;
+		pev->angles.x = 180;
+	}
+
 	ResetSequenceInfo( );
 	SetBoneController( 0, 0 );
 	SetBoneController( 1, 0 );
@@ -397,8 +403,6 @@ void CBaseTurret::Initialize()
 	m_flStartYaw = pev->angles.y;
 	if (m_iOrientation == 1)
 	{
-		pev->idealpitch = 180;
-		pev->angles.x = 180;
 		pev->view_ofs.z = -pev->view_ofs.z;
 		pev->effects |= EF_INVLIGHT;
 		pev->angles.y = pev->angles.y + 180;

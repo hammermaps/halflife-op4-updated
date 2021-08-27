@@ -230,6 +230,7 @@ public:
 	CBasePlayerItem* m_pActiveItem;
 	CBasePlayerItem* m_pClientActiveItem; // client version of the active item
 	CBasePlayerItem* m_pLastItem;
+	CBasePlayerItem* m_pNextItem;
 	// shared ammo slots
 	int m_rgAmmo[MAX_AMMO_SLOTS];
 	int m_rgAmmoLast[MAX_AMMO_SLOTS];
@@ -245,6 +246,29 @@ public:
 	float m_flNextDecalTime; // next time this player can spray a decal
 
 	char m_szTeamName[TEAM_NAME_LENGTH];
+
+	virtual float	CalcRatio(CBaseEntity* pLocus, int mode)//AJH added 'mode' = ratio to return
+	{
+		//ALERT(at_debug,"CBasePlayer CalcRatio called, mode is %i\n",mode);
+		switch (mode) {
+		case 0: {
+			return pev->health / pev->max_health;
+		}break;
+		case 1: {
+			//pev->speed=pev->velocity.Length();
+			//ALERT(at_debug,"Ratio is %f over %f, result %f.\n",pev->speed,pev->maxspeed,pev->speed/pev->maxspeed);
+			//return pev->speed/pev->maxspeed;
+			return pev->velocity.Length();
+		}break;
+		case 2: {
+			return (int)IsSneaking();
+		}break;
+		case 3: {
+			return (int)HasWeapons();
+		}break;
+		}
+		return 0;
+	}
 
 	void Spawn() override;
 	void Pain();
@@ -328,6 +352,7 @@ public:
 	void SelectNextItem(int iItem);
 	void SelectLastItem();
 	void SelectItem(const char* pstr);
+	void QueueItem(CBasePlayerItem* pItem);
 	void ItemPreFrame();
 	void ItemPostFrame();
 	void GiveNamedItem(const char* szName);

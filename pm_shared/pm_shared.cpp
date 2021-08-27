@@ -2892,15 +2892,20 @@ void PM_CheckParamters()
 		pmove->cmd.upmove      *= fRatio;
 	}
 
-	if ( pmove->flags & FL_FROZEN ||
-		 pmove->flags & FL_ONTRAIN || 
-		 pmove->dead )
+	if (pmove->flags & FL_FROZEN || pmove->dead)
 	{
 		pmove->cmd.forwardmove = 0;
 		pmove->cmd.sidemove    = 0;
 		pmove->cmd.upmove      = 0;
+		pmove->cmd.buttons	   = 0; // LRC - no jump sounds when frozen!
 	}
 
+	if (pmove->flags & FL_ONTRAIN)
+	{
+		pmove->cmd.forwardmove = 0;
+		pmove->cmd.sidemove = 0;
+		pmove->cmd.upmove = 0;
+	}
 
 	PM_DropPunchAngle( pmove->punchangle );
 

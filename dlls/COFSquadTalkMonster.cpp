@@ -502,12 +502,10 @@ void COFSquadTalkMonster::StartMonster()
 // Builds a large box in front of the grunt and checks to see 
 // if any squad members are in that box. 
 //=========================================================
-BOOL COFSquadTalkMonster::NoFriendlyFire()
+bool COFSquadTalkMonster::NoFriendlyFire()
 {
 	if (!InSquad())
-	{
-		return TRUE;
-	}
+		return true;
 
 	CPlane backPlane;
 	CPlane leftPlane;
@@ -522,7 +520,7 @@ BOOL COFSquadTalkMonster::NoFriendlyFire()
 	else
 	{
 		// if there's no enemy, pretend there's a friendly in the way, so the grunt won't shoot.
-		return FALSE;
+		return false;
 	}
 
 	//UTIL_MakeVectors ( pev->angles );
@@ -552,12 +550,12 @@ BOOL COFSquadTalkMonster::NoFriendlyFire()
 				rightPlane.PointInFront(pMember->pev->origin))
 			{
 				// this guy is in the check volume! Don't shoot!
-				return FALSE;
+				return false;
 			}
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 //=========================================================
