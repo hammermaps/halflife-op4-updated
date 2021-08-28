@@ -421,11 +421,11 @@ void CHud :: Init()
 	m_pCvarStealMouse = CVAR_CREATE( "hud_capturemouse", "1", FCVAR_ARCHIVE );
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
-	cl_rollangle = CVAR_CREATE("cl_rollangle", "2.0", FCVAR_ARCHIVE);
-	cl_rollspeed = CVAR_CREATE("cl_rollspeed", "200", FCVAR_ARCHIVE);
+	cl_rollangle = CVAR_CREATE("cl_rollangle", "1.8", FCVAR_ARCHIVE);
+	cl_rollspeed = CVAR_CREATE("cl_rollspeed", "180", FCVAR_ARCHIVE);
 	cl_bobtilt = CVAR_CREATE("cl_bobtilt", "0", FCVAR_ARCHIVE);
-	cl_wallgib_life = CVAR_CREATE("cl_wallgib_giblife", "4", FCVAR_ARCHIVE);
-	cl_gibs_cvar = CVAR_CREATE("cl_gibs_cvar", "8", FCVAR_ARCHIVE);
+	cl_wallgib_life = CVAR_CREATE("cl_wallgib_giblife", "3", FCVAR_ARCHIVE);
+	cl_gibs_cvar = CVAR_CREATE("cl_gibs_cvar", "3", FCVAR_ARCHIVE);
 
 	g_ParticleCount = CVAR_CREATE("cl_particlecount", "100", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
 	g_ParticleDebug = CVAR_CREATE("cl_particledebug", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
