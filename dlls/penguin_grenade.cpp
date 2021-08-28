@@ -273,7 +273,7 @@ int CPenguinGrenade::Classify()
 	if (m_iMyClass != 0)
 		return m_iMyClass; // protect against recursion
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		m_iMyClass = CLASS_INSECT; // no one cares about it
 		switch (m_hEnemy->Classify())
@@ -374,7 +374,7 @@ void CPenguinGrenade::HuntThink()
 
 	UTIL_MakeVectors(pev->angles);
 
-	if (m_hEnemy == NULL || !m_hEnemy->IsAlive())
+	if (!HasEnemy() || !m_hEnemy->IsAlive())
 	{
 		// find target, bounce a bit towards it.
 		Look(512);
@@ -393,7 +393,7 @@ void CPenguinGrenade::HuntThink()
 	if (flpitch < 80)
 		flpitch = 80;
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		if (FVisible(m_hEnemy))
 		{

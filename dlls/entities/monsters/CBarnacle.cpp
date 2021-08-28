@@ -117,7 +117,7 @@ void CBarnacle::BarnacleThink()
 
 	UpdateShockEffect();
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		// barnacle has prey.
 
@@ -125,16 +125,16 @@ void CBarnacle::BarnacleThink()
 		{
 			// someone (maybe even the barnacle) killed the prey. Reset barnacle.
 			m_fLiftingPrey = FALSE;// indicate that we're not lifting prey.
-			m_hEnemy = NULL;
+			m_hEnemy = nullptr;
 			return;
 		}
 
 		if (m_fLiftingPrey)
 		{
-			if (m_hEnemy != NULL && m_hEnemy->pev->deadflag != DEAD_NO)
+			if (HasEnemy() && m_hEnemy->pev->deadflag != DEAD_NO)
 			{
 				// crap, someone killed the prey on the way up.
-				m_hEnemy = NULL;
+				m_hEnemy = nullptr;
 				m_fLiftingPrey = FALSE;
 				return;
 			}
@@ -295,7 +295,7 @@ void CBarnacle::Killed(entvars_t* pevAttacker, int iGib)
 
 	ClearShockEffect();
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		CBaseMonster* pVictim = m_hEnemy->MyMonsterPointer();
 

@@ -466,11 +466,11 @@ void ResetGlobalState()
 
 LINK_ENTITY_TO_CLASS(worldspawn, CWorld);
 
-extern DLL_GLOBAL BOOL g_fGameOver;
+extern DLL_GLOBAL bool g_fGameOver;
 
 void CWorld::Spawn()
 {
-	g_fGameOver = FALSE;
+	g_fGameOver = false;
 	Precache();
 	CItemCTF::m_pLastSpawn = nullptr;
 

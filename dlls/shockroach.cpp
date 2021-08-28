@@ -229,7 +229,7 @@ void COFShockRoach :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			UTIL_MakeVectors ( pev->angles );
 
 			Vector vecJumpDir;
-			if (m_hEnemy != NULL)
+			if (HasEnemy())
 			{
 				float gravity = g_psv_gravity->value;
 				if (gravity <= 1)

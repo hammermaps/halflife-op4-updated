@@ -666,11 +666,11 @@ void CController::RunTask(Task_t* pTask)
 			Vector vecSrc = vecHand + pev->velocity * (m_flShootTime - gpGlobals->time);
 			Vector vecDir;
 
-			if (m_pCine != nullptr || m_hEnemy != nullptr)
+			if (m_pCine != nullptr || HasEnemy())
 			{
 				if (m_pCine != nullptr) // LRC- is this a script that's telling it to fire?
 				{
-					if (m_hTargetEnt != nullptr && m_pCine->PreciseAttack())
+					if (HasTargetEntity() && m_pCine->PreciseAttack())
 					{
 						vecDir = (m_hTargetEnt->pev->origin - pev->origin).Normalize() * gSkillData.controllerSpeedBall;
 					}
@@ -680,7 +680,7 @@ void CController::RunTask(Task_t* pTask)
 						vecDir = gpGlobals->v_forward * gSkillData.controllerSpeedBall;
 					}
 				}
-				else if (m_hEnemy != nullptr)
+				else if (HasEnemy())
 				{
 					if (HasConditions(bits_COND_SEE_ENEMY))
 					{
@@ -1245,7 +1245,7 @@ void CControllerHeadBall::HuntThink()
 	MESSAGE_END();
 
 	// check world boundaries
-	if (gpGlobals->time - pev->dmgtime > 5 || pev->renderamt < 64 || m_hEnemy == nullptr || m_hOwner == nullptr || pev->
+	if (gpGlobals->time - pev->dmgtime > 5 || pev->renderamt < 64 || !HasEnemy() || m_hOwner == nullptr || pev->
 		origin.x < -4096 || pev->origin.x > 4096 || pev->origin.y < -4096 || pev->origin.y > 4096 || pev->origin.z < -
 		4096 || pev->origin.z > 4096)
 	{

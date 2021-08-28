@@ -175,7 +175,7 @@ void CBarney::RunTask(Task_t* pTask)
 	switch (pTask->iTask)
 	{
 	case TASK_RANGE_ATTACK1:
-		if (m_hEnemy != nullptr && (m_hEnemy->IsPlayer()))
+		if (HasEnemy() && (m_hEnemy->IsPlayer()))
 		{
 			pev->framerate = 1.5;
 		}
@@ -207,7 +207,7 @@ int CBarney::ISoundMask()
 //=========================================================
 void CBarney::AlertSound()
 {
-	if (m_hEnemy != nullptr)
+	if (HasEnemy())
 	{
 		if (FOkToSpeak())
 		{
@@ -504,7 +504,7 @@ int CBarney::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float f
 
 		// This is a heurstic to determine if the player intended to harm me
 		// If I have an enemy, we can't establish intent (may just be crossfire)
-		if (m_hEnemy == nullptr)
+		if (!HasEnemy())
 		{
 			// If the player was facing directly at me, or I'm already suspicious, get mad
 			if ((m_afMemory & bits_MEMORY_SUSPICIOUS) || IsFacing(pevAttacker, pev->origin))
@@ -523,7 +523,7 @@ int CBarney::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float f
 				}
 
 				Remember(bits_MEMORY_PROVOKED);
-				StopFollowing(TRUE);
+				StopFollowing(true);
 			}
 			else
 			{
@@ -660,7 +660,7 @@ Schedule_t* CBarney::GetScheduleOfType(int Type)
 	switch (Type)
 	{
 	case SCHED_ARM_WEAPON:
-		if (m_hEnemy != nullptr)
+		if (HasEnemy())
 		{
 			// face enemy, then draw.
 			return slBarneyEnemyDraw;
@@ -761,12 +761,12 @@ Schedule_t* CBarney::GetSchedule()
 			return GetScheduleOfType(SCHED_SMALL_FLINCH);
 		}
 
-		if (m_hEnemy == nullptr && IsFollowing())
+		if (!HasEnemy() && IsFollowing())
 		{
 			if (!m_hTargetEnt->IsAlive())
 			{
 				// UNDONE: Comment about the recently dead player here?
-				StopFollowing(FALSE);
+				StopFollowing(false);
 				break;
 			}
 			if (HasConditions(bits_COND_CLIENT_PUSH))

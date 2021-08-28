@@ -138,7 +138,7 @@ int CBaseMonster::Restore(CRestore& restore)
 	m_Activity = ACT_RESET;
 
 	// If we don't have an enemy, clear conditions like see enemy, etc.
-	if (m_hEnemy == nullptr)
+	if (!HasEnemy())
 		m_afConditions = 0;
 
 	return status;
@@ -636,12 +636,12 @@ void CBaseMonster::RouteNew()
 // FRouteClear - returns TRUE is the Route is cleared out
 // ( invalid )
 //=========================================================
-BOOL CBaseMonster::FRouteClear()
+auto CBaseMonster::FRouteClear() const -> bool
 {
 	if (m_Route[m_iRouteIndex].iType == 0 || m_movementGoal == MOVEGOAL_NONE)
-		return TRUE;
+		return true;
 
-	return FALSE;
+	return false;
 }
 
 //=========================================================
@@ -689,7 +689,7 @@ auto CBaseMonster::FRefreshRoute() -> bool
 		break;
 
 	case MOVEGOAL_TARGETENT:
-		if (m_hTargetEnt != nullptr)
+		if (HasTargetEntity())
 		{
 			returnCode = BuildRoute(m_hTargetEnt->pev->origin, bits_MF_TO_TARGETENT, m_hTargetEnt);
 		}
@@ -788,13 +788,14 @@ void DrawRoute(entvars_t* pev, WayPoint_t* m_Route, int m_iRouteIndex, int r, in
 #endif
 
 
-int ShouldSimplify(int routeType)
+auto ShouldSimplify(int routeType) -> bool
 {
 	routeType &= ~bits_MF_IS_GOAL;
 
 	if ((routeType == bits_MF_TO_PATHCORNER) || (routeType & bits_MF_DONT_SIMPLIFY))
-		return FALSE;
-	return TRUE;
+		return false;
+
+	return true;
 }
 
 //=========================================================
@@ -807,11 +808,10 @@ int ShouldSimplify(int routeType)
 void CBaseMonster::RouteSimplify(CBaseEntity* pTargetEnt)
 {
 	// BUGBUG: this doesn't work 100% yet
-	int i, count, outCount;
-	Vector vecStart;
+	int i;
 	WayPoint_t outRoute[ROUTE_SIZE * 2]; // Any points except the ends can turn into 2 points in the simplified route
 
-	count = 0;
+	int count = 0;
 
 	for (i = m_iRouteIndex; i < ROUTE_SIZE; i++)
 	{
@@ -828,8 +828,8 @@ void CBaseMonster::RouteSimplify(CBaseEntity* pTargetEnt)
 		return;
 	}
 
-	outCount = 0;
-	vecStart = pev->origin;
+	int outCount = 0;
+	Vector vecStart = pev->origin;
 	for (i = 0; i < count - 1; i++)
 	{
 		// Don't eliminate path_corners
@@ -910,7 +910,7 @@ void CBaseMonster::RouteSimplify(CBaseEntity* pTargetEnt)
 // right now only used when a barnacle snatches someone, so 
 // may have some special case stuff for that.
 //=========================================================
-BOOL CBaseMonster::FBecomeProne()
+auto CBaseMonster::FBecomeProne() -> bool
 {
 	if (FBitSet(pev->flags, FL_ONGROUND))
 	{
@@ -918,7 +918,7 @@ BOOL CBaseMonster::FBecomeProne()
 	}
 
 	m_IdealMonsterState = MONSTERSTATE_PRONE;
-	return TRUE;
+	return true;
 }
 
 //=========================================================
@@ -951,7 +951,7 @@ BOOL CBaseMonster::CheckRangeAttack2(float flDot, float flDist)
 BOOL CBaseMonster::CheckMeleeAttack1(float flDot, float flDist)
 {
 	// Decent fix to keep folks from kicking/punching hornets and snarks is to check the onground flag(sjb)
-	if (flDist <= 64 && flDot >= 0.7 && m_hEnemy != nullptr && FBitSet(m_hEnemy->pev->flags, FL_ONGROUND))
+	if (flDist <= 64 && flDot >= 0.7 && HasEnemy() && FBitSet(m_hEnemy->pev->flags, FL_ONGROUND))
 	{
 		return TRUE;
 	}
@@ -1795,22 +1795,6 @@ void CBaseMonster::Move(float flInterval)
 
 	if (m_flMoveWaitFinished > gpGlobals->time)
 		return;
-
-	// Debug, test movement code
-#if 0
-//	if ( CVAR_GET_FLOAT("stopmove" ) != 0 )
-	{
-		if ( m_movementGoal == MOVEGOAL_ENEMY )
-			RouteSimplify( m_hEnemy );
-		else
-			RouteSimplify( m_hTargetEnt );
-		FRefreshRoute();
-		return;
-	}
-#else
-	// Debug, draw the route
-	//	DrawRoute( pev, m_Route, m_iRouteIndex, 0, 200, 0 );
-#endif
 
 	// if the monster is moving directly towards an entity (enemy for instance), we'll set this pointer
 	// to that entity for the CheckLocalMove and Triangulate functions.
@@ -2928,7 +2912,7 @@ void CBaseMonster::ReportAIState()
 	else
 		ALERT(level, "No Schedule, ");
 
-	if (m_hEnemy != nullptr)
+	if (HasEnemy())
 		ALERT(level, "\nEnemy is %s", STRING(m_hEnemy->pev->classname));
 	else
 		ALERT(level, "No enemy");
@@ -3017,7 +3001,7 @@ void CBaseMonster::FCheckAITrigger()
 	switch (m_iTriggerCondition)
 	{
 	case AITRIGGER_SEEPLAYER_ANGRY_AT_PLAYER:
-		if (m_hEnemy != nullptr && m_hEnemy->IsPlayer() && HasConditions(bits_COND_SEE_ENEMY))
+		if (HasEnemy() && m_hEnemy->IsPlayer() && HasConditions(bits_COND_SEE_ENEMY))
 		{
 			fFireTarget = true;
 		}
@@ -3210,7 +3194,7 @@ BOOL CBaseMonster::FindLateralCover(const Vector& vecThreat, const Vector& vecVi
 
 Vector CBaseMonster::ShootAtEnemy(const Vector& shootOrigin)
 {
-	if (m_pCine != nullptr && m_hTargetEnt != nullptr && (m_pCine->m_fTurnType == 1))
+	if (m_pCine != nullptr && HasTargetEntity() && (m_pCine->m_fTurnType == 1))
 	{
 		Vector vecDest = (m_hTargetEnt->pev->absmin + m_hTargetEnt->pev->absmax) / 2;
 		return (vecDest - shootOrigin).Normalize();
@@ -3411,7 +3395,7 @@ BOOL CBaseMonster::GetEnemy()
 	}
 
 	// remember old enemies
-	if (m_hEnemy == nullptr && PopEnemy())
+	if (!HasEnemy() && PopEnemy())
 	{
 		if (m_pSchedule)
 		{
@@ -3422,7 +3406,7 @@ BOOL CBaseMonster::GetEnemy()
 		}
 	}
 
-	if (m_hEnemy != nullptr)
+	if (HasEnemy())
 	{
 		// monster has an enemy.
 		return TRUE;
@@ -3462,30 +3446,30 @@ CBaseEntity* CBaseMonster::DropItem(const char* pszItemName, const Vector& vecPo
 }
 
 
-BOOL CBaseMonster::ShouldFadeOnDeath()
+auto CBaseMonster::ShouldFadeOnDeath() -> bool
 {
 	// if flagged to fade out or I have an owner (I came from a monster spawner)
 	if ((pev->spawnflags & SF_MONSTER_FADECORPSE) || !FNullEnt(pev->owner))
-		return TRUE;
+		return true;
 
-	return FALSE;
+	return false;
 }
 
-BOOL CBaseMonster::IsFacing(entvars_t* pevTest, const Vector& reference)
+auto CBaseMonster::IsFacing(entvars_t* pevTest, const Vector& reference) -> bool
 {
 	Vector vecDir = (reference - pevTest->origin);
 	vecDir.z = 0;
 	vecDir = vecDir.Normalize();
-	Vector forward, angle;
-	angle = pevTest->v_angle;
+	Vector forward;
+	Vector angle = pevTest->v_angle;
 	angle.x = 0;
-	UTIL_MakeVectorsPrivate(angle, forward, NULL, NULL);
+	UTIL_MakeVectorsPrivate(angle, forward, nullptr, nullptr);
+
 	// He's facing me, he meant it
-	if (DotProduct(forward, vecDir) > 0.96)	// +/- 15 degrees or so
-	{
-		return TRUE;
-	}
-	return FALSE;
+	if (DotProduct(forward, vecDir) > 0.96f)	// +/- 15 degrees or so
+		return true;
+	
+	return false;
 }
 
 void CBaseMonster::AddShockEffect(float r, float g, float b, float size, float flShockDuration)

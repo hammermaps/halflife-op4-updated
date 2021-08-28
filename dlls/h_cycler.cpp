@@ -44,7 +44,7 @@ public:
 	void Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value ) override;
 
 	// Don't treat as a live target
-	BOOL IsAlive() override { return FALSE; }
+	bool IsAlive() override { return false; }
 
 	int		Save( CSave &save ) override;
 	int		Restore( CRestore &restore ) override;

@@ -428,7 +428,7 @@ void CIchthyosaur :: HandleAnimEvent( MonsterEvent_t *pEvent )
 	case ICHTHYOSAUR_AE_SHAKE_RIGHT:
 	case ICHTHYOSAUR_AE_SHAKE_LEFT:
 		{
-			if (m_hEnemy != NULL && FVisible( m_hEnemy ))
+			if (HasEnemy() && FVisible( m_hEnemy ))
 			{
 				CBaseEntity *pHurt = m_hEnemy;
 
@@ -642,7 +642,7 @@ void CIchthyosaur :: RunTask ( Task_t *pTask )
 	switch ( pTask->iTask )
 	{
 	case TASK_ICHTHYOSAUR_CIRCLE_ENEMY:
-		if (m_hEnemy == NULL)
+		if (!HasEnemy())
 		{
 			TaskComplete( );
 		}
@@ -673,7 +673,7 @@ void CIchthyosaur :: RunTask ( Task_t *pTask )
 
 			if (HasConditions( bits_COND_ENEMY_FACING_ME ) && m_hEnemy->FVisible( this ))
 			{
-				m_flNextAlert -= 0.1;
+				m_flNextAlert -= 0.1f;
 
 				if (m_idealDist < m_flMaxDist)
 				{
@@ -689,12 +689,12 @@ void CIchthyosaur :: RunTask ( Task_t *pTask )
 				}
 				if (m_flMinSpeed < m_flMaxSpeed)
 				{
-					m_flMinSpeed += 0.5;
+					m_flMinSpeed += 0.5f;
 				}
 			}
 			else 
 			{
-				m_flNextAlert += 0.1;
+				m_flNextAlert += 0.1f;
 
 				if (m_idealDist > 128)
 				{
@@ -709,7 +709,7 @@ void CIchthyosaur :: RunTask ( Task_t *pTask )
 		}
 		else
 		{
-			m_flNextAlert = gpGlobals->time + 0.2;
+			m_flNextAlert = gpGlobals->time + 0.2f;
 		}
 
 		if (m_flNextAlert < gpGlobals->time)
@@ -1125,7 +1125,7 @@ Vector CIchthyosaur::DoProbe(const Vector &Probe)
 		}
 	}
 
-	if (bBumpedSomething && (m_hEnemy == NULL || tr.pHit != m_hEnemy->edict()))
+	if (bBumpedSomething && (!HasEnemy() || tr.pHit != m_hEnemy->edict()))
 	{
 		Vector ProbeDir = Probe - pev->origin;
 

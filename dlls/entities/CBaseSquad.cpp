@@ -304,7 +304,7 @@ bool CBaseSquad::SquadEnemySplit()
 	for (int i = 0; i < MAX_SQUAD_MEMBERS; i++)
 	{
 		CBaseSquad* pMember = pSquadLeader->MySquadMember(i);
-		if (pMember != nullptr && pMember->m_hEnemy != nullptr && pMember->m_hEnemy != pEnemy)
+		if (pMember != nullptr && pMember->HasEnemy() && pMember->m_hEnemy != pEnemy)
 		{
 			return true;
 		}
@@ -355,7 +355,7 @@ void CBaseSquad::SquadMakeEnemy(CBaseEntity* pEnemy)
 				// My enemy might be not an enemy for member of my squad, e.g. if I was provoked by player.
 				&& pMember->IRelationship(pEnemy) >= R_DL)
 			{
-				if (pMember->m_hEnemy != nullptr)
+				if (pMember->HasEnemy())
 				{
 					// remember their current enemy
 					pMember->PushEnemy(pMember->m_hEnemy, pMember->m_vecEnemyLKP);

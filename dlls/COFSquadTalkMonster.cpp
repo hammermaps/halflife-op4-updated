@@ -236,7 +236,7 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 	if (!InSquad())
 	{
 		//TODO: pEnemy could be null here
-		if (m_hEnemy != nullptr)
+		if (HasEnemy())
 		{
 			// remember their current enemy
 			PushEnemy(m_hEnemy, m_vecEnemyLKP);
@@ -279,7 +279,7 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 			if (fLeaderIsFollowing == isFollowing && squadMember->m_hEnemy != pEnemy && !squadMember->HasConditions(
 				bits_COND_SEE_ENEMY))
 			{
-				if (squadMember->m_hEnemy != nullptr)
+				if (squadMember->HasEnemy())
 				{
 					// remember their current enemy
 					squadMember->PushEnemy(squadMember->m_hEnemy, squadMember->m_vecEnemyLKP);
@@ -303,7 +303,7 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 	if (fLeaderIsFollowing == leaderIsStillFollowing && squadLeader->m_hEnemy != pEnemy && !squadLeader->HasConditions(
 		bits_COND_SEE_ENEMY))
 	{
-		if (squadLeader->m_hEnemy != nullptr)
+		if (squadLeader->HasEnemy())
 		{
 			// remember their current enemy
 			squadLeader->PushEnemy(squadLeader->m_hEnemy, squadLeader->m_vecEnemyLKP);
@@ -320,7 +320,7 @@ void COFSquadTalkMonster::SquadMakeEnemy(CBaseEntity* pEnemy)
 	// reset members who aren't activly engaged in fighting
 	if (squadLeader->m_hEnemy != pEnemy && !squadLeader->HasConditions(bits_COND_SEE_ENEMY))
 	{
-		if (squadLeader->m_hEnemy != nullptr)
+		if (squadLeader->HasEnemy())
 		{
 			// remember their current enemy
 			squadLeader->PushEnemy(squadLeader->m_hEnemy, squadLeader->m_vecEnemyLKP);
@@ -497,6 +497,27 @@ void COFSquadTalkMonster::StartMonster()
 }
 
 //=========================================================
+// someone else is talking - don't speak
+//=========================================================
+auto COFSquadTalkMonster::FOkToSpeak() const -> bool
+{
+	// if someone else is talking, don't speak
+	if (gpGlobals->time <= COFSquadTalkMonster::g_talkWaitTime)
+		return false;
+
+	if (pev->spawnflags & SF_MONSTER_GAG)
+	{
+		if (m_MonsterState != MONSTERSTATE_COMBAT)
+		{
+			// no talking outside of combat if gagged.
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//=========================================================
 // NoFriendlyFire - checks for possibility of friendly fire
 //
 // Builds a large box in front of the grunt and checks to see 
@@ -513,7 +534,7 @@ bool COFSquadTalkMonster::NoFriendlyFire()
 
 	//!!!BUGBUG - to fix this, the planes must be aligned to where the monster will be firing its gun, not the direction it is facing!!!
 
-	if (m_hEnemy != nullptr)
+	if (HasEnemy())
 	{
 		UTIL_MakeVectors(UTIL_VecToAngles(m_hEnemy->Center() - pev->origin));
 	}
@@ -615,7 +636,7 @@ BOOL COFSquadTalkMonster::SquadEnemySplit()
 	for (int i = 0; i < MAX_SQUAD_MEMBERS; i++)
 	{
 		COFSquadTalkMonster* pMember = pSquadLeader->MySquadMember(i);
-		if (pMember != nullptr && pMember->m_hEnemy != nullptr && pMember->m_hEnemy != pEnemy)
+		if (pMember != nullptr && pMember->HasEnemy() && pMember->m_hEnemy != pEnemy)
 		{
 			return TRUE;
 		}
@@ -689,7 +710,7 @@ void COFSquadTalkMonster::FollowerUse(CBaseEntity* pActivator, CBaseEntity* pCal
 		}
 		else
 		{
-			StopFollowing(TRUE);
+			StopFollowing(true);
 		}
 	}
 }

@@ -46,7 +46,7 @@
 #define SF_TRIGGER_HURT_CLIENTONLYFIRE	16// trigger hurt will only fire its target if it is hurting a client
 #define SF_TRIGGER_HURT_CLIENTONLYTOUCH 32// only clients may touch this trigger.
 
-extern DLL_GLOBAL BOOL g_fGameOver;
+extern DLL_GLOBAL bool g_fGameOver;
 
 extern void SetMovedir(entvars_t* pev);
 extern Vector VecBModelOrigin(entvars_t* pevBModel);
@@ -2153,30 +2153,7 @@ void CEnvCustomize::Affect(CBaseEntity* pTarget, USE_TYPE useType)
 		pMonster->pev->spawnflags &= ~SF_MONSTER_PRISONER;
 		break;
 	}
-	/*	if (m_iPrisoner != CUSTOM_FLAG_NOCHANGE)
-		{
-			if (pMonster->pev->spawnflags & SF_MONSTER_PRISONER && (m_iPrisoner == CUSTOM_FLAG_TOGGLE || m_iPrisoner == CUSTOM_FLAG_OFF))
-			{
-				pMonster->pev->spawnflags &= ~SF_MONSTER_PRISONER;
-				if (pev->spawnflags & SF_CUSTOM_DEBUG)
-					ALERT(at_console, " prisoner=NO");
-			}
-			else if (m_iPrisoner != CUSTOM_FLAG_OFF)
-			{
-				pMonster->pev->spawnflags |= SF_MONSTER_PRISONER;
-				if (pev->spawnflags & SF_CUSTOM_DEBUG)
-					ALERT(at_console, " prisoner=YES");
-				if (pMonster->m_hEnemy)
-				{
-					pMonster->m_hEnemy = NULL;
-					// make 'em stop attacking... might be better to use a different signal?
-					pMonster->SetConditions( bits_COND_NEW_ENEMY );
-				}
-			}
-			else if (pev->spawnflags & SF_CUSTOM_DEBUG)
-				ALERT(at_console, " prisoner=unchanged");
-		}
-	*/
+
 	switch (GetActionFor(m_iMonsterClip, pMonster->pev->flags & FL_MONSTERCLIP, useType, "monsterclip"))
 	{
 	case CUSTOM_FLAG_ON: pMonster->pev->flags |= FL_MONSTERCLIP;
@@ -3838,7 +3815,7 @@ void NextLevel()
 		pChange = GetClassPtr((CChangeLevel*)pEnt->pev);
 
 	strcpy(st_szNextMap, pChange->m_szMapName);
-	g_fGameOver = TRUE;
+	g_fGameOver = true;
 
 	pChange->SetNextThink(0);
 	if (pChange->m_fNextThink)

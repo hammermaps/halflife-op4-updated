@@ -171,7 +171,7 @@ public:
 
 	int IRelationship ( CBaseEntity *pTarget ) override;
 
-	BOOL FOkToSpeak();
+	bool FOkToSpeak();
 	void JustSpoke();
 
 	void MonsterThink() override;
@@ -347,26 +347,22 @@ int CShockTrooper :: ISoundMask ()
 //=========================================================
 // someone else is talking - don't speak
 //=========================================================
-BOOL CShockTrooper :: FOkToSpeak()
+auto CShockTrooper :: FOkToSpeak() -> bool
 {
 // if someone else is talking, don't speak
 	if (gpGlobals->time <= CTalkMonster::g_talkWaitTime)
-		return FALSE;
+		return false;
 
 	if ( pev->spawnflags & SF_MONSTER_GAG )
 	{
 		if ( m_MonsterState != MONSTERSTATE_COMBAT )
 		{
 			// no talking outside of combat if gagged.
-			return FALSE;
+			return false;
 		}
 	}
-
-	// if player is not in pvs, don't speak
-//	if (FNullEnt(FIND_CLIENT_IN_PVS(edict())))
-//		return FALSE;
 	
-	return TRUE;
+	return true;
 }
 
 //=========================================================
@@ -383,7 +379,7 @@ void CShockTrooper :: JustSpoke()
 //=========================================================
 void CShockTrooper :: PrescheduleThink ()
 {
-	if ( InSquad() && m_hEnemy != NULL )
+	if ( InSquad() && HasEnemy())
 	{
 		if ( HasConditions ( bits_COND_SEE_ENEMY ) )
 		{
@@ -433,7 +429,7 @@ BOOL CShockTrooper :: CheckMeleeAttack1 ( float flDot, float flDist )
 {
 	CBaseMonster *pEnemy;
 
-	if ( m_hEnemy != NULL )
+	if (HasEnemy())
 	{
 		pEnemy = m_hEnemy->MyMonsterPointer();
 
@@ -790,7 +786,7 @@ Vector CShockTrooper :: GetGunPosition( )
 //=========================================================
 void CShockTrooper :: Shoot ()
 {
-	if (m_hEnemy == NULL)
+	if (!HasEnemy())
 	{
 		return;
 	}
@@ -1963,10 +1959,10 @@ Schedule_t *CShockTrooper :: GetSchedule()
 						// before he starts pluggin away.
 						if (FOkToSpeak())// && RANDOM_LONG(0,1))
 						{
-							if ((m_hEnemy != NULL) && m_hEnemy->IsPlayer())
+							if (HasEnemy() && m_hEnemy->IsPlayer())
 								// player
 								SENTENCEG_PlayRndSz( ENT(pev), "ST_ALERT", ShockTrooper_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
-							else if ((m_hEnemy != NULL) &&
+							else if (HasEnemy() &&
 									(m_hEnemy->Classify() != CLASS_PLAYER_ALLY) && 
 									(m_hEnemy->Classify() != CLASS_HUMAN_PASSIVE) && 
 									(m_hEnemy->Classify() != CLASS_MACHINE))
@@ -2004,7 +2000,7 @@ Schedule_t *CShockTrooper :: GetSchedule()
 				// 10% chance of flinch.
 				int iPercent = RANDOM_LONG(0,99);
 
-				if ( iPercent <= 90 && m_hEnemy != NULL )
+				if ( iPercent <= 90 && HasEnemy())
 				{
 					// only try to take cover if we actually have an enemy!
 
@@ -2231,7 +2227,7 @@ Schedule_t* CShockTrooper :: GetScheduleOfType ( int Type )
 		}
 	case SCHED_FAIL:
 		{
-			if ( m_hEnemy != NULL )
+			if (HasEnemy())
 			{
 				// grunt has an enemy, so pick a different default fail schedule most likely to help recover.
 				return &slShockTrooperCombatFail[ 0 ];

@@ -583,9 +583,9 @@ public:
 		CBaseMonster::Killed( pevAttacker, iGib );
 	}
 
-	BOOL FVisible( CBaseEntity* pEntity ) override;
+	bool FVisible( CBaseEntity* pEntity ) override;
 
-	BOOL FVisible( const Vector& vecOrigin ) override;
+	bool FVisible( const Vector& vecOrigin ) override;
 
 	void HandleAnimEvent( MonsterEvent_t* pEvent ) override;
 
@@ -1562,7 +1562,7 @@ void COFGeneWorm::TraceAttack( entvars_t* pevAttacker, float flDamage, Vector ve
 	}
 }
 
-BOOL COFGeneWorm::FVisible( CBaseEntity* pEntity )
+auto COFGeneWorm::FVisible( CBaseEntity* pEntity ) -> bool
 {
 	if( !( pEntity->pev->flags & FL_NOTARGET ) )
 	{
@@ -1575,7 +1575,7 @@ BOOL COFGeneWorm::FVisible( CBaseEntity* pEntity )
 	return false;
 }
 
-BOOL COFGeneWorm::FVisible( const Vector& vecOrigin )
+auto COFGeneWorm::FVisible( const Vector& vecOrigin ) -> bool
 {
 	Vector vecLookerOrigin, vecLookerAngle;
 	GetAttachment( 0, vecLookerOrigin, vecLookerAngle );
@@ -1583,7 +1583,7 @@ BOOL COFGeneWorm::FVisible( const Vector& vecOrigin )
 	TraceResult tr;
 	UTIL_TraceLine( vecLookerOrigin, vecOrigin, ignore_monsters, ignore_glass, edict(), &tr );
 
-	return tr.flFraction == 1.0;
+	return tr.flFraction == 1.0f;
 }
 
 void FireHurtTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )

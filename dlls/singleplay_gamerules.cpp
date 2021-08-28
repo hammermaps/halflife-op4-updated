@@ -26,7 +26,7 @@
 #include "UserMessages.h"
 
 extern DLL_GLOBAL CGameRules	*g_pGameRules;
-extern DLL_GLOBAL BOOL	g_fGameOver;
+extern DLL_GLOBAL bool	g_fGameOver;
 
 //LRC- much as I hate to add new globals, I can't see how to read data from the World entity.
 bool g_startSuit; //LRC

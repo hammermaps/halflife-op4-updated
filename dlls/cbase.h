@@ -393,14 +393,14 @@ public:
 	}
 
 	virtual BOOL OnControls(entvars_t* pev) { return FALSE; }
-	virtual BOOL IsSneaking() { return FALSE; }
-	virtual BOOL IsAlive() { return (pev->deadflag == DEAD_NO) && pev->health > 0; }
+	virtual bool IsSneaking() { return false; }
+	virtual bool IsAlive() { return pev->deadflag == DEAD_NO && pev->health > 0; }
 	virtual BOOL IsBSPModel() { return pev->solid == SOLID_BSP || pev->movetype == MOVETYPE_PUSHSTEP; }
 	virtual BOOL ReflectGauss() { return (IsBSPModel() && !pev->takedamage); }
 	virtual BOOL HasTargetName(string_t targetname) { return FStrEq(STRING(targetname), STRING(pev->targetname)); }
 	virtual BOOL HasTarget(string_t target) { return FStrEq(STRING(target), STRING(pev->target)); }
 	virtual BOOL IsInWorld();
-	virtual BOOL IsPlayer() { return FALSE; }
+	virtual bool IsPlayer() { return false; }
 	virtual BOOL IsNetClient() { return FALSE; }
 	virtual const char* TeamID() { return ""; }
 
@@ -665,7 +665,7 @@ public:
 	static CBaseEntity* Create(const char* szName, const Vector& vecOrigin, const Vector& vecAngles,
 	                           edict_t* pentOwner = NULL);
 
-	virtual BOOL FBecomeProne() { return FALSE; }
+	virtual bool FBecomeProne() { return false; }
 	edict_t* edict() { return ENT(pev); }
 	EOFFSET eoffset() { return OFFSET(pev); }
 	int entindex() { return ENTINDEX(edict()); }
@@ -677,8 +677,8 @@ public:
 
 	virtual int Illumination() { return GETENTITYILLUM(ENT(pev)); }
 
-	virtual BOOL FVisible(CBaseEntity* pEntity);
-	virtual BOOL FVisible(const Vector& vecOrigin);
+	virtual bool FVisible(CBaseEntity* pEntity);
+	virtual bool FVisible(const Vector& vecOrigin);
 
 	//We use this variables to store each ammo count.
 	int ammo_9mm;

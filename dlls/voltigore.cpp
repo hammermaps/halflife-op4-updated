@@ -985,7 +985,7 @@ BOOL COFVoltigore :: FCanCheckAttacks ()
 //=========================================================
 BOOL COFVoltigore :: CheckMeleeAttack1 ( float flDot, float flDist )
 {
-	if ( HasConditions ( bits_COND_SEE_ENEMY ) && flDist <= VOLTIGORE_MELEE_DIST && flDot >= 0.6 && m_hEnemy != NULL )
+	if ( HasConditions ( bits_COND_SEE_ENEMY ) && flDist <= VOLTIGORE_MELEE_DIST && flDot >= 0.6 && HasEnemy())
 	{
 		return TRUE;
 	}
@@ -1255,7 +1255,7 @@ Schedule_t* COFVoltigore :: GetScheduleOfType ( int Type )
 	case SCHED_FAIL:
 		// no fail schedule specified, so pick a good generic one.
 		{
-			if ( m_hEnemy != NULL )
+			if (HasEnemy())
 			{
 				// I have an enemy
 				// !!!LATER - what if this enemy is really far away and i'm chasing him?

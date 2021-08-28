@@ -34,4 +34,4 @@ DLL_GLOBAL ULONG		g_ulModelIndexPlayer;
 DLL_GLOBAL Vector		g_vecAttackDir;
 DLL_GLOBAL int			g_iSkillLevel;
 DLL_GLOBAL int			gDisplayTitle;
-DLL_GLOBAL BOOL			g_fGameOver;
+DLL_GLOBAL bool			g_fGameOver;

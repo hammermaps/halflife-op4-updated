@@ -250,7 +250,7 @@ void CLeech::SwitchLeechState()
 	m_stateTime = gpGlobals->time + RANDOM_FLOAT( 3, 6 );
 	if ( m_MonsterState == MONSTERSTATE_COMBAT )
 	{
-		m_hEnemy = NULL;
+		m_hEnemy = nullptr;
 		SetState( MONSTERSTATE_IDLE );
 		// We may be up against the player, so redo the side checks
 		m_sideTime = 0;

@@ -206,7 +206,6 @@ public:
 	void TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override;
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType ) override;
 
-	BOOL FOkToSpeak();
 	void JustSpoke();
 
 	int ObjectCaps() override;
@@ -409,31 +408,6 @@ int CHGruntAlly :: ISoundMask ()
 }
 
 //=========================================================
-// someone else is talking - don't speak
-//=========================================================
-BOOL CHGruntAlly :: FOkToSpeak()
-{
-// if someone else is talking, don't speak
-	if (gpGlobals->time <= COFSquadTalkMonster::g_talkWaitTime)
-		return FALSE;
-
-	if ( pev->spawnflags & SF_MONSTER_GAG )
-	{
-		if ( m_MonsterState != MONSTERSTATE_COMBAT )
-		{
-			// no talking outside of combat if gagged.
-			return FALSE;
-		}
-	}
-
-	// if player is not in pvs, don't speak
-//	if (FNullEnt(FIND_CLIENT_IN_PVS(edict())))
-//		return FALSE;
-	
-	return TRUE;
-}
-
-//=========================================================
 //=========================================================
 void CHGruntAlly :: JustSpoke()
 {
@@ -447,7 +421,7 @@ void CHGruntAlly :: JustSpoke()
 //=========================================================
 void CHGruntAlly :: PrescheduleThink ()
 {
-	if ( InSquad() && m_hEnemy != NULL )
+	if ( InSquad() && HasEnemy())
 	{
 		if ( HasConditions ( bits_COND_SEE_ENEMY ) )
 		{
@@ -497,7 +471,7 @@ BOOL CHGruntAlly :: CheckMeleeAttack1 ( float flDot, float flDist )
 {
 	CBaseMonster *pEnemy;
 
-	if ( m_hEnemy != NULL )
+	if (HasEnemy())
 	{
 		pEnemy = m_hEnemy->MyMonsterPointer();
 
@@ -750,7 +724,7 @@ int CHGruntAlly :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, 
 
 		// This is a heurstic to determine if the player intended to harm me
 		// If I have an enemy, we can't establish intent (may just be crossfire)
-		if( m_hEnemy == NULL )
+		if(!HasEnemy())
 		{
 			// If the player was facing directly at me, or I'm already suspicious, get mad
 			if( gpGlobals->time - m_flLastHitByPlayer < 4.0 && m_iPlayerHits > 2
@@ -760,7 +734,7 @@ int CHGruntAlly :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, 
 				PlaySentence( "FG_MAD", 4, VOL_NORM, ATTN_NORM );
 
 				Remember( bits_MEMORY_PROVOKED );
-				StopFollowing( TRUE );
+				StopFollowing( true );
 				ALERT( at_console, "HGrunt Ally is now MAD!\n" );
 			}
 			else
@@ -938,10 +912,8 @@ Vector CHGruntAlly :: GetGunPosition( )
 //=========================================================
 void CHGruntAlly :: Shoot ()
 {
-	if (m_hEnemy == NULL)
-	{
+	if (!HasEnemy())
 		return;
-	}
 
 	Vector vecShootOrigin = GetGunPosition();
 	Vector vecShootDir = ShootAtEnemy( vecShootOrigin );
@@ -978,11 +950,9 @@ void CHGruntAlly :: Shoot ()
 //=========================================================
 void CHGruntAlly :: Shotgun ()
 {
-	if (m_hEnemy == NULL)
-	{
+	if (!HasEnemy())
 		return;
-	}
-
+	
 	Vector vecShootOrigin = GetGunPosition();
 	Vector vecShootDir = ShootAtEnemy( vecShootOrigin );
 
@@ -2434,10 +2404,10 @@ Schedule_t *CHGruntAlly :: GetSchedule()
 						// before he starts pluggin away.
 						if (FOkToSpeak())// && RANDOM_LONG(0,1))
 						{
-							if ((m_hEnemy != NULL) && m_hEnemy->IsPlayer())
+							if (HasEnemy() && m_hEnemy->IsPlayer())
 								// player
 								SENTENCEG_PlayRndSz( ENT(pev), "FG_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
-							else if ((m_hEnemy != NULL) &&
+							else if (HasEnemy() &&
 									(m_hEnemy->Classify() != CLASS_PLAYER_ALLY) && 
 									(m_hEnemy->Classify() != CLASS_HUMAN_PASSIVE) && 
 									(m_hEnemy->Classify() != CLASS_MACHINE))
@@ -2481,7 +2451,7 @@ Schedule_t *CHGruntAlly :: GetSchedule()
 				// 10% chance of flinch.
 				int iPercent = RANDOM_LONG(0,99);
 
-				if ( iPercent <= 90 && m_hEnemy != NULL )
+				if ( iPercent <= 90 && HasEnemy())
 				{
 					// only try to take cover if we actually have an enemy!
 
@@ -2583,7 +2553,7 @@ Schedule_t *CHGruntAlly :: GetSchedule()
 			}
 			
 			//Only if not following a player
-			if( !m_hTargetEnt || !m_hTargetEnt->IsPlayer() )
+			if( !HasTargetEntity() || !m_hTargetEnt->IsPlayer() )
 			{
 				if( HasConditions( bits_COND_SEE_ENEMY ) && !HasConditions( bits_COND_CAN_RANGE_ATTACK1 ) )
 				{
@@ -2634,12 +2604,12 @@ Schedule_t *CHGruntAlly :: GetSchedule()
 				}
 			}
 
-			if( m_hEnemy == NULL && IsFollowing() )
+			if(!HasEnemy() && IsFollowing() )
 			{
 				if( !m_hTargetEnt->IsAlive() )
 				{
 					// UNDONE: Comment about the recently dead player here?
-					StopFollowing( FALSE );
+					StopFollowing( false );
 					break;
 				}
 				else
@@ -2789,7 +2759,7 @@ Schedule_t* CHGruntAlly :: GetScheduleOfType ( int Type )
 		}
 	case SCHED_FAIL:
 		{
-			if ( m_hEnemy != NULL )
+			if (HasEnemy())
 			{
 				// grunt has an enemy, so pick a different default fail schedule most likely to help recover.
 				return &slGruntAllyCombatFail[ 0 ];
@@ -2897,10 +2867,8 @@ void CHGruntAlly::DeclineFollowing()
 
 void CHGruntAlly::ShootSaw()
 {
-	if( m_hEnemy == NULL )
-	{
+	if(!HasEnemy())
 		return;
-	}
 
 	Vector vecShootOrigin = GetGunPosition();
 	Vector vecShootDir = ShootAtEnemy( vecShootOrigin );

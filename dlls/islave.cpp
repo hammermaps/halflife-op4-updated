@@ -192,7 +192,7 @@ void CISlave :: CallForHelp( const char *szClassname, float flDist, EHANDLE hEne
 //=========================================================
 void CISlave :: AlertSound()
 {
-	if ( m_hEnemy != NULL )
+	if (HasEnemy())
 	{
 		SENTENCEG_PlayRndSz(ENT(pev), "SLV_ALERT", 0.85, ATTN_NORM, 0, m_voicePitch);
 

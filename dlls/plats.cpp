@@ -3567,7 +3567,7 @@ void CGunTarget::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 	{
 		pev->takedamage = DAMAGE_AIM;
 		m_hTargetEnt = GetNextTarget();
-		if (m_hTargetEnt == NULL)
+		if (!HasTargetEntity())
 			return;
 		pev->health = pev->max_health;
 		Next();

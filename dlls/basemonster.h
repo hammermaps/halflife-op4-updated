@@ -42,6 +42,9 @@ public:
 	EHANDLE m_hOldEnemy[MAX_OLD_ENEMIES];
 	Vector m_vecOldEnemy[MAX_OLD_ENEMIES];
 
+	auto HasTargetEntity() -> bool { return m_hTargetEnt != nullptr; }
+	auto HasEnemy() -> bool { return m_hEnemy != nullptr; }
+
 	float m_flFieldOfView; // width of monster's field of view ( dot product )
 	float m_flWaitFinished; // if we're told to wait, this is the time that the wait will be over.
 	float m_flMoveWaitFinished;
@@ -136,8 +139,8 @@ public:
 	virtual void RunAI(); // core ai function!	
 	void Listen();
 
-	virtual BOOL IsAlive() { return (pev->deadflag != DEAD_DEAD); }
-	virtual BOOL ShouldFadeOnDeath();
+	virtual bool IsAlive() { return pev->deadflag != DEAD_DEAD; }
+	virtual bool ShouldFadeOnDeath();
 
 	// Basic Monster AI functions
 	virtual float ChangeYaw(int speed);
@@ -158,8 +161,8 @@ public:
 	void EXPORT MonsterInitThink();
 	virtual void StartMonster();
 	virtual CBaseEntity* BestVisibleEnemy(); // finds best visible enemy for attack
-	virtual BOOL FInViewCone(CBaseEntity* pEntity); // see if pEntity is in monster's view cone
-	virtual BOOL FInViewCone(Vector* pOrigin); // see if given location is in monster's view cone
+	virtual bool FInViewCone(CBaseEntity* pEntity); // see if pEntity is in monster's view cone
+	virtual bool FInViewCone(Vector* pOrigin); // see if given location is in monster's view cone
 	virtual void HandleAnimEvent(MonsterEvent_t* pEvent);
 
 	virtual int CheckLocalMove(const Vector& vecStart, const Vector& vecEnd, CBaseEntity* pTarget, float* pflDist);
@@ -202,7 +205,7 @@ public:
 	}
 
 	virtual bool CanPlaySequence(int interruptFlags);
-	virtual int CanPlaySentence(BOOL fDisregardState) { return IsAlive(); }
+	virtual bool CanPlaySentence(bool fDisregardState) { return IsAlive(); }
 	virtual void PlaySentence(const char* pszSentence, float duration, float volume, float attenuation);
 	virtual void PlayScriptedSentence(const char* pszSentence, float duration, float volume, float attenuation,
 	                                  BOOL bConcurrent, CBaseEntity* pListener);
@@ -233,7 +236,7 @@ public:
 
 	int IScheduleFlags() const;
 	bool FRefreshRoute();
-	BOOL FRouteClear();
+	bool FRouteClear() const;
 	void RouteSimplify(CBaseEntity* pTargetEnt);
 	void AdvanceRoute(float distance);
 	virtual BOOL FTriangulate(const Vector& vecStart, const Vector& vecEnd, float flDist, CBaseEntity* pTargetEnt,
@@ -293,7 +296,7 @@ public:
 	virtual CSound* PBestScent();
 	virtual float HearingSensitivity() { return 1.0; }
 
-	BOOL FBecomeProne() override;
+	bool FBecomeProne() override;
 	virtual void BarnacleVictimBitten(entvars_t* pevBarnacle);
 	virtual void BarnacleVictimReleased();
 
@@ -332,7 +335,7 @@ public:
 	virtual BOOL HasAlienGibs();
 	virtual void FadeMonster(); // Called instead of GibMonster() when gibs are disabled
 
-	BOOL IsFacing(entvars_t* pevTest, const Vector& reference);
+	bool IsFacing(entvars_t* pevTest, const Vector& reference);
 
 	Vector ShootAtEnemy(const Vector& shootOrigin);
 	virtual Vector BodyTarget(const Vector& posSrc) { return Center() * 0.75 + EyePosition() * 0.25; }
@@ -379,7 +382,7 @@ public:
 	{
 	}
 
-	virtual void StopFollowing(BOOL clearSchedule)
+	virtual void StopFollowing(bool clearSchedule)
 	{
 	}
 

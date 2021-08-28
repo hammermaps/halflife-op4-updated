@@ -649,7 +649,7 @@ void CBigMomma::LaunchMortar()
 
 	if (m_pCine) // is a scripted_action making me shoot?
 	{
-		if (m_hTargetEnt != NULL) // don't check m_fTurnType- bigmomma can fire in any direction.
+		if (HasTargetEntity()) // don't check m_fTurnType- bigmomma can fire in any direction.
 		{
 			vecLaunch = VecCheckSplatToss( pev, startPos, m_hTargetEnt->pev->origin, RANDOM_FLOAT( 150, 500 ) );
 		}
@@ -729,7 +729,7 @@ void CBigMomma :: Precache()
 
 void CBigMomma::Activate()
 {
-	if ( m_hTargetEnt == NULL )
+	if (!HasTargetEntity())
 		Remember( bits_MEMORY_ADVANCE_NODE );	// Start 'er up
 
 	CBaseMonster::Activate();
@@ -1104,7 +1104,7 @@ void CBigMomma::RunTask( Task_t *pTask )
 		{
 			float distance;
 
-			if ( m_hTargetEnt == NULL )
+			if (!HasTargetEntity())
 				TaskFail();
 			else
 			{
@@ -1123,7 +1123,7 @@ void CBigMomma::RunTask( Task_t *pTask )
 		break;
 
 	case TASK_WAIT_NODE:
-		if ( m_hTargetEnt != NULL && (m_hTargetEnt->pev->spawnflags & SF_INFOBM_WAIT) )
+		if (HasTargetEntity() && (m_hTargetEnt->pev->spawnflags & SF_INFOBM_WAIT) )
 			return;
 
 		if ( gpGlobals->time > m_flWaitFinished )

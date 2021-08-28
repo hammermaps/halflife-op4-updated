@@ -181,7 +181,7 @@ public:
 
 	int IRelationship ( CBaseEntity *pTarget ) override;
 
-	BOOL FOkToSpeak();
+	bool FOkToSpeak();
 	void JustSpoke();
 
 	void KeyValue( KeyValueData* pkvd ) override;
@@ -363,26 +363,22 @@ int CMOFAssassin :: ISoundMask ()
 //=========================================================
 // someone else is talking - don't speak
 //=========================================================
-BOOL CMOFAssassin :: FOkToSpeak()
+auto CMOFAssassin :: FOkToSpeak() -> bool
 {
 // if someone else is talking, don't speak
 	if (gpGlobals->time <= CTalkMonster::g_talkWaitTime)
-		return FALSE;
+		return false;
 
 	if ( pev->spawnflags & SF_MONSTER_GAG )
 	{
 		if ( m_MonsterState != MONSTERSTATE_COMBAT )
 		{
 			// no talking outside of combat if gagged.
-			return FALSE;
+			return false;
 		}
 	}
 
-	// if player is not in pvs, don't speak
-//	if (FNullEnt(FIND_CLIENT_IN_PVS(edict())))
-//		return FALSE;
-	
-	return TRUE;
+	return true;
 }
 
 //=========================================================
@@ -399,7 +395,7 @@ void CMOFAssassin :: JustSpoke()
 //=========================================================
 void CMOFAssassin :: PrescheduleThink ()
 {
-	if ( InSquad() && m_hEnemy != NULL )
+	if ( InSquad() && HasEnemy())
 	{
 		if ( HasConditions ( bits_COND_SEE_ENEMY ) )
 		{
@@ -449,7 +445,7 @@ BOOL CMOFAssassin :: CheckMeleeAttack1 ( float flDot, float flDist )
 {
 	CBaseMonster *pEnemy;
 
-	if ( m_hEnemy != NULL )
+	if (HasEnemy())
 	{
 		pEnemy = m_hEnemy->MyMonsterPointer();
 
@@ -784,10 +780,8 @@ Vector CMOFAssassin :: GetGunPosition( )
 //=========================================================
 void CMOFAssassin :: Shoot ()
 {
-	if (m_hEnemy == NULL)
-	{
+	if (!HasEnemy())
 		return;
-	}
 
 	if( FBitSet( pev->weapons, MAssassinWeaponFlag::SniperRifle ) && gpGlobals->time - m_flLastShot <= 0.11 )
 	{
@@ -1994,7 +1988,7 @@ Schedule_t *CMOFAssassin :: GetSchedule()
 				// 10% chance of flinch.
 				int iPercent = RANDOM_LONG(0,99);
 
-				if ( iPercent <= 90 && m_hEnemy != NULL )
+				if ( iPercent <= 90 && HasEnemy())
 				{
 					// only try to take cover if we actually have an enemy!
 
@@ -2203,7 +2197,7 @@ Schedule_t* CMOFAssassin :: GetScheduleOfType ( int Type )
 		}
 	case SCHED_FAIL:
 		{
-			if ( m_hEnemy != NULL )
+			if (HasEnemy())
 			{
 				// grunt has an enemy, so pick a different default fail schedule most likely to help recover.
 				return &slOFMAssassinCombatFail[ 0 ];

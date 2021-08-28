@@ -154,13 +154,13 @@ void CBaseMonster :: MonsterUse ( CBaseEntity *pActivator, CBaseEntity *pCaller,
 int CBaseMonster :: IgnoreConditions () { return 0; }
 void CBaseMonster :: RouteClear () { }
 void CBaseMonster :: RouteNew () { }
-BOOL CBaseMonster :: FRouteClear () { return FALSE; }
+auto CBaseMonster::FRouteClear() const -> bool { return false; }
 auto CBaseMonster :: FRefreshRoute () -> bool { return false; }
 auto CBaseMonster::MoveToLocation( Activity movementAct, float waitTime, const Vector &goal ) -> bool { return false; }
 auto CBaseMonster::MoveToTarget( Activity movementAct, float waitTime ) -> bool { return false; }
-int ShouldSimplify( int routeType ) { return TRUE; }
+auto ShouldSimplify( int routeType ) -> bool { return true; }
 void CBaseMonster :: RouteSimplify( CBaseEntity *pTargetEnt ) { }
-BOOL CBaseMonster :: FBecomeProne () { return TRUE; }
+auto CBaseMonster :: FBecomeProne () -> bool { return true; }
 BOOL CBaseMonster :: CheckRangeAttack1 ( float flDot, float flDist ) { return FALSE; }
 BOOL CBaseMonster :: CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
 BOOL CBaseMonster :: CheckMeleeAttack1 ( float flDot, float flDist ) { return FALSE; }
@@ -191,10 +191,10 @@ int CBaseMonster::IRelationship ( CBaseEntity *pTarget ) { return 0; }
 BOOL CBaseMonster :: FindCover ( Vector vecThreat, Vector vecViewOffset, float flMinDist, float flMaxDist ) { return FALSE; }
 BOOL CBaseMonster :: BuildNearestRoute ( Vector vecThreat, Vector vecViewOffset, float flMinDist, float flMaxDist ) { return FALSE; }
 CBaseEntity *CBaseMonster :: BestVisibleEnemy () { return NULL; }
-BOOL CBaseMonster :: FInViewCone ( CBaseEntity *pEntity ) { return FALSE; }
-BOOL CBaseMonster :: FInViewCone ( Vector *pOrigin ) { return FALSE; }
-BOOL CBaseEntity :: FVisible ( CBaseEntity *pEntity ) { return FALSE; }
-BOOL CBaseEntity :: FVisible ( const Vector &vecOrigin ) { return FALSE; }
+auto CBaseMonster :: FInViewCone ( CBaseEntity *pEntity ) -> bool { return false; }
+auto CBaseMonster :: FInViewCone ( Vector *pOrigin ) -> bool { return false; }
+auto CBaseEntity :: FVisible ( CBaseEntity *pEntity ) -> bool { return false; }
+auto CBaseEntity :: FVisible ( const Vector &vecOrigin ) -> bool { return false; }
 void CBaseMonster :: MakeIdealYaw( Vector vecTarget ) { }
 float	CBaseMonster::FlYawDiff () { return 0.0; }
 float CBaseMonster::ChangeYaw ( int yawSpeed ) { return 0; }
@@ -239,7 +239,7 @@ BOOL CBaseMonster :: BBoxFlat () { return TRUE; }
 BOOL CBaseMonster :: GetEnemy () { return FALSE; }
 void CBaseMonster :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) { }
 CBaseEntity* CBaseMonster :: DropItem ( const char *pszItemName, const Vector &vecPos, const Vector &vecAng ) { return NULL; }
-BOOL CBaseMonster :: ShouldFadeOnDeath() { return FALSE; }
+auto CBaseMonster :: ShouldFadeOnDeath() -> bool { return false; }
 void CBaseMonster :: RadiusDamage(entvars_t* pevInflictor, entvars_t*	pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType ) { }
 void CBaseMonster :: RadiusDamage( Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType ) { }
 void CBaseMonster::FadeMonster() { }
@@ -271,7 +271,7 @@ void CBasePlayer::PackDeadPlayerItems() { }
 void CBasePlayer::RemoveAllItems( BOOL removeSuit ) { }
 void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim ) { }
 void CBasePlayer::WaterMove() { }
-BOOL CBasePlayer::IsOnLadder() { return FALSE; }
+auto CBasePlayer::IsOnLadder() -> bool { return false; }
 void CBasePlayer::PlayerDeathThink() { }
 void CBasePlayer::StartDeathCam() { }
 void CBasePlayer::StartObserver( Vector vecPosition, Vector vecViewAngle ) { }
@@ -291,9 +291,9 @@ int CBasePlayer::Save( CSave &save ) { return 0; }
 void CBasePlayer::RenewItems() { }
 int CBasePlayer::Restore( CRestore &restore ) { return 0; }
 void CBasePlayer::SelectNextItem( int iItem ) { }
-BOOL CBasePlayer::HasWeapons() { return FALSE; }
+auto CBasePlayer::HasWeapons() -> bool { return false; }
 void CBasePlayer::SelectPrevItem( int iItem ) { }
-BOOL CBasePlayer :: FlashlightIsOn() { return FALSE; }
+auto CBasePlayer :: FlashlightIsOn() -> bool { return false; }
 void CBasePlayer :: FlashlightTurnOn() { }
 void CBasePlayer :: FlashlightTurnOff() { }
 void CBasePlayer :: ForceClientDllUpdate() { }
@@ -307,7 +307,7 @@ int CBasePlayer::AmmoInventory( int iAmmoIndex ) { return -1; }
 int CBasePlayer::GetAmmoIndex(const char *psz) { return -1; }
 void CBasePlayer::SendAmmoUpdate() { }
 void CBasePlayer :: UpdateClientData() { }
-BOOL CBasePlayer :: FBecomeProne () { return TRUE; }
+auto CBasePlayer :: FBecomeProne () -> bool { return true; }
 void CBasePlayer :: BarnacleVictimBitten ( entvars_t *pevBarnacle ) { }
 void CBasePlayer :: BarnacleVictimReleased () { }
 int CBasePlayer :: Illumination() { return 0; }

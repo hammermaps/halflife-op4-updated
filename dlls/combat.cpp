@@ -951,7 +951,7 @@ int CBaseMonster :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker,
 			else if (m_iPlayerReact == 3)
 			{
 				// try to decide whether it was deliberate... if I have an enemy, assume it was just crossfire.
-				if ( m_hEnemy == NULL )
+				if (!HasEnemy())
 				{
 					if ( (m_afMemory & bits_MEMORY_SUSPICIOUS) || IsFacing( pevAttacker, pev->origin ) )
 						Remember( bits_MEMORY_PROVOKED );
@@ -967,7 +967,7 @@ int CBaseMonster :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker,
 			// enemy's last known position is somewhere down the vector that the attack came from.
 			if (pevInflictor)
 			{
-				if (m_hEnemy == NULL || pevInflictor == m_hEnemy->pev || !HasConditions(bits_COND_SEE_ENEMY))
+				if (!HasEnemy() || pevInflictor == m_hEnemy->pev || !HasConditions(bits_COND_SEE_ENEMY))
 				{
 					m_vecEnemyLKP = pevInflictor->origin;
 				}
@@ -1187,7 +1187,7 @@ CBaseEntity* CBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, in
 		return pEntity;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1196,26 +1196,19 @@ CBaseEntity* CBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, in
 // the caller's forward view cone. The dot product is performed
 // in 2d, making the view cone infinitely tall. 
 //=========================================================
-BOOL CBaseMonster :: FInViewCone ( CBaseEntity *pEntity )
+auto CBaseMonster :: FInViewCone ( CBaseEntity *pEntity ) -> bool
 {
-	Vector2D	vec2LOS;
-	float	flDot;
-
 	UTIL_MakeVectors ( pev->angles );
 	
-	vec2LOS = ( pEntity->pev->origin - pev->origin ).Make2D();
+	Vector2D vec2LOS = (pEntity->pev->origin - pev->origin).Make2D();
 	vec2LOS = vec2LOS.Normalize();
 
-	flDot = DotProduct (vec2LOS , gpGlobals->v_forward.Make2D() );
+	const float flDot = DotProduct(vec2LOS, gpGlobals->v_forward.Make2D());
 
 	if ( flDot > m_flFieldOfView )
-	{
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
+		return true;
+
+	return false;
 }
 
 //=========================================================
@@ -1223,38 +1216,27 @@ BOOL CBaseMonster :: FInViewCone ( CBaseEntity *pEntity )
 // the caller's forward view cone. The dot product is performed
 // in 2d, making the view cone infinitely tall. 
 //=========================================================
-BOOL CBaseMonster :: FInViewCone ( Vector *pOrigin )
+auto CBaseMonster :: FInViewCone ( Vector *pOrigin ) -> bool
 {
-	Vector2D	vec2LOS;
-	float		flDot;
-
 	UTIL_MakeVectors ( pev->angles );
 	
-	vec2LOS = ( *pOrigin - pev->origin ).Make2D();
+	Vector2D vec2LOS = (*pOrigin - pev->origin).Make2D();
 	vec2LOS = vec2LOS.Normalize();
 
-	flDot = DotProduct (vec2LOS , gpGlobals->v_forward.Make2D() );
+	const float flDot = DotProduct(vec2LOS, gpGlobals->v_forward.Make2D());
 
 	if ( flDot > m_flFieldOfView )
-	{
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
+		return true;
+
+	return FALSE;
 }
 
 //=========================================================
 // FVisible - returns true if a line can be traced from
 // the caller's eyes to the target
 //=========================================================
-BOOL CBaseEntity :: FVisible ( CBaseEntity *pEntity )
+auto CBaseEntity :: FVisible ( CBaseEntity *pEntity ) -> bool
 {
-	TraceResult tr;
-	Vector		vecLookerOrigin;
-	Vector		vecTargetOrigin;
-	
 	if (FBitSet( pEntity->pev->flags, FL_NOTARGET ))
 		return FALSE;
 
@@ -1263,44 +1245,37 @@ BOOL CBaseEntity :: FVisible ( CBaseEntity *pEntity )
 		|| (pev->waterlevel == 3 && pEntity->pev->waterlevel == 0))
 		return FALSE;
 
-	vecLookerOrigin = pev->origin + pev->view_ofs;//look through the caller's 'eyes'
-	vecTargetOrigin = pEntity->EyePosition();
+	const Vector vecLookerOrigin = pev->origin + pev->view_ofs;//look through the caller's 'eyes'
+	const Vector vecTargetOrigin = pEntity->EyePosition();
 
-	UTIL_TraceLine(vecLookerOrigin, vecTargetOrigin, ignore_monsters, ignore_glass, ENT(pev)/*pentIgnore*/, &tr);
+	TraceResult tr;
+	UTIL_TraceLine(vecLookerOrigin, vecTargetOrigin, ignore_monsters, ignore_glass, ENT(pev), &tr);
 	
-	if (tr.flFraction != 1.0 && tr.pHit != ENT(pEntity->pev)) //LRC - added so that monsters can "see" some bsp objects
+	if (tr.flFraction != 1.0f && tr.pHit != ENT(pEntity->pev)) //LRC - added so that monsters can "see" some bsp objects
 	{
 //		ALERT(at_console, "can't see \"%s\"\n", STRING(pEntity->pev->classname));
-		return FALSE;// Line of sight is not established
+		return false;// Line of sight is not established
 	}
-	else
-	{
-//		ALERT(at_console, "Seen ok\n");
-		return TRUE;// line of sight is valid.
-	}
+
+//	ALERT(at_console, "Seen ok\n");
+	return true;// line of sight is valid.
 }
 
 //=========================================================
 // FVisible - returns true if a line can be traced from
 // the caller's eyes to the target vector
 //=========================================================
-BOOL CBaseEntity :: FVisible ( const Vector &vecOrigin )
+auto CBaseEntity :: FVisible ( const Vector &vecOrigin ) -> bool
 {
-	TraceResult tr;
-	Vector		vecLookerOrigin;
-	
-	vecLookerOrigin = EyePosition();//look through the caller's 'eyes'
+	const Vector vecLookerOrigin = EyePosition();//look through the caller's 'eyes'
 
-	UTIL_TraceLine(vecLookerOrigin, vecOrigin, ignore_monsters, ignore_glass, ENT(pev)/*pentIgnore*/, &tr);
+	TraceResult tr;
+	UTIL_TraceLine(vecLookerOrigin, vecOrigin, ignore_monsters, ignore_glass, ENT(pev), &tr);
 	
-	if (tr.flFraction != 1.0)
-	{
-		return FALSE;// Line of sight is not established
-	}
-	else
-	{
-		return TRUE;// line of sight is valid.
-	}
+	if (tr.flFraction != 1.0f)
+		return false;// Line of sight is not established
+
+	return true;// line of sight is valid.
 }
 
 /*

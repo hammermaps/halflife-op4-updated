@@ -429,7 +429,7 @@ void CBaseTurret::TurretUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 
 	if (m_iOn)
 	{
-		m_hEnemy = NULL;
+		m_hEnemy = nullptr;
 		SetNextThink(0.1);
 		m_iAutoStart = FALSE;// switching off a turret disables autostart
 		//!!!! this should spin down first!!BUGBUG
@@ -504,9 +504,9 @@ void CBaseTurret::ActiveThink()
 
 	UpdateShockEffect();
 
-	if ((!m_iOn) || (m_hEnemy == NULL))
+	if (!m_iOn || !HasEnemy())
 	{
-		m_hEnemy = NULL;
+		m_hEnemy = nullptr;
 		m_flLastSight = gpGlobals->time + m_flMaxWait;
 		SetThink(&CBaseTurret::SearchThink);
 		return;
@@ -523,7 +523,7 @@ void CBaseTurret::ActiveThink()
 		{
 			if (gpGlobals->time > m_flLastSight)
 			{	
-				m_hEnemy = NULL;
+				m_hEnemy = nullptr;
 				m_flLastSight = gpGlobals->time + m_flMaxWait;
 				SetThink(&CBaseTurret::SearchThink);
 				return;
@@ -552,7 +552,7 @@ void CBaseTurret::ActiveThink()
 			// Should we look for a new target?
 			if (gpGlobals->time > m_flLastSight)
 			{
-				m_hEnemy = NULL;
+				m_hEnemy = nullptr;
 				m_flLastSight = gpGlobals->time + m_flMaxWait;
 				SetThink(&CBaseTurret::SearchThink);
 				return;
@@ -865,7 +865,7 @@ void CBaseTurret::SearchThink()
 	// ensure rethink
 	SetTurretAnim(TURRET_ANIM_SPIN);
 	StudioFrameAdvance( );
-	SetNextThink(0.1);
+	SetNextThink(0.1f);
 
 	UpdateShockEffect();
 
@@ -875,22 +875,22 @@ void CBaseTurret::SearchThink()
 	Ping( );
 
 	// If we have a target and we're still healthy
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		if (!m_hEnemy->IsAlive() )
-			m_hEnemy = NULL;// Dead enemy forces a search for new one
+			m_hEnemy = nullptr;// Dead enemy forces a search for new one
 	}
 
 
 	// Acquire Target
-	if (m_hEnemy == NULL)
+	if (!HasEnemy())
 	{
 		Look(TURRET_RANGE);
 		m_hEnemy = BestVisibleEnemy();
 	}
 
 	// If we've found a target, spin up the barrel and start to attack
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		m_flLastSight = 0;
 		m_flSpinUpTime = 0;
@@ -935,21 +935,21 @@ void CBaseTurret::AutoSearchThink()
 
 	// If we have a target and we're still healthy
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		if (!m_hEnemy->IsAlive() )
-			m_hEnemy = NULL;// Dead enemy forces a search for new one
+			m_hEnemy = nullptr;// Dead enemy forces a search for new one
 	}
 
 	// Acquire Target
 
-	if (m_hEnemy == NULL)
+	if (!HasEnemy())
 	{
 		Look( TURRET_RANGE );
 		m_hEnemy = BestVisibleEnemy();
 	}
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		SetThink(&CBaseTurret::Deploy);
 		EMIT_SOUND(ENT(pev), CHAN_BODY, "turret/tu_alert.wav", TURRET_MACHINE_VOLUME, ATTN_NORM);

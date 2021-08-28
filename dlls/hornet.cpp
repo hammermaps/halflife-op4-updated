@@ -249,7 +249,6 @@ old colors
 void CHornet :: TrackTarget ()
 {
 	Vector	vecFlightDir;
-	Vector	vecDirToEnemy;
 	float	flDelta;
 
 	StudioFrameAdvance( );
@@ -258,27 +257,27 @@ void CHornet :: TrackTarget ()
 	{
 		SetTouch( NULL );
 		SetThink( &CHornet::SUB_Remove );
-		SetNextThink(0.1);
+		SetNextThink(0.1f);
 		return;
 	}
 
 	// UNDONE: The player pointer should come back after returning from another level
-	if ( m_hEnemy == NULL )
+	if (!HasEnemy())
 	{// enemy is dead.
 		Look( 512 );
 		m_hEnemy = BestVisibleEnemy( );
 	}
 	
-	if ( m_hEnemy != NULL && FVisible( m_hEnemy ))
+	if (HasEnemy() && FVisible( m_hEnemy ))
 	{
 		m_vecEnemyLKP = m_hEnemy->BodyTarget( pev->origin );
 	}
 	else
 	{
-		m_vecEnemyLKP = m_vecEnemyLKP + pev->velocity * m_flFlySpeed * 0.1;
+		m_vecEnemyLKP = m_vecEnemyLKP + pev->velocity * m_flFlySpeed * 0.1f;
 	}
 
-	vecDirToEnemy = ( m_vecEnemyLKP - pev->origin ).Normalize();
+	Vector vecDirToEnemy = (m_vecEnemyLKP - pev->origin).Normalize();
 
 	if (pev->velocity.Length() < 0.1)
 		vecFlightDir = vecDirToEnemy;
@@ -332,7 +331,7 @@ void CHornet :: TrackTarget ()
 
 	// if hornet is close to the enemy, jet in a straight line for a half second.
 	// (only in the single player game)
-	if ( m_hEnemy != NULL && !g_pGameRules->IsMultiplayer() )
+	if (HasEnemy() && !g_pGameRules->IsMultiplayer() )
 	{
 		if ( flDelta >= 0.4 && ( pev->origin - m_vecEnemyLKP ).Length() <= 300 )
 		{

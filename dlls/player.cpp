@@ -54,7 +54,7 @@
 // #define DUCKFIX
 
 extern DLL_GLOBAL ULONG g_ulModelIndexPlayer;
-extern DLL_GLOBAL BOOL g_fGameOver;
+extern DLL_GLOBAL bool g_fGameOver;
 extern DLL_GLOBAL BOOL g_fDrawLines;
 int gEvilImpulse101;
 extern DLL_GLOBAL int g_iSkillLevel, gDisplayTitle;
@@ -630,7 +630,7 @@ int CBasePlayer::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, flo
 				auto squadAlly = ally->MySquadTalkMonsterPointer();
 
 				if (squadAlly
-					&& squadAlly->m_hTargetEnt
+					&& squadAlly->HasTargetEntity()
 					&& squadAlly->m_hTargetEnt->IsPlayer())
 				{
 					squadAlly->SquadMakeEnemy(enemy);
@@ -1411,9 +1411,9 @@ void CBasePlayer::WaterMove()
 
 
 // TRUE if the player is attached to a ladder
-BOOL CBasePlayer::IsOnLadder()
+auto CBasePlayer::IsOnLadder() -> bool
 {
-	return (pev->movetype == MOVETYPE_FLY);
+	return pev->movetype == MOVETYPE_FLY;
 }
 
 void CBasePlayer::PlayerDeathThink()
@@ -3608,19 +3608,17 @@ void CBasePlayer::SelectItem(const char* pstr)
 //==============================================
 // HasWeapons - do I have any weapons at all?
 //==============================================
-BOOL CBasePlayer::HasWeapons()
+auto CBasePlayer::HasWeapons() -> bool
 {
-	int i;
-
-	for (i = 0; i < MAX_ITEM_TYPES; i++)
+	for (int i = 0; i < MAX_ITEM_TYPES; i++)
 	{
 		if (m_rgpPlayerItems[i])
 		{
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 void CBasePlayer::SelectPrevItem(int iItem)
@@ -3752,7 +3750,7 @@ void CBasePlayer::GiveNamedItem(const char* pszName)
 	DispatchTouch(pent, ENT(pev));
 }
 
-BOOL CBasePlayer::FlashlightIsOn()
+auto CBasePlayer::FlashlightIsOn() -> bool
 {
 	return FBitSet(pev->effects, EF_BRIGHTLIGHT);
 }
@@ -4875,10 +4873,10 @@ void CBasePlayer::UpdateCTFHud()
 // FBecomeProne - Overridden for the player to set the proper
 // physics flags when a barnacle grabs player.
 //=========================================================
-BOOL CBasePlayer::FBecomeProne()
+auto CBasePlayer::FBecomeProne() -> bool
 {
 	m_afPhysicsFlags |= PFLAG_ONBARNACLE;
-	return TRUE;
+	return true;
 }
 
 //=========================================================

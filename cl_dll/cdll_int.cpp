@@ -418,6 +418,7 @@ public:
 	{
 		if (GetClientVoiceMgr())
 			return GetClientVoiceMgr()->IsPlayerBlocked(playerIndex);
+
 		return false;
 	}
 

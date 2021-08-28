@@ -83,7 +83,7 @@ int CSqueakGrenade :: Classify ()
 	if (m_iMyClass != 0)
 		return m_iMyClass; // protect against recursion
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		m_iMyClass = CLASS_INSECT; // no one cares about it
 		switch( m_hEnemy->Classify( ) )
@@ -242,7 +242,7 @@ void CSqueakGrenade::HuntThink()
 
 	UTIL_MakeVectors( pev->angles );
 
-	if (m_hEnemy == NULL || !m_hEnemy->IsAlive())
+	if (!HasEnemy() || !m_hEnemy->IsAlive())
 	{
 		// find target, bounce a bit towards it.
 		Look( 512 );
@@ -257,11 +257,11 @@ void CSqueakGrenade::HuntThink()
 	}
 
 	// higher pitch as squeeker gets closer to detonation time
-	float flpitch = 155.0 - 60.0 * ((m_flDie - gpGlobals->time) / SQUEEK_DETONATE_DELAY);
+	float flpitch = 155.0f - 60.0f * static_cast<float>((m_flDie - gpGlobals->time) / SQUEEK_DETONATE_DELAY);
 	if (flpitch < 80)
 		flpitch = 80;
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		if (FVisible( m_hEnemy ))
 		{

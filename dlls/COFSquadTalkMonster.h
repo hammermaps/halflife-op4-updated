@@ -41,6 +41,7 @@ public:
 	void Killed( entvars_t *pevAttacker, int iGib ) override;
 	BOOL OccupySlot( int iDesiredSlot );
 	bool NoFriendlyFire() override;
+	bool FOkToSpeak() const;
 
 	// squad functions still left in base class
 	COFSquadTalkMonster *MySquadLeader()

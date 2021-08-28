@@ -247,7 +247,7 @@ public:
 
 	char m_szTeamName[TEAM_NAME_LENGTH];
 
-	virtual float	CalcRatio(CBaseEntity* pLocus, int mode)//AJH added 'mode' = ratio to return
+	virtual float CalcRatio(CBaseEntity* pLocus, int mode)//AJH added 'mode' = ratio to return
 	{
 		//ALERT(at_debug,"CBasePlayer CalcRatio called, mode is %i\n",mode);
 		switch (mode) {
@@ -261,10 +261,10 @@ public:
 			return pev->velocity.Length();
 		}break;
 		case 2: {
-			return (int)IsSneaking();
+			return IsSneaking() ? 1 : 0;
 		}break;
 		case 3: {
-			return (int)HasWeapons();
+			return HasWeapons() ? 1 : 0;
 		}break;
 		}
 		return 0;
@@ -289,10 +289,10 @@ public:
 	// position to shoot at
 	void StartSneaking() override { m_tSneaking = gpGlobals->time - 1; }
 	void StopSneaking() override { m_tSneaking = gpGlobals->time + 30; }
-	BOOL IsSneaking() override { return m_tSneaking <= gpGlobals->time; }
-	BOOL IsAlive() override { return (pev->deadflag == DEAD_NO) && pev->health > 0; }
-	BOOL ShouldFadeOnDeath() override { return FALSE; }
-	BOOL IsPlayer() override { return TRUE; }
+	bool IsSneaking() override { return m_tSneaking <= gpGlobals->time; }
+	bool IsAlive() override { return pev->deadflag == DEAD_NO && pev->health > 0; }
+	bool ShouldFadeOnDeath() override { return false; }
+	bool IsPlayer() override { return true; }
 	// Spectators should return FALSE for this, they aren't "players" as far as game logic is concerned
 
 	BOOL IsNetClient() override { return TRUE; } // Bots should return FALSE for this, they can't receive NET messages
@@ -320,8 +320,8 @@ public:
 	// Player is moved across the transition by other means
 	int ObjectCaps() override { return CBaseMonster::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 	void Precache() override;
-	BOOL IsOnLadder();
-	BOOL FlashlightIsOn();
+	bool IsOnLadder();
+	bool FlashlightIsOn();
 	void FlashlightTurnOn();
 	void FlashlightTurnOff();
 
@@ -347,7 +347,7 @@ public:
 	void DropPlayerItem(char* pszItemName);
 	BOOL HasPlayerItem(CBasePlayerItem* pCheckItem);
 	BOOL HasNamedPlayerItem(const char* pszItemName);
-	BOOL HasWeapons(); // do I have ANY weapons?
+	bool HasWeapons(); // do I have ANY weapons?
 	void SelectPrevItem(int iItem);
 	void SelectNextItem(int iItem);
 	void SelectLastItem();
@@ -370,7 +370,7 @@ public:
 	void UpdateGeigerCounter();
 	void CheckTimeBasedDamage();
 
-	BOOL FBecomeProne() override;
+	bool FBecomeProne() override;
 	void BarnacleVictimBitten(entvars_t* pevBarnacle) override;
 	void BarnacleVictimReleased() override;
 	static int GetAmmoIndex(const char* psz);

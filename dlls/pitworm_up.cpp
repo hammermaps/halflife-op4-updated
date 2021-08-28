@@ -98,9 +98,9 @@ public:
 
 	void TraceAttack( entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType ) override;
 
-	BOOL FVisible( CBaseEntity* pEntity ) override;
+	bool FVisible( CBaseEntity* pEntity ) override;
 
-	BOOL FVisible( const Vector& vecOrigin ) override;
+	bool FVisible( const Vector& vecOrigin ) override;
 
 	void HandleAnimEvent( MonsterEvent_t* pEvent ) override;
 
@@ -1303,7 +1303,7 @@ void COFPitWormUp::TraceAttack( entvars_t* pevAttacker, float flDamage, Vector v
 	}
 }
 
-BOOL COFPitWormUp::FVisible( CBaseEntity* pEntity )
+auto COFPitWormUp::FVisible( CBaseEntity* pEntity ) -> bool
 {
 	if( !( pEntity->pev->flags & FL_NOTARGET ) )
 	{
@@ -1316,7 +1316,7 @@ BOOL COFPitWormUp::FVisible( CBaseEntity* pEntity )
 	return false;
 }
 
-BOOL COFPitWormUp::FVisible( const Vector& vecOrigin )
+auto COFPitWormUp::FVisible( const Vector& vecOrigin ) -> bool
 {
 	Vector vecLookerOrigin, vecLookerAngle;
 	GetAttachment( 0, vecLookerOrigin, vecLookerAngle );
@@ -1324,7 +1324,7 @@ BOOL COFPitWormUp::FVisible( const Vector& vecOrigin )
 	TraceResult tr;
 	UTIL_TraceLine( vecLookerOrigin, vecOrigin, ignore_monsters, ignore_glass, edict(), &tr );
 
-	return tr.flFraction == 1.0;
+	return tr.flFraction == 1.0f;
 }
 
 void COFPitWormUp::HandleAnimEvent( MonsterEvent_t* pEvent )
@@ -1719,7 +1719,7 @@ public:
 
 	void Activate() override
 	{
-		if (m_hTargetEnt == NULL)
+		if (!HasTargetEntity())
 			Remember(bits_MEMORY_ADVANCE_NODE);	// Start 'er up
 	}
 
@@ -2100,12 +2100,8 @@ void COFPitWorm::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecD
 
 void COFPitWorm::Move(float flInterval)
 {
-	float		flWaypointDist;
 	float		flCheckDist;
 	float		flDist;// how far the lookahead check got before hitting an object.
-	Vector		vecDir;
-	Vector		vecApex;
-	CBaseEntity* pTargetEnt;
 
 	// Don't move if no valid route
 	if (FRouteClear())
@@ -2125,11 +2121,11 @@ void COFPitWorm::Move(float flInterval)
 
 	// if the monster is moving directly towards an entity (enemy for instance), we'll set this pointer
 	// to that entity for the CheckLocalMove and Triangulate functions.
-	pTargetEnt = NULL;
+	CBaseEntity* pTargetEnt = NULL;
 
 	// local move to waypoint.
-	vecDir = (m_Route[m_iRouteIndex].vecLocation - pev->origin).Normalize();
-	flWaypointDist = (m_Route[m_iRouteIndex].vecLocation - pev->origin).Length2D();
+	Vector vecDir = (m_Route[m_iRouteIndex].vecLocation - pev->origin).Normalize();
+	float flWaypointDist = (m_Route[m_iRouteIndex].vecLocation - pev->origin).Length2D();
 
 	if (flWaypointDist > 32)
 	{

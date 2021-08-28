@@ -190,7 +190,6 @@ public:
 	void TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override;
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType ) override;
 
-	BOOL FOkToSpeak();
 	void JustSpoke();
 
 	int ObjectCaps() override;
@@ -415,31 +414,6 @@ int COFMedicAlly :: ISoundMask ()
 }
 
 //=========================================================
-// someone else is talking - don't speak
-//=========================================================
-BOOL COFMedicAlly :: FOkToSpeak()
-{
-// if someone else is talking, don't speak
-	if (gpGlobals->time <= COFSquadTalkMonster::g_talkWaitTime)
-		return FALSE;
-
-	if ( pev->spawnflags & SF_MONSTER_GAG )
-	{
-		if ( m_MonsterState != MONSTERSTATE_COMBAT )
-		{
-			// no talking outside of combat if gagged.
-			return FALSE;
-		}
-	}
-
-	// if player is not in pvs, don't speak
-//	if (FNullEnt(FIND_CLIENT_IN_PVS(edict())))
-//		return FALSE;
-	
-	return TRUE;
-}
-
-//=========================================================
 //=========================================================
 void COFMedicAlly :: JustSpoke()
 {
@@ -453,7 +427,7 @@ void COFMedicAlly :: JustSpoke()
 //=========================================================
 void COFMedicAlly :: PrescheduleThink ()
 {
-	if ( InSquad() && m_hEnemy != NULL )
+	if ( InSquad() && HasEnemy())
 	{
 		if ( HasConditions ( bits_COND_SEE_ENEMY ) )
 		{
@@ -503,7 +477,7 @@ BOOL COFMedicAlly :: CheckMeleeAttack1 ( float flDot, float flDist )
 {
 	CBaseMonster *pEnemy;
 
-	if ( m_hEnemy != NULL )
+	if (HasEnemy())
 	{
 		pEnemy = m_hEnemy->MyMonsterPointer();
 
@@ -754,7 +728,7 @@ int COFMedicAlly :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker,
 
 		// This is a heurstic to determine if the player intended to harm me
 		// If I have an enemy, we can't establish intent (may just be crossfire)
-		if( m_hEnemy == NULL )
+		if(!HasEnemy())
 		{
 			// If the player was facing directly at me, or I'm already suspicious, get mad
 			if( gpGlobals->time - m_flLastHitByPlayer < 4.0 && m_iPlayerHits > 2
@@ -764,7 +738,7 @@ int COFMedicAlly :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker,
 				PlaySentence( "FG_MAD", 4, VOL_NORM, ATTN_NORM );
 
 				Remember( bits_MEMORY_PROVOKED );
-				StopFollowing( TRUE );
+				StopFollowing( true );
 				ALERT( at_console, "HGrunt Ally is now MAD!\n" );
 			}
 			else
@@ -943,7 +917,7 @@ Vector COFMedicAlly :: GetGunPosition( )
 void COFMedicAlly :: Shoot ()
 {
 	//Limit fire rate
-	if (m_hEnemy == NULL || gpGlobals->time - m_flLastShot <= 0.11 )
+	if (!HasEnemy() || gpGlobals->time - m_flLastShot <= 0.11 )
 	{
 		return;
 	}
@@ -1340,7 +1314,7 @@ void COFMedicAlly :: StartTask ( Task_t *pTask )
 			if( !m_fHealing )
 				return COFSquadTalkMonster::StartTask( pTask );
 
-			if( m_hTargetEnt )
+			if(HasTargetEntity())
 			{
 				auto pTarget = m_hTargetEnt.Entity<CBaseEntity>();
 				auto pTargetMonster = pTarget->MySquadTalkMonsterPointer();
@@ -1421,7 +1395,7 @@ void COFMedicAlly :: RunTask ( Task_t *pTask )
 				{
 					m_fHealActive = true;
 
-					if( m_hTargetEnt )
+					if(HasTargetEntity())
 					{
 						auto pHealTarget = m_hTargetEnt.Entity<CBaseEntity>();
 
@@ -2439,7 +2413,7 @@ Schedule_t *COFMedicAlly :: GetSchedule()
 
 	if( m_fHealing )
 	{
-		if( m_hTargetEnt )
+		if(HasTargetEntity())
 		{
 			auto pHealTarget = m_hTargetEnt.Entity<CBaseEntity>();
 
@@ -2542,10 +2516,10 @@ Schedule_t *COFMedicAlly :: GetSchedule()
 						// before he starts pluggin away.
 						if (FOkToSpeak())// && RANDOM_LONG(0,1))
 						{
-							if ((m_hEnemy != NULL) && m_hEnemy->IsPlayer())
+							if (HasEnemy() && m_hEnemy->IsPlayer())
 								// player
 								SENTENCEG_PlayRndSz( ENT(pev), "FG_ALERT", MEDIC_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
-							else if ((m_hEnemy != NULL) &&
+							else if (HasEnemy() &&
 									(m_hEnemy->Classify() != CLASS_PLAYER_ALLY) && 
 									(m_hEnemy->Classify() != CLASS_HUMAN_PASSIVE) && 
 									(m_hEnemy->Classify() != CLASS_MACHINE))
@@ -2589,7 +2563,7 @@ Schedule_t *COFMedicAlly :: GetSchedule()
 				// 10% chance of flinch.
 				int iPercent = RANDOM_LONG(0,99);
 
-				if ( iPercent <= 90 && m_hEnemy != NULL )
+				if ( iPercent <= 90 && HasEnemy())
 				{
 					// only try to take cover if we actually have an enemy!
 
@@ -2684,7 +2658,7 @@ Schedule_t *COFMedicAlly :: GetSchedule()
 			}
 			
 			//Only if not following a player
-			if( !m_hTargetEnt || !m_hTargetEnt->IsPlayer() )
+			if( !HasTargetEntity() || !m_hTargetEnt->IsPlayer() )
 			{
 				if( HasConditions( bits_COND_SEE_ENEMY ) && !HasConditions( bits_COND_CAN_RANGE_ATTACK1 ) )
 				{
@@ -2735,12 +2709,12 @@ Schedule_t *COFMedicAlly :: GetSchedule()
 				}
 			}
 
-			if( m_hEnemy == NULL && IsFollowing() )
+			if(!HasEnemy() && IsFollowing() )
 			{
 				if( !m_hTargetEnt->IsAlive() )
 				{
 					// UNDONE: Comment about the recently dead player here?
-					StopFollowing( FALSE );
+					StopFollowing( false );
 					break;
 				}
 				else
@@ -2890,7 +2864,7 @@ Schedule_t* COFMedicAlly :: GetScheduleOfType ( int Type )
 		}
 	case SCHED_FAIL:
 		{
-			if ( m_hEnemy != NULL )
+			if (HasEnemy())
 			{
 				// grunt has an enemy, so pick a different default fail schedule most likely to help recover.
 				return &slMedicAllyCombatFail[ 0 ];
@@ -3014,7 +2988,7 @@ void COFMedicAlly::KeyValue( KeyValueData *pkvd )
 
 void COFMedicAlly::Killed( entvars_t* pevAttacker, int iGib )
 {
-	if( m_hTargetEnt != nullptr )
+	if(HasTargetEntity())
 	{
 		auto pSquadMonster = m_hTargetEnt->MySquadTalkMonsterPointer();
 
@@ -3059,7 +3033,7 @@ BOOL COFMedicAlly::HealMe( COFSquadTalkMonster* pTarget )
 {
 	if( pTarget )
 	{
-		if( m_hTargetEnt && !m_hTargetEnt->IsPlayer() )
+		if(HasTargetEntity() && !m_hTargetEnt->IsPlayer() )
 		{
 			auto pCurrentTarget = m_hTargetEnt->MySquadTalkMonsterPointer();
 
@@ -3082,7 +3056,7 @@ BOOL COFMedicAlly::HealMe( COFSquadTalkMonster* pTarget )
 	}
 	else
 	{
-		if( m_hTargetEnt )
+		if(HasTargetEntity())
 		{
 			auto v14 = m_hTargetEnt->MySquadTalkMonsterPointer();
 			if( v14 )
@@ -3117,7 +3091,7 @@ void COFMedicAlly::HealOff()
 
 void COFMedicAlly::HealerActivate( CBaseMonster* pTarget )
 {
-	if( m_hTargetEnt )
+	if(HasTargetEntity())
 	{
 		auto pMonster = m_hTargetEnt->MySquadTalkMonsterPointer();
 
@@ -3142,7 +3116,7 @@ void COFMedicAlly::HealerActivate( CBaseMonster* pTarget )
 		&& pTarget->pev->max_health > pTarget->pev->health
 		&& !m_fHealing )
 	{
-		if( m_hTargetEnt && m_hTargetEnt->IsPlayer() )
+		if(HasTargetEntity() && m_hTargetEnt->IsPlayer() )
 		{
 			StopFollowing( false );
 		}
@@ -3184,7 +3158,7 @@ void COFMedicAlly::HealerUse( CBaseEntity* pActivator, CBaseEntity* pCaller, USE
 			m_fFollowChecking = false;
 		}
 
-		const auto newTarget = !m_fUseHealing && m_hTargetEnt && m_fHealing;
+		const auto newTarget = !m_fUseHealing && HasTargetEntity() && m_fHealing;
 
 		if( newTarget )
 		{
@@ -3205,7 +3179,7 @@ void COFMedicAlly::HealerUse( CBaseEntity* pActivator, CBaseEntity* pCaller, USE
 		{
 			if( !m_fHealing )
 			{
-				if( m_hTargetEnt && m_hTargetEnt->IsPlayer() )
+				if(HasTargetEntity() && m_hTargetEnt->IsPlayer() )
 				{
 					StopFollowing( false );
 				}

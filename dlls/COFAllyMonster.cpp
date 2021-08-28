@@ -413,7 +413,7 @@ void COFAllyMonster::StartTask(Task_t* pTask)
 		break;
 
 	case TASK_CANT_FOLLOW:
-		StopFollowing(FALSE);
+		StopFollowing(false);
 		PlaySentence(m_szGrp[TLK_STOP], RANDOM_FLOAT(2, 2.5), VOL_NORM, ATTN_NORM);
 		TaskComplete();
 		break;
@@ -698,7 +698,7 @@ void COFAllyMonster::LimitFollowers(CBaseEntity* pPlayer, int maxFollowers)
 				{
 					count++;
 					if (count > maxFollowers)
-						pMonster->StopFollowing(TRUE);
+						pMonster->StopFollowing(true);
 				}
 			}
 		}
@@ -709,7 +709,7 @@ void COFAllyMonster::LimitFollowers(CBaseEntity* pPlayer, int maxFollowers)
 float COFAllyMonster::TargetDistance()
 {
 	// If we lose the player, or he dies, return a really large distance
-	if (m_hTargetEnt == nullptr || !m_hTargetEnt->IsAlive())
+	if (!HasTargetEntity() || !m_hTargetEnt->IsAlive())
 		return 1e6;
 
 	return (m_hTargetEnt->pev->origin - pev->origin).Length();
@@ -757,15 +757,13 @@ void COFAllyMonster::TalkInit()
 // Scan for nearest, visible friend. If fPlayer is true, look for
 // nearest player
 //=========================================================
-CBaseEntity* COFAllyMonster::FindNearestFriend(BOOL fPlayer)
+CBaseEntity* COFAllyMonster::FindNearestFriend(bool fPlayer)
 {
 	CBaseEntity* pFriend = nullptr;
 	CBaseEntity* pNearest = nullptr;
 	float range = 10000000.0;
 	TraceResult tr;
 	Vector vecStart = pev->origin;
-	Vector vecCheck;
-	int i;
 	char* pszFriend;
 	int cfriends;
 
@@ -778,7 +776,7 @@ CBaseEntity* COFAllyMonster::FindNearestFriend(BOOL fPlayer)
 
 	// for each type of friend...
 
-	for (i = cfriends - 1; i > -1; i--)
+	for (int i = cfriends - 1; i > -1; i--)
 	{
 		if (fPlayer)
 			pszFriend = "player";
@@ -802,7 +800,7 @@ CBaseEntity* COFAllyMonster::FindNearestFriend(BOOL fPlayer)
 				MONSTERSTATE_PRONE)
 				continue;
 
-			vecCheck = pFriend->pev->origin;
+			Vector vecCheck = pFriend->pev->origin;
 			vecCheck.z = pFriend->pev->absmax.z;
 
 			// if closer than previous friend, and in range, see if he's visible
@@ -868,61 +866,58 @@ void COFAllyMonster::IdleRespond()
 	PlaySentence(m_szGrp[TLK_ANSWER], RANDOM_FLOAT(2.8, 3.2), VOL_NORM, ATTN_IDLE);
 }
 
-int COFAllyMonster::FOkToSpeak()
+auto COFAllyMonster::FOkToSpeak() -> bool
 {
 	// if in the grip of a barnacle, don't speak
 	if (m_MonsterState == MONSTERSTATE_PRONE || m_IdealMonsterState == MONSTERSTATE_PRONE)
-	{
-		return FALSE;
-	}
+		return false;
 
 	// if not alive, certainly don't speak
 	if (pev->deadflag != DEAD_NO)
-	{
-		return FALSE;
-	}
+		return false;
 
 	// if someone else is talking, don't speak
 	if (gpGlobals->time <= g_talkWaitTime)
-		return FALSE;
+		return false;
 
 	if (pev->spawnflags & SF_MONSTER_GAG)
-		return FALSE;
+		return false;
 
 	if (m_MonsterState == MONSTERSTATE_PRONE)
-		return FALSE;
+		return false;
 
 	// if player is not in pvs, don't speak
 	if (!IsAlive() || FNullEnt(FIND_CLIENT_IN_PVS(edict())))
-		return FALSE;
+		return false;
 
 	// don't talk if you're in combat
-	if (m_hEnemy != nullptr && FVisible(m_hEnemy))
-		return FALSE;
+	if (HasEnemy() && FVisible(m_hEnemy))
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 
-int COFAllyMonster::CanPlaySentence(BOOL fDisregardState)
+auto COFAllyMonster::CanPlaySentence(bool fDisregardState)-> bool
 {
 	if (fDisregardState)
 		return CBaseMonster::CanPlaySentence(fDisregardState);
+
 	return FOkToSpeak();
 }
 
 //=========================================================
 // FIdleStare
 //=========================================================
-int COFAllyMonster::FIdleStare()
+auto COFAllyMonster::FIdleStare() -> bool
 {
 	if (!FOkToSpeak())
-		return FALSE;
+		return false;
 
 	PlaySentence(m_szGrp[TLK_STARE], RANDOM_FLOAT(5, 7.5), VOL_NORM, ATTN_IDLE);
 
-	m_hTalkTarget = FindNearestFriend(TRUE);
-	return TRUE;
+	m_hTalkTarget = FindNearestFriend(true);
+	return true;
 }
 
 //=========================================================
@@ -938,7 +933,7 @@ int COFAllyMonster::FIdleHello()
 	if (!FBitSet(m_bitsSaid, bit_saidHelloPlayer))
 	{
 		// get a player
-		CBaseEntity* pPlayer = FindNearestFriend(TRUE);
+		CBaseEntity* pPlayer = FindNearestFriend(true);
 
 		if (pPlayer)
 		{
@@ -1055,7 +1050,7 @@ int COFAllyMonster::FIdleSpeak()
 	}
 
 	// if there is a friend nearby to speak to, play sentence, set friend's response time, return
-	CBaseEntity* pFriend = FindNearestFriend(FALSE);
+	CBaseEntity* pFriend = FindNearestFriend(false);
 
 	if (pFriend && !(pFriend->IsMoving()) && (RANDOM_LONG(0, 99) < 75))
 	{
@@ -1076,7 +1071,7 @@ int COFAllyMonster::FIdleSpeak()
 	if (RANDOM_LONG(0, 1))
 	{
 		//SENTENCEG_PlayRndSz( ENT(pev), szIdleGroup, 1.0, ATTN_IDLE, 0, pitch );
-		CBaseEntity* pFriend = FindNearestFriend(TRUE);
+		CBaseEntity* pFriend = FindNearestFriend(true);
 
 		if (pFriend)
 		{
@@ -1157,7 +1152,7 @@ int COFAllyMonster::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, 
 		// if player damaged this entity, have other friends talk about it
 		if (pevAttacker && m_MonsterState != MONSTERSTATE_PRONE && FBitSet(pevAttacker->flags, FL_CLIENT))
 		{
-			CBaseEntity* pFriend = FindNearestFriend(FALSE);
+			CBaseEntity* pFriend = FindNearestFriend(false);
 
 			if (pFriend && pFriend->IsAlive())
 			{
@@ -1312,7 +1307,7 @@ int COFAllyMonster::IRelationship(CBaseEntity* pTarget)
 }
 
 
-void COFAllyMonster::StopFollowing(BOOL clearSchedule)
+void COFAllyMonster::StopFollowing(bool clearSchedule)
 {
 	if (IsFollowing())
 	{
@@ -1330,7 +1325,7 @@ void COFAllyMonster::StopFollowing(BOOL clearSchedule)
 		if (clearSchedule)
 			ClearSchedule();
 		
-		if (m_hEnemy != nullptr)
+		if (HasEnemy())
 			m_IdealMonsterState = MONSTERSTATE_COMBAT;
 	}
 }
@@ -1341,7 +1336,7 @@ void COFAllyMonster::StartFollowing(CBaseEntity* pLeader)
 	if (m_pCine)
 		m_pCine->CancelScript();
 
-	if (m_hEnemy != nullptr)
+	if (HasEnemy())
 		m_IdealMonsterState = MONSTERSTATE_ALERT;
 
 	m_hTargetEnt = pLeader;
@@ -1352,16 +1347,16 @@ void COFAllyMonster::StartFollowing(CBaseEntity* pLeader)
 }
 
 
-BOOL COFAllyMonster::CanFollow()
+auto COFAllyMonster::CanFollow() -> bool
 {
 	if (m_MonsterState == MONSTERSTATE_SCRIPT)
 	{
 		if (!m_pCine->CanInterrupt())
-			return FALSE;
+			return false;
 	}
 
 	if (!IsAlive())
-		return FALSE;
+		return false;
 
 	return !IsFollowing();
 }
@@ -1394,7 +1389,7 @@ void COFAllyMonster::FollowerUse(CBaseEntity* pActivator, CBaseEntity* pCaller, 
 		}
 		else
 		{
-			StopFollowing(TRUE);
+			StopFollowing(true);
 		}
 	}
 }

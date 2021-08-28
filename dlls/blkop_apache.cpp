@@ -468,7 +468,7 @@ void COFBlackOpsApache :: HuntThink()
 		}
 	}
 
-	// if (m_hEnemy == NULL)
+	// if (!HasEnemy())
 	{
 		Look( 4092 );
 		m_hEnemy = BestVisibleEnemy( );
@@ -478,7 +478,7 @@ void COFBlackOpsApache :: HuntThink()
 	if (m_flGoalSpeed < 800)
 		m_flGoalSpeed += 5;
 
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 	{
 		// ALERT( at_console, "%s\n", STRING( m_hEnemy->pev->classname ) );
 		if (FVisible( m_hEnemy ))
@@ -490,7 +490,7 @@ void COFBlackOpsApache :: HuntThink()
 		}
 		else
 		{
-			m_hEnemy = NULL;
+			m_hEnemy = nullptr;
 		}
 	}
 
@@ -572,7 +572,7 @@ void COFBlackOpsApache :: HuntThink()
 	{
 		if (m_flLastSeen + 60 > gpGlobals->time)
 		{
-			if (m_hEnemy != NULL)
+			if (HasEnemy())
 			{
 				// make sure it's a good shot
 				if (DotProduct( m_vecTarget, vecEst) > .965)

@@ -407,7 +407,7 @@ void CParticleSystemManager::CreateMappedPS(char* sFile, particle_system_managem
 	if (IEngineStudio.IsHardware() == false)
 		return;
 
-	gEngfuncs.Con_Printf("CMappedParticleSystem\n");
+	//gEngfuncs.Con_Printf("CMappedParticleSystem\n");
 
 	AddSystem(new CMappedParticleSystem(sFile, pSystem));
 }

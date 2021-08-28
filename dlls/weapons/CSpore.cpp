@@ -74,7 +74,7 @@ void CSpore::Spawn()
 
 		if( !m_bPuked )
 		{
-			pev->angles.x -= RANDOM_LONG( -5, 5 ) + 30;
+			pev->angles.x -= static_cast<float>(RANDOM_LONG(-5, 5)) + 30;
 		}
 	}
 	else
@@ -95,22 +95,22 @@ void CSpore::Spawn()
 	}
 	else
 	{
-		pev->gravity = 0.5;
-		pev->friction = 0.7;
+		pev->gravity = 0.5f;
+		pev->friction = 0.7f;
 	}
 
 	pev->dmg = gSkillData.plrDmgSpore;
 
 	m_flIgniteTime = gpGlobals->time;
 
-	SetNextThink(0.01);
+	SetNextThink(0.01f);
 
-	auto sprite = CSprite::SpriteCreate( "sprites/glow01.spr", pev->origin, false );
+	const auto sprite = CSprite::SpriteCreate( "sprites/glow01.spr", pev->origin, false );
 
 	m_hSprite = sprite;
 
 	sprite->SetTransparency( kRenderTransAdd, 180, 180, 40, 100, kRenderFxDistort );
-	sprite->SetScale( 0.8 );
+	sprite->SetScale( 0.8f );
 	sprite->SetAttachment( edict(), 0 );
 
 	m_fRegisteredSound = false;
@@ -215,7 +215,7 @@ void CSpore::FlyThink()
 		SetThink( &CSpore::IgniteThink );
 	}
 
-	SetNextThink(0.03);
+	SetNextThink(0.03f);
 }
 
 void CSpore::GibThink()
@@ -241,9 +241,9 @@ void CSpore::MyBounceTouch( CBaseEntity* pOther )
 		{
 			if( gpGlobals->time > m_flSoundDelay )
 			{
-				CSoundEnt::InsertSound( bits_SOUND_DANGER, pev->origin, static_cast<int>( pev->dmg / 0.4 ), 0.3 );
+				CSoundEnt::InsertSound( bits_SOUND_DANGER, pev->origin, static_cast<int>( pev->dmg / 0.4f ), 0.3f );
 
-				m_flSoundDelay = gpGlobals->time + 1.0;
+				m_flSoundDelay = gpGlobals->time + 1.0f;
 			}
 
 			if( pev->flags & FL_ONGROUND )
@@ -268,7 +268,7 @@ CSpore* CSpore::CreateSpore(
 	const Vector& vecOrigin, const Vector& vecAngles, CBaseEntity* pOwner,
 	SporeType sporeType, bool bIsAI, bool bPuked )
 {
-	auto pSpore = GetClassPtr<CSpore>( nullptr );
+	const auto pSpore = GetClassPtr<CSpore>( nullptr );
 
 	UTIL_SetOrigin( pSpore, vecOrigin );
 

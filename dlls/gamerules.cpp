@@ -32,8 +32,8 @@
 
 extern edict_t *EntSelectSpawnPoint( CBasePlayer *pPlayer );
 
-DLL_GLOBAL CGameRules*	g_pGameRules = NULL;
-extern DLL_GLOBAL BOOL	g_fGameOver;
+DLL_GLOBAL CGameRules*	g_pGameRules = nullptr;
+extern DLL_GLOBAL bool	g_fGameOver;
 
 int g_teamplay = 0;
 

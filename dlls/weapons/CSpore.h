@@ -29,7 +29,6 @@ public:
 		GRENADE		= 2
 	};
 
-public:
 	using BaseClass = CGrenade;
 
 #ifndef CLIENT_DLL
@@ -49,7 +48,7 @@ public:
 
 	void EXPORT FlyThink();
 
-	void EXPORT GibThink();
+	static void EXPORT GibThink();
 
 	void EXPORT RocketTouch( CBaseEntity* pOther );
 
@@ -60,21 +59,21 @@ public:
 		SporeType sporeType, bool bIsAI, bool bPuked );
 
 private:
-	int m_iBlow;
-	int m_iBlowSmall;
+	int m_iBlow = 0;
+	int m_iBlowSmall = 0;
 
-	int m_iSpitSprite;
-	int m_iTrail;
+	int m_iSpitSprite = 0;
+	int m_iTrail = 0;
 
-	SporeType m_SporeType;
+	SporeType m_SporeType = SporeType::GRENADE;
 
-	float m_flIgniteTime;
-	float m_flSoundDelay;
+	float m_flIgniteTime = 0;
+	float m_flSoundDelay = 0;
 
-	bool m_bPuked;
-	BOOL m_bIsAI;
+	bool m_bPuked = false;
+	bool m_bIsAI = false;
 
-	EHANDLE m_hSprite;
+	EHANDLE m_hSprite = {};
 };
 
 #endif

@@ -92,12 +92,12 @@ Schedule_t* CRecruit::GetSchedule()
 			return GetScheduleOfType(SCHED_SMALL_FLINCH);
 		}
 
-		if (m_hEnemy == nullptr && IsFollowing())
+		if (!HasEnemy() && IsFollowing())
 		{
 			if (!m_hTargetEnt->IsAlive())
 			{
 				// UNDONE: Comment about the recently dead player here?
-				StopFollowing(FALSE);
+				StopFollowing(false);
 				break;
 			}
 			if (HasConditions(bits_COND_CLIENT_PUSH))
@@ -209,7 +209,7 @@ int CRecruit::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float 
 
 		// This is a heurstic to determine if the player intended to harm me
 		// If I have an enemy, we can't establish intent (may just be crossfire)
-		if (m_hEnemy == nullptr)
+		if (!HasEnemy())
 		{
 			// If the player was facing directly at me, or I'm already suspicious, get mad
 			if ((m_afMemory & bits_MEMORY_SUSPICIOUS) || IsFacing(pevAttacker, pev->origin))
@@ -218,7 +218,7 @@ int CRecruit::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float 
 				PlaySentence("RC_MAD", 4, VOL_NORM, ATTN_NORM);
 
 				Remember(bits_MEMORY_PROVOKED);
-				StopFollowing(TRUE);
+				StopFollowing(true);
 			}
 			else
 			{

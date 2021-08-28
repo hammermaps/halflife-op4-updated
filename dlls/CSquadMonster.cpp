@@ -114,7 +114,7 @@ bool CSquadMonster::NoFriendlyFire(bool playerAlly)
 
 	//!!!BUGBUG - to fix this, the planes must be aligned to where the monster will be firing its gun, not the direction it is facing!!!
 
-	if (m_hEnemy != nullptr)
+	if (HasEnemy())
 	{
 		UTIL_MakeVectors(UTIL_VecToAngles(m_hEnemy->Center() - pev->origin));
 	}

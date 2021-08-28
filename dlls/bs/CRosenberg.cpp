@@ -354,8 +354,9 @@ void CRosenberg::Scream(void)
 
 Activity CRosenberg::GetStoppedActivity(void)
 {
-	if (m_hEnemy != NULL)
+	if (HasEnemy())
 		return ACT_EXCITED;
+
 	return CTalkMonster::GetStoppedActivity();
 }
 
@@ -439,7 +440,7 @@ void CRosenberg::RunTask(Task_t* pTask)
 		if (RANDOM_LONG(0, 63) < 8)
 			Scream();
 
-		if (m_hEnemy == NULL)
+		if (!HasEnemy())
 		{
 			TaskFail();
 		}
@@ -787,8 +788,7 @@ Schedule_t* CRosenberg::GetSchedule(void)
 
 	if (HasConditions(bits_COND_HEAR_SOUND))
 	{
-		CSound* pSound;
-		pSound = PBestSound();
+		CSound* pSound = PBestSound();
 
 		ASSERT(pSound != NULL);
 		if (pSound && (pSound->m_iType & bits_SOUND_DANGER))
@@ -805,8 +805,8 @@ Schedule_t* CRosenberg::GetSchedule(void)
 				m_fearTime = gpGlobals->time;
 			else if (DisregardEnemy(pEnemy))		// After 15 seconds of being hidden, return to alert
 			{
-				m_hEnemy = NULL;
-				pEnemy = NULL;
+				m_hEnemy = nullptr;
+				pEnemy = nullptr;
 			}
 		}
 
@@ -842,14 +842,14 @@ Schedule_t* CRosenberg::GetSchedule(void)
 			if (!m_hTargetEnt->IsAlive())
 			{
 				// UNDONE: Comment about the recently dead player here?
-				StopFollowing(FALSE);
+				StopFollowing(false);
 				break;
 			}
 
 			int relationship = R_NO;
 
 			// Nothing scary, just me and the player
-			if (pEnemy != NULL)
+			if (pEnemy != nullptr)
 				relationship = IRelationship(pEnemy);
 
 			// UNDONE: Model fear properly, fix R_FR and add multiple levels of fear
@@ -912,31 +912,31 @@ MONSTERSTATE CRosenberg::GetIdealState(void)
 					m_IdealMonsterState = MONSTERSTATE_ALERT;
 					return m_IdealMonsterState;
 				}
-				StopFollowing(TRUE);
+				StopFollowing(true);
 			}
 		}
 		else if (HasConditions(bits_COND_LIGHT_DAMAGE | bits_COND_HEAVY_DAMAGE))
 		{
 			// Stop following if you take damage
 			if (IsFollowing())
-				StopFollowing(TRUE);
+				StopFollowing(true);
 		}
 		break;
 
 	case MONSTERSTATE_COMBAT:
 	{
 		CBaseEntity* pEnemy = m_hEnemy;
-		if (pEnemy != NULL)
+		if (pEnemy != nullptr)
 		{
 			if (DisregardEnemy(pEnemy))		// After 15 seconds of being hidden, return to alert
 			{
 				// Strip enemy when going to alert
 				m_IdealMonsterState = MONSTERSTATE_ALERT;
-				m_hEnemy = NULL;
+				m_hEnemy = nullptr;
 				return m_IdealMonsterState;
 			}
 			// Follow if only scared a little
-			if (m_hTargetEnt != NULL)
+			if (HasTargetEntity())
 			{
 				m_IdealMonsterState = MONSTERSTATE_ALERT;
 				return m_IdealMonsterState;
@@ -958,15 +958,15 @@ MONSTERSTATE CRosenberg::GetIdealState(void)
 }
 
 
-BOOL CRosenberg::CanHeal(void)
+auto CRosenberg::CanHeal() -> bool
 {
-	if ((m_healTime > gpGlobals->time) || (m_hTargetEnt == NULL) || (m_hTargetEnt->pev->health > (m_hTargetEnt->pev->max_health * 0.5)))
-		return FALSE;
+	if ((m_healTime > gpGlobals->time) || !HasTargetEntity() || (m_hTargetEnt->pev->health > (m_hTargetEnt->pev->max_health * 0.5)))
+		return false;
 
-	return TRUE;
+	return true;
 }
 
-void CRosenberg::Heal(void)
+void CRosenberg::Heal()
 {
 	if (!CanHeal())
 		return;

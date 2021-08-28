@@ -319,7 +319,7 @@ BOOL CPitdrone :: CheckRangeAttack1 ( float flDot, float flDist )
 
 	if ( flDist > 128 && flDist <= 784 && flDot >= 0.5 && gpGlobals->time >= m_flNextSpikeTime )
 	{
-		if ( m_hEnemy != NULL )
+		if (HasEnemy())
 		{
 			if ( fabs( pev->origin.z - m_hEnemy->pev->origin.z ) > 256 )
 			{
@@ -763,7 +763,7 @@ void CPitdrone :: RunAI ()
 	// first, do base class stuff
 	CBaseMonster :: RunAI();
 
-	if ( m_hEnemy != NULL && m_Activity == ACT_RUN )
+	if (HasEnemy() && m_Activity == ACT_RUN )
 	{
 		// chasing enemy. Sprint for last bit
 		if ( (pev->origin - m_hEnemy->pev->origin).Length2D() < SQUID_SPRINT_DIST )

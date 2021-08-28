@@ -83,9 +83,9 @@ public:
 	void DeclineFollowing() override;
 
 	float	CoverRadius() override { return 1200; }		// Need more room for cover because scientists want to get far away!
-	BOOL	DisregardEnemy( CBaseEntity *pEnemy ) { return !pEnemy->IsAlive() || (gpGlobals->time - m_fearTime) > 15; }
+	bool	DisregardEnemy( CBaseEntity *pEnemy ) const { return !pEnemy->IsAlive() || (gpGlobals->time - m_fearTime) > 15; }
 
-	BOOL	CanHeal();
+	bool	CanHeal();
 	void	Heal();
 	void	Scream();
 
@@ -445,7 +445,7 @@ void CCleansuitScientist :: Scream()
 
 Activity CCleansuitScientist::GetStoppedActivity()
 { 
-	if ( m_hEnemy != NULL ) 
+	if (HasEnemy())
 		return ACT_EXCITED;
 	return CTalkMonster::GetStoppedActivity();
 }
@@ -531,7 +531,7 @@ void CCleansuitScientist :: RunTask( Task_t *pTask )
 			if ( RANDOM_LONG(0,63)< 8 )
 				Scream();
 
-			if ( m_hEnemy == NULL )
+			if (!HasEnemy())
 			{
 				TaskFail();
 			}
@@ -771,7 +771,7 @@ int CCleansuitScientist :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAt
 	if ( pevInflictor && pevInflictor->flags & FL_CLIENT )
 	{
 		Remember( bits_MEMORY_PROVOKED );
-		StopFollowing( TRUE );
+		StopFollowing( true );
 	}
 
 	// make sure friends talk about it if player hurts scientist...
@@ -903,8 +903,7 @@ Schedule_t *CCleansuitScientist :: GetSchedule ()
 
 	if ( HasConditions( bits_COND_HEAR_SOUND ) )
 	{
-		CSound *pSound;
-		pSound = PBestSound();
+		CSound* pSound = PBestSound();
 
 		ASSERT( pSound != NULL );
 		if ( pSound && (pSound->m_iType & bits_SOUND_DANGER) )
@@ -921,8 +920,8 @@ Schedule_t *CCleansuitScientist :: GetSchedule ()
 				m_fearTime = gpGlobals->time;
 			else if ( DisregardEnemy( pEnemy ) )		// After 15 seconds of being hidden, return to alert
 			{
-				m_hEnemy = NULL;
-				pEnemy = NULL;
+				m_hEnemy = nullptr;
+				pEnemy = nullptr;
 			}
 		}
 
@@ -958,7 +957,7 @@ Schedule_t *CCleansuitScientist :: GetSchedule ()
 			if ( !m_hTargetEnt->IsAlive() )
 			{
 				// UNDONE: Comment about the recently dead player here?
-				StopFollowing( FALSE );
+				StopFollowing( false );
 				break;
 			}
 
@@ -1028,31 +1027,31 @@ MONSTERSTATE CCleansuitScientist :: GetIdealState ()
 					m_IdealMonsterState = MONSTERSTATE_ALERT;
 					return m_IdealMonsterState;
 				}
-				StopFollowing( TRUE );
+				StopFollowing( true );
 			}
 		}
 		else if ( HasConditions( bits_COND_LIGHT_DAMAGE | bits_COND_HEAVY_DAMAGE ) )
 		{
 			// Stop following if you take damage
 			if ( IsFollowing() )
-				StopFollowing( TRUE );
+				StopFollowing( true );
 		}
 		break;
 
 	case MONSTERSTATE_COMBAT:
 		{
 			CBaseEntity *pEnemy = m_hEnemy;
-			if ( pEnemy != NULL )
+			if ( pEnemy != nullptr)
 			{
 				if ( DisregardEnemy( pEnemy ) )		// After 15 seconds of being hidden, return to alert
 				{
 					// Strip enemy when going to alert
 					m_IdealMonsterState = MONSTERSTATE_ALERT;
-					m_hEnemy = NULL;
+					m_hEnemy = nullptr;
 					return m_IdealMonsterState;
 				}
 				// Follow if only scared a little
-				if ( m_hTargetEnt != NULL )
+				if (HasTargetEntity())
 				{
 					m_IdealMonsterState = MONSTERSTATE_ALERT;
 					return m_IdealMonsterState;
@@ -1074,12 +1073,12 @@ MONSTERSTATE CCleansuitScientist :: GetIdealState ()
 }
 
 
-BOOL CCleansuitScientist::CanHeal()
+auto CCleansuitScientist::CanHeal() -> bool
 { 
-	if ( (m_healTime > gpGlobals->time) || (m_hTargetEnt == NULL) || (m_hTargetEnt->pev->health > (m_hTargetEnt->pev->max_health * 0.5)) )
-		return FALSE;
+	if ( (m_healTime > gpGlobals->time) || !HasTargetEntity() || (m_hTargetEnt->pev->health > (m_hTargetEnt->pev->max_health * 0.5)) )
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 void CCleansuitScientist::Heal()
@@ -1293,7 +1292,7 @@ void CSittingCleansuitScientist :: SittingThink()
 	// try to greet player
 	if (FIdleHello())
 	{
-		pent = FindNearestFriend(TRUE);
+		pent = FindNearestFriend(true);
 		if (pent)
 		{
 			float yaw = VecToYaw(pent->pev->origin - pev->origin) - pev->angles.y;
@@ -1330,9 +1329,9 @@ void CSittingCleansuitScientist :: SittingThink()
 			// turn towards player or nearest friend and speak
 
 			if (!FBitSet(m_bitsSaid, bit_saidHelloPlayer))
-				pent = FindNearestFriend(TRUE);
+				pent = FindNearestFriend(true);
 			else
-				pent = FindNearestFriend(FALSE);
+				pent = FindNearestFriend(false);
 
 			if (!FIdleSpeak() || !pent)
 			{	
@@ -1409,7 +1408,7 @@ int CSittingCleansuitScientist :: FIdleSpeak ()
 	// if there is a friend nearby to speak to, play sentence, set friend's response time, return
 
 	// try to talk to any standing or sitting scientists nearby
-	CBaseEntity *pentFriend = FindNearestFriend(FALSE);
+	CBaseEntity *pentFriend = FindNearestFriend(false);
 
 	if (pentFriend && RANDOM_LONG(0,1))
 	{
